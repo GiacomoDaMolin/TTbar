@@ -11,11 +11,22 @@ using namespace std;
 #define MAX_ARRAY_SIZE 1024
 
 int main(int argc, char** argv){
+
+  /*array<TTree*,N> TinArr
+    for (int i=0; i++;i<argc){
+	TFile a=TFile(argv[1]);
+	TTree *ti = new TTree("Tree"+argv[1]");
+	TinArr[i]=ti;
+	}
+    */
     string inputFile = argv[1];
     string outputFile = argv[2];
     func(inputFile, outputFile);
 }
 void func(string inputFile, string ofile){
+
+   
+
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -64,5 +75,13 @@ void func(string inputFile, string ofile){
         tin->GetEntry(i)
         
     }
+    
+    
+    
+    //save the histograms in a new File
+    TFile *fout =new TFile(ofile.c_str(),"RECREATE");
+    //h1->Write() //dummy example of writing an histogram
+    fout->Write();
+    fout->Close();
     
 }
