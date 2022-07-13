@@ -7,6 +7,9 @@
 #include "TCanvas.h"
 #include "TLorentzVector.h"
 
+//include user defined histograms and auxiliary macros
+#include "Auxiliary.cpp"
+#include "Histodef.cpp"
 
 using namespace std;
 
@@ -85,18 +88,20 @@ void func(string inputFile, string ofile){
     tin->SetBranchAddress("Jet_mass", &Jet_mass);
 
     // get gen quantities
-    Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE], GenPart_pdgId[MAX_ARRAY_SIZE];
+    Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE], GenPart_pdgId[MAX_ARRAY_SIZE*4], GenPart_genPartIdxMother[MAX_ARRAY_SIZE*4],; //These last guys are actually huge, better be careful!
     UChar_t Muon_genPartFlav[MAX_ARRAY_SIZE], Electron_genPartFlav[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Electron_genPartIdx", 1);
     tin->SetBranchStatus("Electron_genPartFlav", 1);
     tin->SetBranchStatus("Muon_genPartIdx", 1);
     tin->SetBranchStatus("Muon_genPartFlav", 1);
     tin->SetBranchStatus("GenPart_pdgId", 1);
+    tin->SetBranchStatus("GenPart_genPartIdxMother",1);
     tin->SetBranchAddress("Electron_genPartIdx", &Electron_genPartIdx);
     tin->SetBranchAddress("Electron_genPartFlav", &Electron_genPartFlav);
     tin->SetBranchAddress("Muon_genPartIdx", &Muon_genPartIdx);
     tin->SetBranchAddress("Muon_genPartFlav", &Muon_genPartFlav);
     tin->SetBranchAddress("GenPart_pdgId", &GenPart_pdgId);
+    tin->SetBranchAddress("GenPart_genPartIdxMother",&GenPart_genPartIdxMother);
 
     // collect the trigger information
     Bool_t HLT_IsoMu27, HLT_Ele35_WPTight_Gsf; 
@@ -105,23 +110,6 @@ void func(string inputFile, string ofile){
     tin->SetBranchAddress("HLT_IsoMu27", &HLT_IsoMu27);
     tin->SetBranchAddress("HLT_Ele35_WPTight_Gsf", &HLT_Ele35_WPTight_Gsf);
 
-
-
-    // Define the histogram objects
-    TH1D* h_Muon_pt = new TH1D("Muon_pt", "Muon_pt", 100, 0, 200);
-    TH1D* h_Muon_eta = new TH1D("Muon_eta", "Muon_eta", 100, -5, 5);
-    TH1D* h_Electron_pt = new TH1D("Electron_pt", "Electron_pt", 100, 0, 200);
-    TH1D* h_Electron_eta = new TH1D("Electron_eta", "Electron_eta", 100, -5, 5);
-
-    TH1D* h_Muon_pt_trigger = new TH1D("Muon_pt_trigger", "Muon_pt_trigger", 100, 0, 200);
-    TH1D* h_Muon_eta_trigger = new TH1D("Muon_eta_trigger", "Muon_eta_trigger", 100, -5, 5);
-    TH1D* h_Electron_pt_trigger = new TH1D("Electron_pt_trigger", "Electron_pt_trigger", 100, 0, 200);
-    TH1D* h_Electron_eta_trigger = new TH1D("Electron_eta_trigger", "Electron_eta_trigger", 100, -5, 5);
-
-
-    TH1D* h_Muon_Electron_invariant_mass = new TH1D("Muon_Electron_invariant_mass", "Muon_Electron_invariant_mass", 100, 0, 200);
-    TH1D* h_Muon_Muon_invariant_mass = new TH1D("Muon_Muon_invariant_mass", "Muon_Muon_invariant_mass", 100, 0, 200);
-    TH1D* h_Electron_Electron_invariant_mass = new TH1D("Electron_Electron_invariant_mass", "Electron_Electron_invariant_mass", 100, 0, 200);
     //tin->Draw("Muon_pt >> h_Muon_pt");
     /*tin->Draw("Muon_eta >> h_Muon_eta","", "GOFF");
     tin->Draw("Electron_pt >> h_Electron_pt","", "GOFF");
@@ -148,7 +136,7 @@ void func(string inputFile, string ofile){
                 h_Muon_eta_trigger->Fill(Muon_eta[j]);
             }
             // match the muon to the PID of the W boson (PID=24)
-            if (GenPart_pdgId[Muon_genPartIdx[j]] == 24 || GenPart_pdgId[Muon_genPartIdx[j]] == -24){
+            if (GenPart_pdgId[Muon_genPartIdx[j]] == 24 || GenPart_pdgId[Muon_genPartIdx[j]] == -24){ //isFromW(MAX_ARRAY_SIZE,GenPart_pdgId,GenPart_genPartIdxMother,Muon_genPartIdx[j])
                 
                 Muon_p4_temp.SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
                 Muon_p4.push_back(Muon_p4_temp);
@@ -165,7 +153,7 @@ void func(string inputFile, string ofile){
                 h_Electron_pt_trigger->Fill(Electron_pt[j]);
                 h_Electron_eta_trigger->Fill(Electron_eta[j]);
             }
-            if (GenPart_pdgId[Electron_genPartIdx[j]] == 24 || GenPart_pdgId[Electron_genPartIdx[j]] == -24){
+            if (GenPart_pdgId[Electron_genPartIdx[j]] == 24 || GenPart_pdgId[Electron_genPartIdx[j]] == -24){ //isFromW(MAX_ARRAY_SIZE,GenPart_pdgId,GenPart_genPartIdxMother,Electron_genPartIdx[j])
                 
                 Electron_p4_temp.SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 Electron_p4.push_back(Electron_p4_temp);
