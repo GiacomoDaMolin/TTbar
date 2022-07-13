@@ -142,14 +142,14 @@ void func(string inputFile, string ofile){
         for (int j = 0; j<nMuon; j++){
             h_Muon_pt->Fill(Muon_pt[j]);
             h_Muon_eta->Fill(Muon_eta[j]);
-
+            TLorentzVector Muon_p4_temp;
             if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf){
                 h_Muon_pt_trigger->Fill(Muon_pt[j]);
                 h_Muon_eta_trigger->Fill(Muon_eta[j]);
             }
             // match the muon to the PID of the W boson (PID=24)
             if (GenPart_pdgId[Muon_genPartIdx[j]] == 24 || GenPart_pdgId[Muon_genPartIdx[j]] == -24){
-                TLorentzVector Muon_p4_temp;
+                
                 Muon_p4_temp.SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
                 Muon_p4.push_back(Muon_p4_temp);
             }
@@ -159,16 +159,23 @@ void func(string inputFile, string ofile){
         for (int j = 0; j<nElectron; j++){
             h_Electron_pt->Fill(Electron_pt[j]);
             h_Electron_eta->Fill(Electron_eta[j]);
+            TLorentzVector Electron_p4_temp;
 
             if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf){
                 h_Electron_pt_trigger->Fill(Electron_pt[j]);
                 h_Electron_eta_trigger->Fill(Electron_eta[j]);
             }
             if (GenPart_pdgId[Electron_genPartIdx[j]] == 24 || GenPart_pdgId[Electron_genPartIdx[j]] == -24){
-                TLorentzVector Electron_p4_temp;
+                
                 Electron_p4_temp.SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 Electron_p4.push_back(Electron_p4_temp);
             }
+        bool selection=false;
+        //selection= (Muon_pt[0]>SOMETHING && abs(Muon_eta[0])<2.4) && (idem with ele)
+        //selection = selection && opposite charge mu and e
+        //selection = selection && ((muon is trigger) || (ele is trigger))
+        //selection = selection && (one b-jet)
+        //if (selection) {fill histo}
         }
         // check the number of muons and electrons
         cout << "Muon_p4.size() = " << Muon_p4.size() << endl;
