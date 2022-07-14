@@ -14,9 +14,10 @@
 using namespace std;
 
 #define MAX_ARRAY_SIZE 128
+#define GEN_MAX_ARRAY_SIZE 1024
 
 
-void func(string inputFile, string ofile);
+void Analysis(string inputFile, string ofile);
 int main(int argc, char** argv){
 
   /*array<TTree*,N> TinArr
@@ -28,10 +29,10 @@ int main(int argc, char** argv){
     */
     string inputFile = argv[1];
     string outputFile = argv[2];
-    func(inputFile, outputFile);
+    Analysis(inputFile, outputFile);
 }
 
-void func(string inputFile, string ofile){
+void Analysis(string inputFile, string ofile){
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -88,14 +89,18 @@ void func(string inputFile, string ofile){
     tin->SetBranchAddress("Jet_mass", &Jet_mass);
 
     // get gen quantities
-    Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE], GenPart_pdgId[MAX_ARRAY_SIZE*4], GenPart_genPartIdxMother[MAX_ARRAY_SIZE*4],; //These last guys are actually huge, better be careful!
+    Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE];
+    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE]; //These last guys are actually huge, better be careful!
     UChar_t Muon_genPartFlav[MAX_ARRAY_SIZE], Electron_genPartFlav[MAX_ARRAY_SIZE];
+    UInt_t nGenPart;
     tin->SetBranchStatus("Electron_genPartIdx", 1);
     tin->SetBranchStatus("Electron_genPartFlav", 1);
     tin->SetBranchStatus("Muon_genPartIdx", 1);
     tin->SetBranchStatus("Muon_genPartFlav", 1);
     tin->SetBranchStatus("GenPart_pdgId", 1);
     tin->SetBranchStatus("GenPart_genPartIdxMother",1);
+    tin->SetBranchStatus("nGenPart", 1);
+    tin->SetBranchAddress("nGenPart", &nGenPart);
     tin->SetBranchAddress("Electron_genPartIdx", &Electron_genPartIdx);
     tin->SetBranchAddress("Electron_genPartFlav", &Electron_genPartFlav);
     tin->SetBranchAddress("Muon_genPartIdx", &Muon_genPartIdx);
@@ -119,71 +124,77 @@ void func(string inputFile, string ofile){
     //tin->Draw("Electron_pt >> h_Electron_pt_trigger", "(HLT_IsoMu27) || (HLT_Ele35_WPTight_Gsf)","GOFF");
     //tin->Draw("Electron_eta >> h_Electron_eta_trigger", "(HLT_IsoMu27) || (HLT_Ele35_WPTight_Gsf)","GOFF");
     const auto nEv = tin->GetEntries();
-    for (size_t i = 0; i < 100; i++){
+    vector <TLorentzVector*> Muon_p4(20, nullptr), Electron_p4(20, nullptr);
+    for (size_t i = 0; i < nEv; i++){
+        //std::cout << "Event = " << i << std::endl;
         tin->GetEntry(i);
         // apply triggers
         //if (HLT_IsoMu27==0&&HLT_Ele35_WPTight_Gsf==0){
         //    continue;
         //}
         // initialise exactly 2 LorentzVectors for e and muon as there should not be more
-        vector <TLorentzVector> Muon_p4, Electron_p4;
+        size_t nMuon_p4 = 0, nElectron_p4 = 0;
         for (int j = 0; j<nMuon; j++){
             h_Muon_pt->Fill(Muon_pt[j]);
             h_Muon_eta->Fill(Muon_eta[j]);
-            TLorentzVector Muon_p4_temp;
             if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf){
                 h_Muon_pt_trigger->Fill(Muon_pt[j]);
                 h_Muon_eta_trigger->Fill(Muon_eta[j]);
             }
             // match the muon to the PID of the W boson (PID=24)
-            if (GenPart_pdgId[Muon_genPartIdx[j]] == 24 || GenPart_pdgId[Muon_genPartIdx[j]] == -24){ //isFromW(MAX_ARRAY_SIZE,GenPart_pdgId,GenPart_genPartIdxMother,Muon_genPartIdx[j])
-                
-                Muon_p4_temp.SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-                Muon_p4.push_back(Muon_p4_temp);
+            //printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
+            if (isFromW(nGenPart,GenPart_pdgId,GenPart_genPartIdxMother,Muon_genPartIdx[j])){
+                if (Muon_p4[nMuon_p4] == nullptr){
+                    Muon_p4[nMuon_p4] = new TLorentzVector();
+                }
+                // nMuon_p4++ increments by one and returns the previuos value
+                //std::cout << "Muon " << nMuon_p4 << std::endl;
+                Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
             }
-            // match the electron to the PID of the W boson (PID=24)
         }
         
         for (int j = 0; j<nElectron; j++){
             h_Electron_pt->Fill(Electron_pt[j]);
             h_Electron_eta->Fill(Electron_eta[j]);
-            TLorentzVector Electron_p4_temp;
 
             if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf){
                 h_Electron_pt_trigger->Fill(Electron_pt[j]);
                 h_Electron_eta_trigger->Fill(Electron_eta[j]);
             }
-            if (GenPart_pdgId[Electron_genPartIdx[j]] == 24 || GenPart_pdgId[Electron_genPartIdx[j]] == -24){ //isFromW(MAX_ARRAY_SIZE,GenPart_pdgId,GenPart_genPartIdxMother,Electron_genPartIdx[j])
-                
-                Electron_p4_temp.SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
-                Electron_p4.push_back(Electron_p4_temp);
+            //printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Electron_genPartIdx[j]);
+            if (isFromW(nGenPart,GenPart_pdgId,GenPart_genPartIdxMother,Electron_genPartIdx[j])){                 
+                if (Electron_p4[nElectron_p4] == nullptr){
+                    Electron_p4[nElectron_p4] = new TLorentzVector();
+                }
+                //std::cout << "Electron " << nElectron_p4 << std::endl;
+                Electron_p4[nElectron_p4++]->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
             }
-        bool selection=false;
-        //selection= (Muon_pt[0]>SOMETHING && abs(Muon_eta[0])<2.4) && (idem with ele)
-        //selection = selection && opposite charge mu and e
-        //selection = selection && ((muon is trigger) || (ele is trigger))
-        //selection = selection && (one b-jet)
-        //if (selection) {fill histo}
+            bool selection=false;
+            //selection= (Muon_pt[0]>SOMETHING && abs(Muon_eta[0])<2.4) && (idem with ele)
+            //selection = selection && opposite charge mu and e
+            //selection = selection && ((muon is trigger) || (ele is trigger))
+            //selection = selection && (one b-jet)
+            //if (selection) {fill histo}
         }
         // check the number of muons and electrons
-        cout << "Muon_p4.size() = " << Muon_p4.size() << endl;
-        cout << "Electron_p4.size() = " << Electron_p4.size() << endl;
-        if (Muon_p4.size() == 1 || Electron_p4.size() == 1){
+        //cout << "Muon_p4.size() = " << nMuon_p4 << endl;
+        //cout << "Electron_p4.size() = " << nElectron_p4 << endl;
+        if (nMuon_p4 == 1 && nElectron_p4 == 1){
             // calculate the invariant mass of the two muons
-            float_t lepton_invariant_mass = (Muon_p4[0] + Electron_p4[0]).M();
+            float_t lepton_invariant_mass = (*(Muon_p4[0]) + *(Electron_p4[0])).M();
             // fill the invariant mass histogram
             h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass);
         }
 
-        if (Muon_p4.size() == 2){
+        if (nMuon_p4 == 2){
             // calculate the invariant mass of the two muons
-            float_t lepton_invariant_mass = (Muon_p4[0] + Muon_p4[1]).M();
+            float_t lepton_invariant_mass = (*(Muon_p4[0]) + *(Muon_p4[1])).M();
             // fill the invariant mass histogram
             h_Muon_Muon_invariant_mass->Fill(lepton_invariant_mass);
         }
-        if (Electron_p4.size() == 2){
+        if (nElectron_p4 == 2){
             // calculate the invariant mass of the two muons
-            float_t lepton_invariant_mass = (Electron_p4[0] + Electron_p4[1]).M();
+            float_t lepton_invariant_mass = (*(Electron_p4[0]) + *(Electron_p4[1])).M();
             // fill the invariant mass histogram
             h_Electron_Electron_invariant_mass->Fill(lepton_invariant_mass);
         }

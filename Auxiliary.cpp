@@ -25,3 +25,23 @@ bool isFromW(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 	}
 	return false;
 }
+
+
+void printMCTree(int size, Int_t *GenId, Int_t *GenParent, Int_t initialID)
+{
+	// retrieve first PDG ID number
+	Int_t startPdg = GenId[initialID]; 
+	Int_t newPdg = startPdg;
+	Int_t newID = initialID; 
+	// look for the parent; if the parent is of same PDGID of starting particle, iterate until parent is different particle
+	while (newPdg == startPdg)
+	{
+		if (newID > size)
+		{
+			std::cout << "WARNING: index " << newID << " exceeding max size " << size << endl;
+		}
+		newID = GenParent[newID];
+		newPdg = GenId[newID];
+		std::cout << "ID: " << newID << " PDG: " << newPdg << endl;
+	}
+}
