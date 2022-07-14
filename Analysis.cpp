@@ -118,24 +118,27 @@ void Analysis(string inputFile, string ofile){
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
     Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE],Muon_triggerIdLoose[MAX_ARRAY_SIZE],Muon_tightId[MAX_ARRAY_SIZE];
-    UChar_t Muon_pfIsoId[MAX_ARRAY_SIZE];
+    Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Muon_tightId", 1);
     tin->SetBranchStatus("Muon_charge", 1);
     tin->SetBranchStatus("Muon_triggerIdLoose", 1);
-    tin->SetBranchStatus("Muon_pfIsoId", 1);
+    tin->SetBranchStatus("Muon_pfRelIso04_all", 1);
     tin->SetBranchStatus("Electron_charge", 1);
     tin->SetBranchStatus("Electron_mvaFall17V2Iso_WP90", 1);
     tin->SetBranchAddress("Electron_mvaFall17V2Iso_WP90", &Electron_mvaFall17V2Iso_WP90);
     tin->SetBranchAddress("Muon_tightId", &Muon_tightId);
     tin->SetBranchAddress("Muon_charge", &Muon_charge);
     tin->SetBranchAddress("Muon_triggerIdLoose", &Muon_triggerIdLoose);
-    tin->SetBranchAddress("Muon_pfIsoId", &Muon_pfIsoId);
+    tin->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all);
     tin->SetBranchAddress("Electron_charge", &Electron_charge);
 
     // Jet tagging
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE];
+    UInt_t nJet;
     tin->SetBranchStatus("Jet_btagDeepFlavB", 1);
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
+    tin->SetBranchStatus("nJet", 1);
+    tin->SetBranchAddress("nJet", &nJet);
 
 
     //tin->Draw("Muon_pt >> h_Muon_pt");
@@ -150,14 +153,25 @@ void Analysis(string inputFile, string ofile){
     vector <TLorentzVector*> Muon_p4(20, nullptr), Electron_p4(20, nullptr);
     for (size_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
-        bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfIsoId[0] == 4);  
+        bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
+        // TODO: Electron isolation comparison with ANUP
         bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         bool selection = (muon_selection && electron_selection);
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
         Float_t jet_tag_wp = 0.71;
-        bool one_jet = (Jet_btagDeepFlavB > jet_tag_wp);
+        // cycle through btags and check if one passes the tagging WP
+        bool one_Bjet = false;
+        for (size_t j = 0; j < nJet; j++){
+            if (Jet_btagDeepFlavB[j] > jet_tag_wp){
+                one_Bjet = true;
+                break;
+            }
+        }
         selection = selection && (Muon_charge[0] * Electron_charge[0]) < 0;
-        selection = selection && (one_jet);
+        selection = selection && (one_Bjet);
+        // continue if the selection is not passed
+        if (!selection) continue;
+
         //if (selection) {fill histo}
         // apply triggers
         //if (HLT_IsoMu27==0&&HLT_Ele35_WPTight_Gsf==0){
