@@ -115,6 +115,29 @@ void Analysis(string inputFile, string ofile){
     tin->SetBranchAddress("HLT_IsoMu27", &HLT_IsoMu27);
     tin->SetBranchAddress("HLT_Ele35_WPTight_Gsf", &HLT_Ele35_WPTight_Gsf);
 
+    // collect the triggger Ids
+    Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
+    Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE],Muon_triggerIdLoose[MAX_ARRAY_SIZE],Muon_tightId[MAX_ARRAY_SIZE];
+    UChar_t Muon_pfIsoId[MAX_ARRAY_SIZE];
+    tin->SetBranchStatus("Muon_tightId", 1);
+    tin->SetBranchStatus("Muon_charge", 1);
+    tin->SetBranchStatus("Muon_triggerIdLoose", 1);
+    tin->SetBranchStatus("Muon_pfIsoId", 1);
+    tin->SetBranchStatus("Electron_charge", 1);
+    tin->SetBranchStatus("Electron_mvaFall17V2Iso_WP90", 1);
+    tin->SetBranchAddress("Electron_mvaFall17V2Iso_WP90", &Electron_mvaFall17V2Iso_WP90);
+    tin->SetBranchAddress("Muon_tightId", &Muon_tightId);
+    tin->SetBranchAddress("Muon_charge", &Muon_charge);
+    tin->SetBranchAddress("Muon_triggerIdLoose", &Muon_triggerIdLoose);
+    tin->SetBranchAddress("Muon_pfIsoId", &Muon_pfIsoId);
+    tin->SetBranchAddress("Electron_charge", &Electron_charge);
+
+    // Jet tagging
+    Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE];
+    tin->SetBranchStatus("Jet_btagDeepFlavB", 1);
+    tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
+
+
     //tin->Draw("Muon_pt >> h_Muon_pt");
     /*tin->Draw("Muon_eta >> h_Muon_eta","", "GOFF");
     tin->Draw("Electron_pt >> h_Electron_pt","", "GOFF");
@@ -126,55 +149,63 @@ void Analysis(string inputFile, string ofile){
     const auto nEv = tin->GetEntries();
     vector <TLorentzVector*> Muon_p4(20, nullptr), Electron_p4(20, nullptr);
     for (size_t i = 0; i < nEv; i++){
-        //std::cout << "Event = " << i << std::endl;
         tin->GetEntry(i);
+        bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfIsoId[0] == 4);  
+        bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
+        bool selection = (muon_selection && electron_selection);
+        // the tight working point is 0.71, medium 0.2783, loose 0.0490
+        Float_t jet_tag_wp = 0.71;
+        bool one_jet = (Jet_btagDeepFlavB > jet_tag_wp);
+        selection = selection && (Muon_charge[0] * Electron_charge[0]) < 0;
+        selection = selection && (one_jet);
+        //if (selection) {fill histo}
         // apply triggers
         //if (HLT_IsoMu27==0&&HLT_Ele35_WPTight_Gsf==0){
         //    continue;
         //}
         // initialise exactly 2 LorentzVectors for e and muon as there should not be more
         size_t nMuon_p4 = 0, nElectron_p4 = 0;
-        for (int j = 0; j<nMuon; j++){
-            h_Muon_pt->Fill(Muon_pt[j]);
-            h_Muon_eta->Fill(Muon_eta[j]);
-            if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf){
-                h_Muon_pt_trigger->Fill(Muon_pt[j]);
-                h_Muon_eta_trigger->Fill(Muon_eta[j]);
-            }
+        for (int j = 0; j < nMuon; j++)
+        {
             // match the muon to the PID of the W boson (PID=24)
-            //printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
-            if (isFromW(nGenPart,GenPart_pdgId,GenPart_genPartIdxMother,Muon_genPartIdx[j])){
-                if (Muon_p4[nMuon_p4] == nullptr){
+            // printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
+            if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Muon_genPartIdx[j]))
+            {
+                if (Muon_p4[nMuon_p4] == nullptr)
+                {
                     Muon_p4[nMuon_p4] = new TLorentzVector();
                 }
                 // nMuon_p4++ increments by one and returns the previuos value
-                //std::cout << "Muon " << nMuon_p4 << std::endl;
+                // std::cout << "Muon " << nMuon_p4 << std::endl;
                 Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
+                if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf)
+                {
+                    h_Muon_pt_trigger->Fill(Muon_pt[j]);
+                    h_Muon_eta_trigger->Fill(Muon_eta[j]);
+                }
+                h_Muon_pt->Fill(Muon_pt[j]);
+                h_Muon_eta->Fill(Muon_eta[j]);
             }
         }
-        
-        for (int j = 0; j<nElectron; j++){
-            h_Electron_pt->Fill(Electron_pt[j]);
-            h_Electron_eta->Fill(Electron_eta[j]);
 
-            if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf){
-                h_Electron_pt_trigger->Fill(Electron_pt[j]);
-                h_Electron_eta_trigger->Fill(Electron_eta[j]);
-            }
-            //printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Electron_genPartIdx[j]);
-            if (isFromW(nGenPart,GenPart_pdgId,GenPart_genPartIdxMother,Electron_genPartIdx[j])){                 
-                if (Electron_p4[nElectron_p4] == nullptr){
+        for (int j = 0; j<nElectron; j++){
+            if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Electron_genPartIdx[j]))
+            {
+                if (Electron_p4[nElectron_p4] == nullptr)
+                {
                     Electron_p4[nElectron_p4] = new TLorentzVector();
                 }
-                //std::cout << "Electron " << nElectron_p4 << std::endl;
+                // nElectron_p4++ increments by one and returns the previuos value
+                // std::cout << "Electron " << nElectron_p4 << std::endl;
                 Electron_p4[nElectron_p4++]->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
+                if (HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf)
+                {
+                    h_Electron_pt_trigger->Fill(Electron_pt[j]);
+                    h_Electron_eta_trigger->Fill(Electron_eta[j]);
+                }
+                h_Electron_pt->Fill(Electron_pt[j]);
+                h_Electron_eta->Fill(Electron_eta[j]);
             }
-            bool selection=false;
-            //selection= (Muon_pt[0]>SOMETHING && abs(Muon_eta[0])<2.4) && (idem with ele)
-            //selection = selection && opposite charge mu and e
-            //selection = selection && ((muon is trigger) || (ele is trigger))
-            //selection = selection && (one b-jet)
-            //if (selection) {fill histo}
         }
         // check the number of muons and electrons
         //cout << "Muon_p4.size() = " << nMuon_p4 << endl;
