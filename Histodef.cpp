@@ -1,3 +1,5 @@
+#ifndef Histodef_cpp
+#define Histodef_cpp
 #include "TH1.h"
 
  // Define the histogram objects
@@ -15,3 +17,4 @@
     TH1D* h_Muon_Electron_invariant_mass = new TH1D("Muon_Electron_invariant_mass", "Muon_Electron_invariant_mass", 100, 0, 400);
     TH1D* h_Muon_Muon_invariant_mass = new TH1D("Muon_Muon_invariant_mass", "Muon_Muon_invariant_mass", 100, 0, 400);
     TH1D* h_Electron_Electron_invariant_mass = new TH1D("Electron_Electron_invariant_mass", "Electron_Electron_invariant_mass", 100, 0, 400);
+#endif // Histodef_cpp

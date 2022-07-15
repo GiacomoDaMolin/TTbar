@@ -1,3 +1,5 @@
+#ifndef Auxiliary_cpp
+#define Auxiliary_cpp
 #include <iostream>
 // inputs are: size of arrays GenID and GenPar
 // the pointer at the start of the array of GenParticles_PDGID
@@ -45,3 +47,5 @@ void printMCTree(int size, Int_t *GenId, Int_t *GenParent, Int_t initialID)
 		std::cout << "ID: " << newID << " PDG: " << newPdg << endl;
 	}
 }
+
+#endif // Auxiliary_cpp
