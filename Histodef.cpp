@@ -3,8 +3,8 @@
 #include "TH1.h"
 
  // Define the histogram objects
-    TH1D* h_Muon_pt = new TH1D("Muon_pt", "Muon_pt", 100, 0, 200);
-    TH1D* h_Muon_eta = new TH1D("Muon_eta", "Muon_eta", 100, -5, 5);
+    TH1D* h_Muon_pt_from_W = new TH1D("Muon_pt", "Muon_pt_from_W", 100, 0, 200);
+    TH1D* h_Muon_eta_from_W = new TH1D("Muon_eta", "Muon_eta_from_W", 100, -5, 5);
     TH1D* h_Electron_pt = new TH1D("Electron_pt", "Electron_pt", 100, 0, 200);
     TH1D* h_Electron_eta = new TH1D("Electron_eta", "Electron_eta", 100, -5, 5);
 

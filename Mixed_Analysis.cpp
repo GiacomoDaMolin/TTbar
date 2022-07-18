@@ -160,6 +160,7 @@ void Mixed_Analysis(string inputFile, string ofile){
             electron_idx = j;
         }
         bool selection = ((muon_idx > -1) && (electron_idx > -1));
+        // check the seleected objects for opposite charge
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
         //Float_t jet_btag_deepFlav_wp = 0.71;
@@ -193,8 +194,9 @@ void Mixed_Analysis(string inputFile, string ofile){
                 // nMuon_p4++ increments by one and returns the previuos value
                 // std::cout << "Muon " << nMuon_p4 << std::endl;
                 Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-                h_Muon_pt->Fill(Muon_pt[j]);
-                h_Muon_eta->Fill(Muon_eta[j]);
+                cc_index = j;
+                h_Muon_pt_from_W->Fill(Muon_pt[j]);
+                h_Muon_eta_from_W->Fill(Muon_eta[j]);
             }
         }
 
@@ -233,8 +235,8 @@ void Mixed_Analysis(string inputFile, string ofile){
     //save the histograms in a new File
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // Write the histograms to the file
-    h_Muon_pt->Write(); 
-    h_Muon_eta->Write(); 
+    h_Muon_pt_from_W->Write(); 
+    h_Muon_eta_from_W->Write(); 
     h_Electron_eta->Write(); 
     h_Electron_pt->Write();
 
