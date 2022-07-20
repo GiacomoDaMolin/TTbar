@@ -1,5 +1,9 @@
+*.ipynb
+## ignore root files
 *.root
+# igore compilation files
 *.so
 *.d
 *.pcm
+
 .vscode/*

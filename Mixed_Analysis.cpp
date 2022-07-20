@@ -16,6 +16,14 @@ using namespace std;
 #define MAX_ARRAY_SIZE 128
 #define GEN_MAX_ARRAY_SIZE 1024
 
+// function to calculate the weight for each event
+// the weight is defined as the luminosity times the cross section divided by the number of generated events
+// in practive, we calculate it by the product of luminosity and cross section of the process times the genWeight,
+// divided by the number of generated events
+double getWeight(double luminosity, double crossSection, double genWeight, double genEvents)
+{
+    return (luminosity * crossSection * genWeight) / genEvents;
+}
 
 //void Mixed_Analysis(string inputFile, string ofile);
 //int main(int argc, char** argv){
@@ -363,6 +371,12 @@ void BackgroundAnalyis(string inputFile, string ofile){
     tin->SetBranchAddress("nJet", &nJet);
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
+
+    // genWeight
+    Float_t genWeight;
+    tin->SetBranchStatus("genWeight", 1);
+    tin->SetBranchAddress("genWeight", &genWeight);
+
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
