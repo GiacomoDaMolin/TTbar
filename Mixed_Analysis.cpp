@@ -20,9 +20,9 @@ using namespace std;
 // the weight is defined as the luminosity times the cross section divided by the number of generated events
 // in practive, we calculate it by the product of luminosity and cross section of the process times the genWeight,
 // divided by the number of generated events
-double getWeight(double luminosity, double crossSection, double genWeight, double genEvents)
+double getWeight(double luminosity, double crossSection, double genWeight, double SumWeights)
 {
-    return (luminosity * crossSection * genWeight) / genEvents;
+    return (luminosity * crossSection * genWeight) / SumWeights;
 }
 
 //void Mixed_Analysis(string inputFile, string ofile);
@@ -40,7 +40,9 @@ double getWeight(double luminosity, double crossSection, double genWeight, doubl
 //    Mixed_Analysis(inputFile, outputFile);
 //}
 //
-void Mixed_Analysis(string inputFile, string ofile){
+void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1 ){
+
+    if (crossSection<0 || IntLuminosity<0) {cout<<"WARNING: crosssection "<< crossSection << " and Integrated luminosity "<< IntLuminosity<<endl;}
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -151,6 +153,12 @@ void Mixed_Analysis(string inputFile, string ofile){
     const auto nEv = tin->GetEntries();
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
+    //compute Sum of Weights of all events
+    double_t SumEvsWeights=0;
+    for (UInt_t i = 0; i < nEv; i++){
+    	tin->GetEntry(i);
+    	SumEvsWeights+=genWeight;
+    }
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
         if (i % 100000 == 0) cout << "Processing entry " << i << " of " << nEv << endl;
@@ -201,6 +209,8 @@ void Mixed_Analysis(string inputFile, string ofile){
             n_dropped++;
             continue;
         }
+        
+        double Weight=getWeight(,,genWeight,SumEvsWeights); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
