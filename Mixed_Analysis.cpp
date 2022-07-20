@@ -140,6 +140,11 @@ void Mixed_Analysis(string inputFile, string ofile){
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
 
+    // gen weight
+    Float_t genWeight;
+    tin->SetBranchStatus("genWeight", 1);
+    tin->SetBranchAddress("genWeight", &genWeight);
+
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
     int trigger_dropped = 0;
