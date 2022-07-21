@@ -42,7 +42,10 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
 //
 void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1 ){
 
-    if (crossSection<0 || IntLuminosity<0) {std::cout<<"WARNING: crosssection "<< crossSection << " and Integrated luminosity "<< IntLuminosity<<endl;}
+    if (crossSection < 0 || IntLuminosity < 0)
+    {
+        std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
+    }
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -306,7 +309,11 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
 
 
 
-void BackgroundAnalyis(string inputFile, string ofile, double cross_section, int nSim = -1){
+void BackgroundAnalyis(string inputFile, string ofile, double crossSection=-1, int IntLuminosity=-1){
+    if (crossSection == -1 || IntLuminosity == -1){
+        std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
+        return;
+    }
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -401,19 +408,25 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section, int
 
 
     // calculate the weight for the MC
-    float w;
-    float lumi_18 = 62.5;
-    float lumi_sim;
-    if (nSim != -1)
-    {
-        lumi_sim = (nSim*1.) / cross_section;
-    }
-    else
-    {
-        lumi_sim = (nEv*1.) / cross_section;
-    }
-    w = lumi_18 / lumi_sim;
+    //float w;
+    //float lumi_18 = 62.5;
+    //float lumi_sim;
+    //if (nSim != -1)
+    //{
+        //lumi_sim = (nSim*1.) / crossSection;
+    //}
+    //else
+    //{
+        //lumi_sim = (nEv*1.) / crossSection;
+    //}
+    //w = lumi_18 / lumi_sim;
     
+    //compute Sum of Weights of all events
+    double_t SumEvsWeights=0;
+    for (UInt_t i = 0; i < nEv; i++){
+    	tin->GetEntry(i);
+    	SumEvsWeights+=genWeight;
+    }
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -465,26 +478,27 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section, int
             continue;
         }
         
+        double Weight=getWeight(IntLuminosity,crossSection,genWeight,SumEvsWeights);
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
             // fill the hist
-            h_leading_lepton_pt->Fill(Muon_p4->Pt(), w);
+            h_leading_lepton_pt->Fill(Muon_p4->Pt(), Weight);
         } else {
-            h_leading_lepton_pt->Fill(Electron_p4->Pt(), w);
+            h_leading_lepton_pt->Fill(Electron_p4->Pt(), Weight);
         }
 
         // fill the histograms
-        h_Muon_pt->Fill(Muon_pt[muon_idx], w);
-        h_Muon_eta->Fill(Muon_eta[muon_idx], w);
+        h_Muon_pt->Fill(Muon_pt[muon_idx], Weight);
+        h_Muon_eta->Fill(Muon_eta[muon_idx], Weight);
 
-        h_Electron_pt->Fill(Electron_pt[electron_idx], w);
-        h_Electron_eta->Fill(Electron_eta[electron_idx], w);
+        h_Electron_pt->Fill(Electron_pt[electron_idx], Weight);
+        h_Electron_eta->Fill(Electron_eta[electron_idx], Weight);
 
         if (muon_idx > -1 && electron_idx > -1){
             // calculate the invariant mass of the two muons
             float_t lepton_invariant_mass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
-            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass, w);
+            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass, Weight);
         }
     }
     
