@@ -1,0 +1,26 @@
+######### SIGNAL:
+GenCrossSection=72.1pb
+
+I think all cross sections in the CMSDAS are in pb, but I cannot find a sure source
+
+######## BACKGROUND:
+DY:
+0Jet:   	5313.0
+1Jet:   	951.5 (or 955.8)
+2Jet:   	360.4
+M 10-50:	15810.0 
+
+######### W:
+
+0Jet:		53330.0
+1Jet:		8875.0
+2Jet:		3338.0
+
+########
+SingleTop:	32.45	
+SingleantiTop:	32.51
+
+
+######   QCD
+Enriched EM:
+ENriched Mu:
