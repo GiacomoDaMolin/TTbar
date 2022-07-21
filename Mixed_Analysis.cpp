@@ -40,9 +40,9 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
 //    Mixed_Analysis(inputFile, outputFile);
 //}
 //
-void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1 ){
+void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double nSim=-1 ){
 
-    if (crossSection<0 || IntLuminosity<0) {std::cout<<"WARNING: crosssection "<< crossSection << " and Integrated luminosity "<< IntLuminosity<<endl;}
+    //if (crossSection<0 || IntLuminosity<0) {std::cout<<"WARNING: crosssection "<< crossSection << " and Integrated luminosity "<< IntLuminosity<<endl;}
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -153,6 +153,24 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     const auto nEv = tin->GetEntries();
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
+
+    // calculate the weight for the MC
+    float w;
+    float lumi_18 = 62.5;
+    float lumi_sim;
+    if (nSim != nEv)
+    {
+        // exit the program
+        cout << "nSim passed into program is: " << nSim << "nEvents in the file is: " << nEv << endl;
+        exit(1);
+        lumi_sim = (nSim*1.) / crossSection;
+    }
+    else
+    {
+        lumi_sim = (nEv*1.) / crossSection;
+    }
+    w = lumi_18 / lumi_sim;
+
     //compute Sum of Weights of all events
     double_t SumEvsWeights=0;
     for (UInt_t i = 0; i < nEv; i++){
@@ -209,7 +227,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             continue;
         }
         
-        double Weight=getWeight(IntLuminosity,crossSection,genWeight,SumEvsWeights);
+        // double Weight=getWeight(IntLuminosity,crossSection,genWeight,SumEvsWeights);
         
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
@@ -306,7 +324,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
 
 
 
-void BackgroundAnalyis(string inputFile, string ofile, double cross_section, int nSim = -1){
+void BackgroundAnalyis(string inputFile, string ofile, double crossSection, int nSim = -1){
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -406,11 +424,11 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section, int
     float lumi_sim;
     if (nSim != -1)
     {
-        lumi_sim = (nSim*1.) / cross_section;
+        lumi_sim = (nSim*1.) / crossSection;
     }
     else
     {
-        lumi_sim = (nEv*1.) / cross_section;
+        lumi_sim = (nEv*1.) / crossSection;
     }
     w = lumi_18 / lumi_sim;
     
