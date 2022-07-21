@@ -1,4 +1,5 @@
 ## The 019*.root file is fully leptonic
+GenCrossSection=72.1pb
 https://cmsweb.cern.ch/das/request?input=file%3D%2Fstore%2Fmc%2FRunIISummer20UL18NanoAODv2%2FTTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8%2FNANOAODSIM%2F106X_upgrade2018_realistic_v15_L1v1-v1%2F270000%2F019426EE-3D50-1249-B266-F6DBA0AFE3B5.root&instance=prod/global
 
 
