@@ -20,7 +20,7 @@ using namespace std;
 // the weight is defined as the luminosity times the cross section divided by the number of generated events
 // in practive, we calculate it by the product of luminosity and cross section of the process times the genWeight,
 // divided by the number of generated events
-double getWeight(double luminosity, double crossSection, double genWeight, double SumWeights)
+double getWeight(double luminosity, double crossSection, Float_t genWeight, double SumWeights)
 {
     return (luminosity * crossSection * genWeight) / SumWeights;
 }
@@ -209,22 +209,22 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             continue;
         }
         
-        //double Weight=getWeight(,,genWeight,SumEvsWeights);
+        double Weight=getWeight(IntLuminosity,crossSection,genWeight,SumEvsWeights);
         
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
             // fill the hist
-            h_leading_lepton_pt->Fill(Muon_p4->Pt());
+            h_leading_lepton_pt->Fill(Muon_p4->Pt(),Weight);
         } else {
-            h_leading_lepton_pt->Fill(Electron_p4->Pt());
+            h_leading_lepton_pt->Fill(Electron_p4->Pt(),Weight);
         }
 
         // fill the histograms
-        h_Muon_pt->Fill(Muon_pt[muon_idx]);
-        h_Muon_eta->Fill(Muon_eta[muon_idx]);
+        h_Muon_pt->Fill(Muon_pt[muon_idx],Weight);
+        h_Muon_eta->Fill(Muon_eta[muon_idx],Weight);
 
-        h_Electron_pt->Fill(Electron_pt[electron_idx]);
-        h_Electron_eta->Fill(Electron_eta[electron_idx]);
+        h_Electron_pt->Fill(Electron_pt[electron_idx],Weight);
+        h_Electron_eta->Fill(Electron_eta[electron_idx],Weight);
 
         // cross check which index the objects have that actually originate from the W
         size_t nMuon_p4 = 0, nElectron_p4 = 0;
@@ -241,8 +241,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
                 //// nMuon_p4++ increments by one and returns the previuos value
                 //// std::std::cout << "Muon " << nMuon_p4 << std::endl;
                 //Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-                h_Muon_pt_from_W->Fill(Muon_pt[j]);
-                h_Muon_eta_from_W->Fill(Muon_eta[j]);
+                h_Muon_pt_from_W->Fill(Muon_pt[j],Weight);
+                h_Muon_eta_from_W->Fill(Muon_eta[j],Weight);
                 if (muon_idx != j) non_matching_muon++;
             }
         }
@@ -257,8 +257,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
                 // nElectron_p4++ increments by one and returns the previuos value
                 // std::std::cout << "Electron " << nElectron_p4 << std::endl;
                 //Electron_p4[nElectron_p4++]->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
-                h_Electron_pt_from_W->Fill(Electron_pt[j]);
-                h_Electron_eta_from_W->Fill(Electron_eta[j]);
+                h_Electron_pt_from_W->Fill(Electron_pt[j],Weight);
+                h_Electron_eta_from_W->Fill(Electron_eta[j],Weight);
                 if (electron_idx != j) non_matching_electron++;
             }
         }
@@ -269,7 +269,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             // calculate the invariant mass of the two muons
             float_t lepton_invariant_mass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
-            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass);
+            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass,Weight);
         }
     }
     
@@ -427,7 +427,6 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section, int
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
-        // TODO: Electron isolation comparison with ANUP
         //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
