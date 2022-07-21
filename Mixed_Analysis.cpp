@@ -232,17 +232,17 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
             // fill the hist
-            h_leading_lepton_pt->Fill(Muon_p4->Pt(),Weight);
+            h_leading_lepton_pt->Fill(Muon_p4->Pt(),w);
         } else {
-            h_leading_lepton_pt->Fill(Electron_p4->Pt(),Weight);
+            h_leading_lepton_pt->Fill(Electron_p4->Pt(),w);
         }
 
         // fill the histograms
-        h_Muon_pt->Fill(Muon_pt[muon_idx],Weight);
-        h_Muon_eta->Fill(Muon_eta[muon_idx],Weight);
+        h_Muon_pt->Fill(Muon_pt[muon_idx],w);
+        h_Muon_eta->Fill(Muon_eta[muon_idx],w);
 
-        h_Electron_pt->Fill(Electron_pt[electron_idx],Weight);
-        h_Electron_eta->Fill(Electron_eta[electron_idx],Weight);
+        h_Electron_pt->Fill(Electron_pt[electron_idx],w);
+        h_Electron_eta->Fill(Electron_eta[electron_idx],w);
 
         // cross check which index the objects have that actually originate from the W
         size_t nMuon_p4 = 0, nElectron_p4 = 0;
@@ -259,8 +259,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
                 //// nMuon_p4++ increments by one and returns the previuos value
                 //// std::std::cout << "Muon " << nMuon_p4 << std::endl;
                 //Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-                h_Muon_pt_from_W->Fill(Muon_pt[j],Weight);
-                h_Muon_eta_from_W->Fill(Muon_eta[j],Weight);
+                h_Muon_pt_from_W->Fill(Muon_pt[j],w);
+                h_Muon_eta_from_W->Fill(Muon_eta[j],w);
                 if (muon_idx != j) non_matching_muon++;
             }
         }
@@ -275,8 +275,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
                 // nElectron_p4++ increments by one and returns the previuos value
                 // std::std::cout << "Electron " << nElectron_p4 << std::endl;
                 //Electron_p4[nElectron_p4++]->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
-                h_Electron_pt_from_W->Fill(Electron_pt[j],Weight);
-                h_Electron_eta_from_W->Fill(Electron_eta[j],Weight);
+                h_Electron_pt_from_W->Fill(Electron_pt[j],w);
+                h_Electron_eta_from_W->Fill(Electron_eta[j],w);
                 if (electron_idx != j) non_matching_electron++;
             }
         }
@@ -287,7 +287,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             // calculate the invariant mass of the two muons
             float_t lepton_invariant_mass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
-            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass,Weight);
+            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass,w);
         }
     }
     
