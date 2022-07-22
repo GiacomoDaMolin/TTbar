@@ -309,7 +309,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
 
 
 
-void BackgroundAnalyis(string inputFile, string ofile, double crossSection=-1, int IntLuminosity=-1){
+void Background_Analysis(string inputFile, string ofile, double crossSection=-1, int IntLuminosity=-1){
     if (crossSection == -1 || IntLuminosity == -1){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
         return;
