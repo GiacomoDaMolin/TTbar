@@ -10,6 +10,9 @@
 
 bool isFromW(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 {
+	if (initialID < 0){
+		return false;
+	}
 	// retrieve first PDG ID number
 	int startPdg = GenId[initialID];
 	int newID = initialID, newPdg = startPdg;
@@ -31,6 +34,9 @@ bool isFromW(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 
 void printMCTree(int size, Int_t *GenId, Int_t *GenParent, Int_t initialID)
 {
+	if (initialID < 0){
+		return;
+	}
 	// retrieve first PDG ID number
 	Int_t startPdg = GenId[initialID]; 
 	Int_t newPdg = startPdg;
