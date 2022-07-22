@@ -159,6 +159,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     //compute Sum of Weights of all events
     double_t SumEvsWeights=0;
     for (UInt_t i = 0; i < nEv; i++){
+        if (i % 100000 == 0) std::cout << "Processing event " << i <<  " of " << nEv << std::endl;
     	tin->GetEntry(i);
     	SumEvsWeights+=genWeight;
     }
@@ -424,6 +425,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     //compute Sum of Weights of all events
     double_t SumEvsWeights=0;
     for (UInt_t i = 0; i < nEv; i++){
+        if (i % 100000 == 0) cout << "Processing " << i << "th event" <<  " of " << nEv << endl;
     	tin->GetEntry(i);
     	SumEvsWeights+=genWeight;
     }
