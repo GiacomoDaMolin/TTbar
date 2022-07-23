@@ -146,9 +146,11 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
 
     // gen weight
-    Float_t genWeight;
+    Float_t genWeight, genEventSumw;
     tin->SetBranchStatus("genWeight", 1);
+    tin->SetBranchStatus("genEventSumw", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
+    tin->SetBranchAddress("genEventSumw", &genEventSumw);
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
@@ -156,12 +158,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     const auto nEv = tin->GetEntries();
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
-    //compute Sum of Weights of all events
-    double_t SumEvsWeights=0;
-    for (UInt_t i = 0; i < nEv; i++){
-    	tin->GetEntry(i);
-    	SumEvsWeights+=genWeight;
-    }
+
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
@@ -212,7 +209,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             continue;
         }
         
-        double Weight=getWeight(IntLuminosity,crossSection,genWeight,SumEvsWeights);
+        double Weight=getWeight(IntLuminosity,crossSection,genWeight,genEventSumw);
         
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
@@ -395,9 +392,11 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
 
     // genWeight
-    Float_t genWeight;
+    Float_t genWeight, genEventSumw;
     tin->SetBranchStatus("genWeight", 1);
+    tin->SetBranchStatus("genEventSumw", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
+    tin->SetBranchAddress("genEventSumw", &genEventSumw);
 
 
     int non_matching_muon = 0, non_matching_electron = 0;
@@ -423,12 +422,6 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     //w = lumi_18 / lumi_sim;
     
     //compute Sum of Weights of all events
-    double_t SumEvsWeights=0;
-    for (UInt_t i = 0; i < nEv; i++){
-        if (i % 100000 == 0) cout << "Processing " << i << "th event" <<  " of " << nEv << endl;
-    	tin->GetEntry(i);
-    	SumEvsWeights+=genWeight;
-    }
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -480,7 +473,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
             continue;
         }
         
-        double Weight=getWeight(IntLuminosity,crossSection,genWeight,SumEvsWeights);
+        double Weight=getWeight(IntLuminosity,crossSection,genWeight,genEventSumw);
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
             // fill the hist
