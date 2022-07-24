@@ -29,6 +29,8 @@ void Muon_Analysis(string inputFile, string ofile){
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
+    TTree *tin2 = static_cast<TTree*>(fin->Get("Runs"));
+
 
     // Set all branches to 0
     tin->SetBranchStatus("*", 0);

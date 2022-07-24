@@ -49,6 +49,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
+    TTree *tin2 = static_cast<TTree*>(fin->Get("Runs"));
 
     // Set all branches to 0
     tin->SetBranchStatus("*", 0);
@@ -148,9 +149,11 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     // gen weight
     Float_t genWeight, genEventSumw;
     tin->SetBranchStatus("genWeight", 1);
-    tin->SetBranchStatus("genEventSumw", 1);
+    tin2->SetBranchStatus("genEventSumw", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
-    tin->SetBranchAddress("genEventSumw", &genEventSumw);
+    tin2->SetBranchAddress("genEventSumw", &genEventSumw);
+    tin2->GetEntry(0);
+
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
@@ -170,8 +173,6 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         };
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
-        //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
-        //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
             if ((Muon_pt[j]>30. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
@@ -234,13 +235,6 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             // printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
             if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Muon_genPartIdx[j]))
             {
-                //if (Muon_p4[nMuon_p4] == nullptr)
-                //{
-                //    Muon_p4[nMuon_p4] = new TLorentzVector();
-                //}
-                //// nMuon_p4++ increments by one and returns the previuos value
-                //// std::std::cout << "Muon " << nMuon_p4 << std::endl;
-                //Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
                 h_Muon_pt_from_W->Fill(Muon_pt[j],Weight);
                 h_Muon_eta_from_W->Fill(Muon_eta[j],Weight);
                 if (muon_idx != j) non_matching_muon++;
@@ -251,13 +245,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         for (UInt_t j = 0; j<nElectron; j++){
             if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Electron_genPartIdx[j]))
             {
-                //if (Electron_p4[nElectron_p4] == nullptr)
-                //{
-                //    Electron_p4[nElectron_p4] = new TLorentzVector();
-                //}
-                // nElectron_p4++ increments by one and returns the previuos value
-                // std::std::cout << "Electron " << nElectron_p4 << std::endl;
-                //Electron_p4[nElectron_p4++]->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
+                
                 h_Electron_pt_from_W->Fill(Electron_pt[j],Weight);
                 h_Electron_eta_from_W->Fill(Electron_eta[j],Weight);
                 if (electron_idx != j) non_matching_electron++;
@@ -315,6 +303,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
+    TTree *tin2 = static_cast<TTree*>(fin->Get("Runs"));
 
     // Set all branches to 0
     tin->SetBranchStatus("*", 0);
@@ -391,12 +380,13 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
 
-    // genWeight
+     // gen weight
     Float_t genWeight, genEventSumw;
     tin->SetBranchStatus("genWeight", 1);
-    tin->SetBranchStatus("genEventSumw", 1);
+    tin2->SetBranchStatus("genEventSumw", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
-    tin->SetBranchAddress("genEventSumw", &genEventSumw);
+    tin2->SetBranchAddress("genEventSumw", &genEventSumw);
+    tin2->GetEntry(0);
 
 
     int non_matching_muon = 0, non_matching_electron = 0;
@@ -405,23 +395,6 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     const auto nEv = tin->GetEntries();
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
-
-
-    // calculate the weight for the MC
-    //float w;
-    //float lumi_18 = 62.5;
-    //float lumi_sim;
-    //if (nSim != -1)
-    //{
-        //lumi_sim = (nSim*1.) / crossSection;
-    //}
-    //else
-    //{
-        //lumi_sim = (nEv*1.) / crossSection;
-    //}
-    //w = lumi_18 / lumi_sim;
-    
-    //compute Sum of Weights of all events
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -434,8 +407,6 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
         };
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
-        //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
-        //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
             if ((Muon_pt[j]>30. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
