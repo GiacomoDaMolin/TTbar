@@ -25,21 +25,6 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
     return (luminosity * crossSection * genWeight) / SumWeights;
 }
 
-//void Mixed_Analysis(string inputFile, string ofile);
-//int main(int argc, char** argv){
-//
-//  /*array<TTree*,N> TinArr
-//    for (int i=0; i++;i<argc){
-//	TFile a=TFile(argv[1]);
-//	TTree *ti = new TTree("Tree"+argv[1]");
-//	TinArr[i]=ti;
-//	}
-//    */
-//    string inputFile = argv[1];
-//    string outputFile = argv[2];
-//    Mixed_Analysis(inputFile, outputFile);
-//}
-//
 void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1 ){
 
     if (crossSection < 0 || IntLuminosity < 0)
@@ -48,8 +33,18 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     }
 
     TFile *fin = TFile::Open(inputFile.c_str());
+    TTree *trun = static_cast<TTree*>(fin->Get("Runs"));
+    Long64_t genEventCount;
+    Double_t genEventSumw;
+    trun->SetBranchStatus("*", 0);
+    trun->SetBranchStatus("genEventSumw", 1);
+    trun->SetBranchStatus("genEventCount", 1);
+    trun->SetBranchAddress("genEventSumw", &genEventSumw);
+    trun->SetBranchAddress("genEventCount", &genEventCount);
+
+    trun->GetEntry(0);
+
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
-    TTree *tin2 = static_cast<TTree*>(fin->Get("Runs"));
 
     // Set all branches to 0
     tin->SetBranchStatus("*", 0);
@@ -147,13 +142,9 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
 
     // gen weight
-    Float_t genWeight, genEventSumw;
+    Float_t genWeight;
     tin->SetBranchStatus("genWeight", 1);
-    tin2->SetBranchStatus("genEventSumw", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
-    tin2->SetBranchAddress("genEventSumw", &genEventSumw);
-    tin2->GetEntry(0);
-
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
@@ -173,6 +164,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         };
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
+        //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
+        //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
             if ((Muon_pt[j]>30. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
@@ -235,6 +228,13 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             // printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
             if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Muon_genPartIdx[j]))
             {
+                //if (Muon_p4[nMuon_p4] == nullptr)
+                //{
+                //    Muon_p4[nMuon_p4] = new TLorentzVector();
+                //}
+                //// nMuon_p4++ increments by one and returns the previuos value
+                //// std::std::cout << "Muon " << nMuon_p4 << std::endl;
+                //Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
                 h_Muon_pt_from_W->Fill(Muon_pt[j],Weight);
                 h_Muon_eta_from_W->Fill(Muon_eta[j],Weight);
                 if (muon_idx != j) non_matching_muon++;
@@ -245,7 +245,13 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         for (UInt_t j = 0; j<nElectron; j++){
             if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Electron_genPartIdx[j]))
             {
-                
+                //if (Electron_p4[nElectron_p4] == nullptr)
+                //{
+                //    Electron_p4[nElectron_p4] = new TLorentzVector();
+                //}
+                // nElectron_p4++ increments by one and returns the previuos value
+                // std::std::cout << "Electron " << nElectron_p4 << std::endl;
+                //Electron_p4[nElectron_p4++]->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 h_Electron_pt_from_W->Fill(Electron_pt[j],Weight);
                 h_Electron_eta_from_W->Fill(Electron_eta[j],Weight);
                 if (electron_idx != j) non_matching_electron++;
@@ -294,7 +300,6 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
 }
 
 
-
 void Background_Analysis(string inputFile, string ofile, double crossSection=-1, int IntLuminosity=-1){
     if (crossSection == -1 || IntLuminosity == -1){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
@@ -302,8 +307,17 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     }
 
     TFile *fin = TFile::Open(inputFile.c_str());
+    TTree *trun = static_cast<TTree*>(fin->Get("Runs"));
+    Long64_t genEventCount;
+    Double_t genEventSumw;
+    trun->SetBranchStatus("*", 0);
+    trun->SetBranchStatus("genEventSumw", 1);
+    trun->SetBranchStatus("genEventCount", 1);
+    trun->SetBranchAddress("genEventSumw", &genEventSumw);
+    trun->SetBranchAddress("genEventCount", &genEventCount);
+
+    trun->GetEntry(0);
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
-    TTree *tin2 = static_cast<TTree*>(fin->Get("Runs"));
 
     // Set all branches to 0
     tin->SetBranchStatus("*", 0);
@@ -380,13 +394,10 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
 
-     // gen weight
-    Float_t genWeight, genEventSumw;
+    // genWeight
+    Float_t genWeight;
     tin->SetBranchStatus("genWeight", 1);
-    tin2->SetBranchStatus("genEventSumw", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
-    tin2->SetBranchAddress("genEventSumw", &genEventSumw);
-    tin2->GetEntry(0);
 
 
     int non_matching_muon = 0, non_matching_electron = 0;
@@ -395,6 +406,23 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     const auto nEv = tin->GetEntries();
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
+
+
+    // calculate the weight for the MC
+    //float w;
+    //float lumi_18 = 62.5;
+    //float lumi_sim;
+    //if (nSim != -1)
+    //{
+        //lumi_sim = (nSim*1.) / crossSection;
+    //}
+    //else
+    //{
+        //lumi_sim = (nEv*1.) / crossSection;
+    //}
+    //w = lumi_18 / lumi_sim;
+    
+    //compute Sum of Weights of all events
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -407,6 +435,8 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
         };
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
+        //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
+        //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
             if ((Muon_pt[j]>30. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
@@ -490,4 +520,23 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     fout->Write();
     fout->Close();
     
+}
+
+int main(int argc, char **argv)
+{
+    string inputFile = argv[1];
+    string outputFile = argv[2];
+    double crossSection = atof(argv[3]);
+    double IntLuminosity = atof(argv[4]);
+    bool Signal = atoi(argv[5]);
+    if (Signal)
+    {
+        Mixed_Analysis(inputFile, outputFile, crossSection, IntLuminosity);
+        return 1;
+    }
+    else
+    {
+        Background_Analysis(inputFile, outputFile, crossSection, IntLuminosity);
+        return 1;
+    }
 }
