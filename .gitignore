@@ -6,4 +6,9 @@
 *.d
 *.pcm
 
+*.pdf
+*.csv
+
 .vscode/*
+
+output/**
