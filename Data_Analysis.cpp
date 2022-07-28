@@ -15,7 +15,7 @@ using namespace std;
 
 #define MAX_ARRAY_SIZE 128
 
-void BackgroundAnalyis(string inputFile, string ofile, double cross_section=1, int nSim = -1){
+void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nSim = -1){
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *tin = static_cast<TTree*>(fin->Get("Events"));
@@ -62,11 +62,13 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section=1, i
     tin->SetBranchAddress("Jet_mass", &Jet_mass);
 
     // collect the trigger information
-    Bool_t HLT_IsoMu27, HLT_Ele35_WPTight_Gsf; 
-    tin->SetBranchStatus("HLT_IsoMu27", 1);
-    tin->SetBranchStatus("HLT_Ele35_WPTight_Gsf", 1);
-    tin->SetBranchAddress("HLT_IsoMu27", &HLT_IsoMu27);
-    tin->SetBranchAddress("HLT_Ele35_WPTight_Gsf", &HLT_Ele35_WPTight_Gsf);
+    // triggers were 27 and 35 before
+    // Triggers now changed to looser cuts due to Michele's request
+    Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf; 
+    tin->SetBranchStatus("HLT_IsoMu24", 1);
+    tin->SetBranchStatus("HLT_Ele32_WPTight_Gsf", 1);
+    tin->SetBranchAddress("HLT_IsoMu24", &HLT_IsoMu24);
+    tin->SetBranchAddress("HLT_Ele32_WPTight_Gsf", &HLT_Ele32_WPTight_Gsf);
 
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
@@ -108,14 +110,12 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section=1, i
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
         // apply triggers
 
-        if (!(HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf)){
+        if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf)){
             trigger_dropped++;
             continue;
         };
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
-        //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
-        //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
             if ((Muon_pt[j]>30. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
@@ -175,7 +175,7 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section=1, i
             h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass);
         }
     }
-    /*
+    std::cout << "Total number of events: " << nEv << endl;
     std::cout << "Number of events discarded by trigger = " << trigger_dropped << endl;
     std::cout << "Number of events discarded by selection = " << n_dropped << endl;
 
@@ -183,7 +183,6 @@ void BackgroundAnalyis(string inputFile, string ofile, double cross_section=1, i
     std::cout << "Number of events passing selection = " << (nEv - trigger_dropped) - n_dropped << endl;
 
     std::cout << "Selected events over triggered events = " << (nEv - trigger_dropped- n_dropped)*1./(nEv - trigger_dropped) << endl;
-    */
     //save the histograms in a new File
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // Write the histograms to the file
