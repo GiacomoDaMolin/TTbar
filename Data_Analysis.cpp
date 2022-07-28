@@ -7,18 +7,18 @@
 #include "TCanvas.h"
 #include "TLorentzVector.h"
 
-//include user defined histograms and auxiliary macros
-#include "Auxiliary.cpp"
+// include user defined histograms and auxiliary macros
 #include "Histodef.cpp"
 
 using namespace std;
 
 #define MAX_ARRAY_SIZE 128
 
-void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nSim = -1){
+void DataAnalysis(string inputFile, string ofile)
+{
 
     TFile *fin = TFile::Open(inputFile.c_str());
-    TTree *tin = static_cast<TTree*>(fin->Get("Events"));
+    TTree *tin = static_cast<TTree *>(fin->Get("Events"));
 
     // Set all branches to 0
     tin->SetBranchStatus("*", 0);
@@ -64,7 +64,7 @@ void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nS
     // collect the trigger information
     // triggers were 27 and 35 before
     // Triggers now changed to looser cuts due to Michele's request
-    Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf; 
+    Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf;
     tin->SetBranchStatus("HLT_IsoMu24", 1);
     tin->SetBranchStatus("HLT_Ele32_WPTight_Gsf", 1);
     tin->SetBranchAddress("HLT_IsoMu24", &HLT_IsoMu24);
@@ -72,7 +72,7 @@ void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nS
 
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
-    Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE],Muon_triggerIdLoose[MAX_ARRAY_SIZE],Muon_tightId[MAX_ARRAY_SIZE];
+    Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE], Muon_triggerIdLoose[MAX_ARRAY_SIZE], Muon_tightId[MAX_ARRAY_SIZE];
     Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Muon_tightId", 1);
     tin->SetBranchStatus("Muon_charge", 1);
@@ -103,30 +103,36 @@ void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nS
     const auto nEv = tin->GetEntries();
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
-    
 
-    for (UInt_t i = 0; i < nEv; i++){
+    for (UInt_t i = 0; i < nEv; i++)
+    {
         tin->GetEntry(i);
-        if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
+        if (i % 100000 == 0)
+            std::cout << "Processing entry " << i << " of " << nEv << std::endl;
         // apply triggers
 
-        if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf)){
+        if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf))
+        {
             trigger_dropped++;
             continue;
         };
-        
+
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         Int_t muon_idx = -1;
-        for (UInt_t j = 0; j < nMuon; j++){
-            if ((Muon_pt[j]>30. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
+        for (UInt_t j = 0; j < nMuon; j++)
+        {
+            if ((Muon_pt[j] > 30. && abs(Muon_eta[j]) < 2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15))
+            {
                 muon_idx = j;
                 Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
                 break;
             }
         }
         Int_t electron_idx = -1;
-        for (UInt_t j = 0; j < nElectron; j++){
-            if ((Electron_pt[j]>37 && abs(Electron_eta[j])<2.4 && Electron_mvaFall17V2Iso_WP90[j])){
+        for (UInt_t j = 0; j < nElectron; j++)
+        {
+            if ((Electron_pt[j] > 37 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j]))
+            {
                 electron_idx = j;
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 break;
@@ -138,26 +144,32 @@ void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nS
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
         Float_t jet_btag_deepFlav_wp = 0.71;
         // the wp are: (0.1355, 0.4506, 0.7738)
-        //Float_t jet_btag_deep_wp = 0.4506;
+        // Float_t jet_btag_deep_wp = 0.4506;
         // cycle through btags and check if one passes the tagging WP
         bool one_Bjet = false;
-        for (size_t j = 0; j < nJet; j++){
-            if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp){
+        for (size_t j = 0; j < nJet; j++)
+        {
+            if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp)
+            {
                 one_Bjet = true;
                 break;
             }
         }
         selection = selection && (one_Bjet);
-        if (!selection){
+        if (!selection)
+        {
             n_dropped++;
             continue;
         }
-        
+
         // check whether muon or electron is the leading one
-        if (Muon_p4->Pt() > Electron_p4->Pt()){
+        if (Muon_p4->Pt() > Electron_p4->Pt())
+        {
             // fill the hist
             h_leading_lepton_pt->Fill(Muon_p4->Pt());
-        } else {
+        }
+        else
+        {
             h_leading_lepton_pt->Fill(Electron_p4->Pt());
         }
 
@@ -168,28 +180,29 @@ void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nS
         h_Electron_pt->Fill(Electron_pt[electron_idx]);
         h_Electron_eta->Fill(Electron_eta[electron_idx]);
 
-        if (muon_idx > -1 && electron_idx > -1){
+        if (muon_idx > -1 && electron_idx > -1)
+        {
             // calculate the invariant mass of the two muons
             float_t lepton_invariant_mass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
             h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass);
         }
     }
-    std::cout << "Total number of events: " << nEv << endl;
-    std::cout << "Number of events discarded by trigger = " << trigger_dropped << endl;
-    std::cout << "Number of events discarded by selection = " << n_dropped << endl;
+    std::cout << "Total number of events: " << nEv << std::endl;
+    std::cout << "Number of events discarded by trigger = " << trigger_dropped << std::endl;
+    std::cout << "Number of events discarded by selection = " << n_dropped << std::endl;
 
-    std::cout << "Number of events passing triggers = " << (nEv - trigger_dropped) << endl;
-    std::cout << "Number of events passing selection = " << (nEv - trigger_dropped) - n_dropped << endl;
+    std::cout << "Number of events passing triggers = " << (nEv - trigger_dropped) << std::endl;
+    std::cout << "Number of events passing selection = " << (nEv - trigger_dropped) - n_dropped << std::endl;
 
-    std::cout << "Selected events over triggered events = " << (nEv - trigger_dropped- n_dropped)*1./(nEv - trigger_dropped) << endl;
-    //save the histograms in a new File
-    TFile *fout =new TFile(ofile.c_str(),"RECREATE");
+    std::cout << "Selected events over triggered events = " << (nEv - trigger_dropped - n_dropped) * 1. / (nEv - trigger_dropped) << std::endl;
+    // save the histograms in a new File
+    TFile *fout = new TFile(ofile.c_str(), "RECREATE");
     // Write the histograms to the file
-    h_Muon_eta->Write(); 
+    h_Muon_eta->Write();
     h_Muon_pt->Write();
 
-    h_Electron_eta->Write(); 
+    h_Electron_eta->Write();
     h_Electron_pt->Write();
 
     h_Muon_Electron_invariant_mass->Write();
@@ -197,5 +210,11 @@ void DataAnalysis(string inputFile, string ofile, double cross_section=1, int nS
 
     fout->Write();
     fout->Close();
-    
+}
+
+int main(int argc, char **argv)
+{
+    string inputFile = argv[1];
+    string outputFile = argv[2];
+    DataAnalysis(inputFile, outputFile);
 }

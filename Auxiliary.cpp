@@ -22,7 +22,7 @@ bool isFromW(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 	{
 		if (newID > size)
 		{
-			std::cout << "WARNING: index " << newID << " exceeding max size " << size << endl;
+			std::cout << "WARNING: index " << newID << " exceeding max size " << size << std::endl;
 		}
 		newID = GenParent[newID];
 		newPdg = GenId[newID];
@@ -47,11 +47,11 @@ void printMCTree(int size, Int_t *GenId, Int_t *GenParent, Int_t initialID)
 	{
 		if (newID > size)
 		{
-			std::cout << "WARNING: index " << newID << " exceeding max size " << size << endl;
+			std::cout << "WARNING: index " << newID << " exceeding max size " << size << std::endl;
 		}
 		newID = GenParent[newID];
 		newPdg = GenId[newID];
-		std::cout << "ID: " << newID << " PDG: " << newPdg << endl;
+		std::cout << "ID: " << newID << " PDG: " << newPdg << std::endl;
 	}
 }
 
