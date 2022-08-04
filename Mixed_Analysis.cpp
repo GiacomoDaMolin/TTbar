@@ -153,6 +153,21 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
 
+    // allow pt, inv mass, and eta to be stored in a Branch
+    Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
+    Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
+    //save the histograms in a new File
+    TFile *fout =new TFile(ofile.c_str(),"RECREATE");
+    // create a new tree for the output
+    TTree *tout = new TTree("tout","tout");
+    // set the branches for the output tree
+    tout->Branch("leading_lepton_pt", &leading_lepton_pt);
+    tout->Branch("invMass", &invMass);
+    tout->Branch("electron_eta", &electron_eta);
+    tout->Branch("electron_pt", &electron_pt);
+    tout->Branch("muon_eta", &muon_eta);
+    tout->Branch("muon_pt", &muon_pt);
+
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
@@ -208,17 +223,30 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
             // fill the hist
-            h_leading_lepton_pt->Fill(Muon_p4->Pt(),Weight);
+            leading_lepton_pt = Muon_p4->Pt();
+            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
         } else {
-            h_leading_lepton_pt->Fill(Electron_p4->Pt(),Weight);
+            leading_lepton_pt = Electron_p4->Pt();
+            h_leading_lepton_pt->Fill(leading_lepton_pt);
+            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
         }
 
         // fill the histograms
-        h_Muon_pt->Fill(Muon_pt[muon_idx],Weight);
-        h_Muon_eta->Fill(Muon_eta[muon_idx],Weight);
+        muon_pt = Muon_pt[muon_idx];
+        muon_eta = Muon_eta[muon_idx];
+        electron_pt = Electron_pt[electron_idx];
+        electron_eta = Electron_eta[electron_idx];
 
-        h_Electron_pt->Fill(Electron_pt[electron_idx],Weight);
-        h_Electron_eta->Fill(Electron_eta[electron_idx],Weight);
+        h_Muon_pt->Fill(muon_pt);
+        h_Muon_eta->Fill(muon_eta);
+
+        h_Electron_pt->Fill(electron_pt);
+        h_Electron_eta->Fill(electron_eta);
+        // fill the weighted histograms
+        h_Muon_pt_weighted->Fill(muon_pt,Weight);
+        h_Muon_eta_weighted->Fill(muon_eta,Weight);
+        h_Electron_pt_weighted->Fill(electron_pt,Weight);
+        h_Electron_eta_weighted->Fill(electron_eta,Weight);
 
         // cross check which index the objects have that actually originate from the W
         size_t nMuon_p4 = 0, nElectron_p4 = 0;
@@ -228,15 +256,12 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             // printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
             if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Muon_genPartIdx[j]))
             {
-                //if (Muon_p4[nMuon_p4] == nullptr)
-                //{
-                //    Muon_p4[nMuon_p4] = new TLorentzVector();
-                //}
-                //// nMuon_p4++ increments by one and returns the previuos value
-                //// std::std::cout << "Muon " << nMuon_p4 << std::endl;
-                //Muon_p4[nMuon_p4++]->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-                h_Muon_pt_from_W->Fill(Muon_pt[j],Weight);
-                h_Muon_eta_from_W->Fill(Muon_eta[j],Weight);
+                muon_pt_from_W = Muon_pt[j];
+                muon_eta_from_W = Muon_eta[j];
+                h_Muon_pt_from_W->Fill(muon_pt_from_W);
+                h_Muon_eta_from_W->Fill(muon_eta_from_W);
+                h_Muon_pt_weighted_from_W->Fill(muon_pt_from_W,Weight);
+                h_Muon_eta_weighted_from_W->Fill(muon_eta_from_W,Weight);
                 if (muon_idx != j) non_matching_muon++;
             }
         }
@@ -245,15 +270,12 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         for (UInt_t j = 0; j<nElectron; j++){
             if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Electron_genPartIdx[j]))
             {
-                //if (Electron_p4[nElectron_p4] == nullptr)
-                //{
-                //    Electron_p4[nElectron_p4] = new TLorentzVector();
-                //}
-                // nElectron_p4++ increments by one and returns the previuos value
-                // std::std::cout << "Electron " << nElectron_p4 << std::endl;
-                //Electron_p4[nElectron_p4++]->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
-                h_Electron_pt_from_W->Fill(Electron_pt[j],Weight);
-                h_Electron_eta_from_W->Fill(Electron_eta[j],Weight);
+                electron_pt_from_W = Electron_pt[j];
+                electron_eta_from_W = Electron_eta[j];
+                h_Electron_pt_from_W->Fill(electron_pt_from_W);
+                h_Electron_eta_from_W->Fill(electron_eta_from_W);
+                h_Electron_pt_weighted_from_W->Fill(electron_pt_from_W,Weight);
+                h_Electron_eta_weighted_from_W->Fill(electron_eta_from_W,Weight);
                 if (electron_idx != j) non_matching_electron++;
             }
         }
@@ -262,10 +284,13 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         //std::cout << "Electron_p4.size() = " << nElectron_p4 << endl;
         if (muon_idx > -1 && electron_idx > -1){
             // calculate the invariant mass of the two muons
-            float_t lepton_invariant_mass = (*(Muon_p4) + *(Electron_p4)).M();
+            invMass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
-            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass,Weight);
+            h_Muon_Electron_invariant_mass->Fill(invMass);
+            h_Muon_Electron_invariant_mass_weighted->Fill(invMass,Weight);
         }
+        // fill the tree
+        tout->Fill();
     }
     
     std::cout << "non_matching_muon = " << non_matching_muon << endl;
@@ -278,21 +303,30 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     std::cout << "Fraction of events passing selection = " << (nEv - n_dropped)*1./nEv << endl;
 
     std::cout << "Selected events over triggered events = " << (nEv - trigger_dropped - n_dropped)*1./(nEv - trigger_dropped) << endl;
-    //save the histograms in a new File
-    TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // Write the histograms to the file
     h_Muon_eta->Write(); 
     h_Muon_pt->Write();
     h_Muon_pt_from_W->Write(); 
     h_Muon_eta_from_W->Write(); 
+    // weighted histograms
+    h_Muon_eta_weighted->Write();
+    h_Muon_pt_weighted->Write();
+    h_Muon_pt_weighted_from_W->Write();
+    h_Muon_eta_weighted_from_W->Write();
 
     h_Electron_eta->Write(); 
     h_Electron_pt->Write();
     h_Electron_pt_from_W->Write(); 
     h_Electron_eta_from_W->Write(); 
+    // weighted histograms
+    h_Electron_eta_weighted->Write();
+    h_Electron_pt_weighted->Write();
+    h_Electron_pt_weighted_from_W->Write();
+    h_Electron_eta_weighted_from_W->Write();
 
     h_Muon_Electron_invariant_mass->Write();
     h_leading_lepton_pt->Write();
+    h_leading_lepton_pt_weighted->Write();
 
     fout->Write();
     fout->Close();
@@ -407,22 +441,22 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
 
+    // allow pt, inv mass, and eta to be stored in a Branch
+    Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
+    Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
+    //save the histograms in a new File
+    TFile *fout =new TFile(ofile.c_str(),"RECREATE");
+    // create a new tree for the output
+    TTree *tout = new TTree("tout","tout");
+    // set the branches for the output tree
+    tout->Branch("leading_lepton_pt", &leading_lepton_pt);
+    tout->Branch("invMass", &invMass);
+    tout->Branch("electron_eta", &electron_eta);
+    tout->Branch("electron_pt", &electron_pt);
+    tout->Branch("muon_eta", &muon_eta);
+    tout->Branch("muon_pt", &muon_pt);
 
-    // calculate the weight for the MC
-    //float w;
-    //float lumi_18 = 62.5;
-    //float lumi_sim;
-    //if (nSim != -1)
-    //{
-        //lumi_sim = (nSim*1.) / crossSection;
-    //}
-    //else
-    //{
-        //lumi_sim = (nEv*1.) / crossSection;
-    //}
-    //w = lumi_18 / lumi_sim;
-    
-    //compute Sum of Weights of all events
+
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -478,24 +512,40 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
             // fill the hist
-            h_leading_lepton_pt->Fill(Muon_p4->Pt(), Weight);
+            leading_lepton_pt = Muon_p4->Pt();
+            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
         } else {
-            h_leading_lepton_pt->Fill(Electron_p4->Pt(), Weight);
+            leading_lepton_pt = Electron_p4->Pt();
+            h_leading_lepton_pt->Fill(leading_lepton_pt);
+            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
         }
-
         // fill the histograms
-        h_Muon_pt->Fill(Muon_pt[muon_idx], Weight);
-        h_Muon_eta->Fill(Muon_eta[muon_idx], Weight);
+        muon_pt = Muon_pt[muon_idx];
+        muon_eta = Muon_eta[muon_idx];
+        electron_pt = Electron_pt[electron_idx];
+        electron_eta = Electron_eta[electron_idx];
 
-        h_Electron_pt->Fill(Electron_pt[electron_idx], Weight);
-        h_Electron_eta->Fill(Electron_eta[electron_idx], Weight);
+        h_Muon_pt->Fill(muon_pt);
+        h_Muon_eta->Fill(muon_eta);
+
+        h_Electron_pt->Fill(electron_pt);
+        h_Electron_eta->Fill(electron_eta);
+        // fill the weighted histograms
+        h_Muon_pt_weighted->Fill(muon_pt,Weight);
+        h_Muon_eta_weighted->Fill(muon_eta,Weight);
+        h_Electron_pt_weighted->Fill(electron_pt,Weight);
+        h_Electron_eta_weighted->Fill(electron_eta,Weight);
+
+
 
         if (muon_idx > -1 && electron_idx > -1){
             // calculate the invariant mass of the two muons
-            float_t lepton_invariant_mass = (*(Muon_p4) + *(Electron_p4)).M();
+            invMass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
-            h_Muon_Electron_invariant_mass->Fill(lepton_invariant_mass, Weight);
+            h_Muon_Electron_invariant_mass->Fill(invMass);
+            h_Muon_Electron_invariant_mass_weighted->Fill(invMass,Weight);
         }
+        tout->Fill();
     }
     
     std::cout << "Number of events discarded by trigger = " << trigger_dropped << endl;
@@ -505,17 +555,30 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     std::cout << "Number of events passing selection = " << (nEv - trigger_dropped) - n_dropped << endl;
 
     std::cout << "Selected events over triggered events = " << (nEv - trigger_dropped- n_dropped)*1./(nEv - trigger_dropped) << endl;
-    //save the histograms in a new File
-    TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // Write the histograms to the file
     h_Muon_eta->Write(); 
     h_Muon_pt->Write();
+    h_Muon_pt_from_W->Write(); 
+    h_Muon_eta_from_W->Write(); 
+    // weighted histograms
+    h_Muon_eta_weighted->Write();
+    h_Muon_pt_weighted->Write();
+    h_Muon_pt_weighted_from_W->Write();
+    h_Muon_eta_weighted_from_W->Write();
 
     h_Electron_eta->Write(); 
     h_Electron_pt->Write();
+    h_Electron_pt_from_W->Write(); 
+    h_Electron_eta_from_W->Write(); 
+    // weighted histograms
+    h_Electron_eta_weighted->Write();
+    h_Electron_pt_weighted->Write();
+    h_Electron_pt_weighted_from_W->Write();
+    h_Electron_eta_weighted_from_W->Write();
 
     h_Muon_Electron_invariant_mass->Write();
     h_leading_lepton_pt->Write();
+    h_leading_lepton_pt_weighted->Write();
 
     fout->Write();
     fout->Close();
