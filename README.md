@@ -6,12 +6,43 @@ https://cmsweb.cern.ch/das/request?input=dataset%3D%2FEGamma%2FRun2018A-UL2018_M
 ### D is v9-v3
 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FEGamma%2FRun2018D-UL2018_MiniAODv2_NanoAODv9-v3%2FNANOAOD&instance=prod/global
 
+### Luminosity
+
+brilcalc lumi -u /fb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json --hltpath "HLT_Ele32_WPTight_Gsf_v*" -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
+
+#Summary:  
++---------------------------+-------+------+--------+-------------------+------------------+  
+| hltpath                   | nfill | nrun | ncms   | totdelivered(/fb) | totrecorded(/fb) |  
++---------------------------+-------+------+--------+-------------------+------------------+  
+| HLT_Ele32_WPTight_Gsf_v13 | 23    | 50   | 22670  | 5.449751450       | 5.291407965      |  
+| HLT_Ele32_WPTight_Gsf_v14 | 10    | 26   | 13311  | 3.796985905       | 3.659410871      |  
+| HLT_Ele32_WPTight_Gsf_v15 | 164   | 402  | 198129 | 52.965171486      | 50.877060670     |  
++---------------------------+-------+------+--------+-------------------+------------------+  
+#Sum delivered : 62.211908842  
+#Sum recorded : 59.827879506  
+#Check JSON:  
+#(run,ls) in json but not in results: [(325172, 477), (325172, 478), (325172, 479), (325172, 480), (325172, 481), (325172, 482), (325172, 483), (325172, 484), (325172, 485)]  
+
 ## SingleMuon
 ### A-C are v9-v2
 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FSingleMuon%2FRun2018A-UL2018_MiniAODv2_NanoAODv9-v2%2FNANOAOD&instance=prod/global
 ### D is v9-v1
 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FSingleMuon%2FRun2018D-UL2018_MiniAODv2_NanoAODv9-v1%2FNANOAOD&instance=prod/global
 
+### Luminosity:
+brilcalc lumi -u /fb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json --hltpath "HLT_IsoMu24_v*" -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
+#Summary:  
++-----------------+-------+------+--------+-------------------+------------------+  
+| hltpath         | nfill | nrun | ncms   | totdelivered(/fb) | totrecorded(/fb) |  
++-----------------+-------+------+--------+-------------------+------------------+  
+| HLT_IsoMu24_v11 | 23    | 50   | 22670  | 5.449751450       | 5.291407965      |  
+| HLT_IsoMu24_v12 | 10    | 26   | 13287  | 3.788621855       | 3.651245839      |  
+| HLT_IsoMu24_v13 | 164   | 402  | 198129 | 52.965171486      | 50.877060670     |  
++-----------------+-------+------+--------+-------------------+------------------+  
+#Sum delivered : 62.203544792  
+#Sum recorded : 59.819714474  
+#Check JSON:  
+#(run,ls) in json but not in results: [(325172, 477), (325172, 478), (325172, 479), (325172, 480), (325172, 481), (325172, 482), (325172, 483), (325172, 484), (325172, 485)]  
 # MC
 
 ## Signal
