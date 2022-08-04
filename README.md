@@ -8,7 +8,9 @@ https://cmsweb.cern.ch/das/request?input=dataset%3D%2FEGamma%2FRun2018D-UL2018_M
 
 ### Luminosity
 
-```brilcalc lumi -u /fb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json --hltpath "HLT_Ele32_WPTight_Gsf_v*" -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt```
+```
+brilcalc lumi -u /fb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json --hltpath "HLT_Ele32_WPTight_Gsf_v*" -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
+```
 
 #Summary:  
 +---------------------------+-------+------+--------+-------------------+------------------+  
@@ -30,7 +32,9 @@ https://cmsweb.cern.ch/das/request?input=dataset%3D%2FSingleMuon%2FRun2018A-UL20
 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FSingleMuon%2FRun2018D-UL2018_MiniAODv2_NanoAODv9-v1%2FNANOAOD&instance=prod/global
 
 ### Luminosity:
-```brilcalc lumi -u /fb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json --hltpath "HLT_IsoMu24_v*" -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt```
+```
+brilcalc lumi -u /fb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json --hltpath "HLT_IsoMu24_v*" -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
+```
 #Summary:  
 +-----------------+-------+------+--------+-------------------+------------------+  
 | hltpath         | nfill | nrun | ncms   | totdelivered(/fb) | totrecorded(/fb) |  
