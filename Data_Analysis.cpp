@@ -117,6 +117,13 @@ void DataAnalysis(string inputFile, string ofile)
             continue;
         };
 
+        // avoid cross triggers
+        if (HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
+        {
+            trigger_dropped++;
+            continue;
+        }
+
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++)

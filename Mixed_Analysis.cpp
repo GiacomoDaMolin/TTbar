@@ -108,11 +108,11 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     tin->SetBranchAddress("GenPart_genPartIdxMother",&GenPart_genPartIdxMother);
 
     // collect the trigger information
-    Bool_t HLT_IsoMu27, HLT_Ele35_WPTight_Gsf; 
-    tin->SetBranchStatus("HLT_IsoMu27", 1);
-    tin->SetBranchStatus("HLT_Ele35_WPTight_Gsf", 1);
-    tin->SetBranchAddress("HLT_IsoMu27", &HLT_IsoMu27);
-    tin->SetBranchAddress("HLT_Ele35_WPTight_Gsf", &HLT_Ele35_WPTight_Gsf);
+    Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf;; 
+    tin->SetBranchStatus("HLT_IsoMu24", 1);
+    tin->SetBranchStatus("HLT_Ele32_WPTight_Gsf", 1);
+    tin->SetBranchAddress("HLT_IsoMu24", &HLT_IsoMu24);
+    tin->SetBranchAddress("HLT_Ele32_WPTight_Gsf", &HLT_Ele32_WPTight_Gsf);
 
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
@@ -173,10 +173,16 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
         // apply triggers
 
-        if (!(HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf)){
+        if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf)){
             trigger_dropped++;
             continue;
         };
+        // avoid cross triggers
+        if (HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
+        {
+            trigger_dropped++;
+            continue;
+        }
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
@@ -395,11 +401,11 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     tin->SetBranchAddress("Jet_mass", &Jet_mass);
 
     // collect the trigger information
-    Bool_t HLT_IsoMu27, HLT_Ele35_WPTight_Gsf; 
-    tin->SetBranchStatus("HLT_IsoMu27", 1);
-    tin->SetBranchStatus("HLT_Ele35_WPTight_Gsf", 1);
-    tin->SetBranchAddress("HLT_IsoMu27", &HLT_IsoMu27);
-    tin->SetBranchAddress("HLT_Ele35_WPTight_Gsf", &HLT_Ele35_WPTight_Gsf);
+    Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf; 
+    tin->SetBranchStatus("HLT_IsoMu24", 1);
+    tin->SetBranchStatus("HLT_Ele32_WPTight_Gsf", 1);
+    tin->SetBranchAddress("HLT_IsoMu24", &HLT_IsoMu24);
+    tin->SetBranchAddress("HLT_Ele32_WPTight_Gsf", &HLT_Ele32_WPTight_Gsf);
 
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
@@ -463,11 +469,17 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
         // apply triggers
 
-        if (!(HLT_IsoMu27 || HLT_Ele35_WPTight_Gsf)){
+        if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf)){
             trigger_dropped++;
             continue;
         };
         
+        // avoid cross triggers
+        if (HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
+        {
+            trigger_dropped++;
+            continue;
+        }
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
         //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
