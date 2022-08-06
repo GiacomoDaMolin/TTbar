@@ -228,7 +228,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             continue;
         }
         
-        double Weight=getWeight(IntLuminosity,crossSection,genWeight,genEventSumw);
+        Weight=getWeight(IntLuminosity,crossSection,genWeight,genEventSumw);
         
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
