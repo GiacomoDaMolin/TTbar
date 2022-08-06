@@ -156,6 +156,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     // allow pt, inv mass, and eta to be stored in a Branch
     Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
+    Float_t Weight;
     //save the histograms in a new File
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // create a new tree for the output
@@ -167,6 +168,9 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     tout->Branch("electron_pt", &electron_pt);
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
+
+    tout->Branch("Weight", &Weight);
+    tout->Branch("genWeight", &genWeight);
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -335,6 +339,10 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     h_leading_lepton_pt_weighted->Write();
 
     fout->Write();
+    //write xs and sum of weights to the output file
+    fout->WriteObject(&genEventSumw, "genEventSumw");
+    fout->WriteObject(&crossSection, "xs");
+    fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Close();
     
 }
@@ -450,6 +458,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     // allow pt, inv mass, and eta to be stored in a Branch
     Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
+    Float_t Weight;
     //save the histograms in a new File
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // create a new tree for the output
@@ -461,6 +470,10 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     tout->Branch("electron_pt", &electron_pt);
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
+
+    tout->Branch("Weight", &Weight);
+    tout->Branch("genWeight", &genWeight);
+
 
 
 
@@ -520,7 +533,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
             continue;
         }
         
-        double Weight=getWeight(IntLuminosity,crossSection,genWeight,genEventSumw);
+        Weight=getWeight(IntLuminosity,crossSection,genWeight,genEventSumw);
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt()){
             // fill the hist
@@ -593,6 +606,11 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     h_leading_lepton_pt_weighted->Write();
 
     fout->Write();
+
+    //write xs and sum of weights to the output file
+    fout->WriteObject(&genEventSumw, "genEventSumw");
+    fout->WriteObject(&crossSection, "xs");
+    fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Close();
     
 }

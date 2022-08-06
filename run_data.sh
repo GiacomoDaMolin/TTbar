@@ -25,7 +25,7 @@ cd /eos/user/j/jowulff/TTbar/CMSSW_12_4_0/src && cmsenv && cd /eos/user/j/jowulf
 datafiles=$(dasgoclient -query="file dataset=$p")
 # check if the output folder exists if not create it
 if [ ! -d "$o$p" ]; then
-    mkdir -p $o$p
+    mkdir -p $o$p || exit
 fi
 for file in $datafiles; do
     #create the name of the output file: strip the path
