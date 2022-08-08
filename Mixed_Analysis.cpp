@@ -156,7 +156,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     // allow pt, inv mass, and eta to be stored in a Branch
     Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
-    Float_t Weight;
+    float Weight;
     //save the histograms in a new File
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // create a new tree for the output
@@ -169,8 +169,11 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
 
-    tout->Branch("Weight", &Weight);
-    tout->Branch("genWeight", &genWeight);
+    tout->Branch("genEventSumw", &genEventSumw);
+    tout->Branch("IntLumi", &IntLuminosity);
+    tout->Branch("xs", &crossSection);
+    //tout->Branch("nEvents", &nEv);
+    tout->Branch("Weight", &Weight); 
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -335,21 +338,23 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     h_Electron_eta_weighted_from_W->Write();
 
     h_Muon_Electron_invariant_mass->Write();
+    h_Muon_Electron_invariant_mass_weighted->Write();
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
 
+    // throws an error saying type is unknown! really don't understand why this is the case
+    //fout->WriteObject(&Weight, "Weight");
+    //fout->WriteObject(&genEventSumw, "genEventSumw");
+    //fout->WriteObject(&crossSection, "xs");
+    //fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Write();
-    //write xs and sum of weights to the output file
-    fout->WriteObject(&genEventSumw, "genEventSumw");
-    fout->WriteObject(&crossSection, "xs");
-    fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Close();
     
 }
 
 
-void Background_Analysis(string inputFile, string ofile, double crossSection=-1, int IntLuminosity=-1){
-    if (crossSection == -1 || IntLuminosity == -1){
+void Background_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1){
+    if (crossSection < 0 || IntLuminosity < 0){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
         return;
     }
@@ -458,7 +463,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     // allow pt, inv mass, and eta to be stored in a Branch
     Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
-    Float_t Weight;
+    float Weight;
     //save the histograms in a new File
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // create a new tree for the output
@@ -470,11 +475,12 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     tout->Branch("electron_pt", &electron_pt);
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
-
-    tout->Branch("Weight", &Weight);
-    tout->Branch("genWeight", &genWeight);
-
-
+    
+    tout->Branch("genEventSumw", &genEventSumw);
+    tout->Branch("IntLumi", &IntLuminosity);
+    tout->Branch("xs", &crossSection);
+    //tout->Branch("nEvents", &nEv);
+    tout->Branch("Weight", &Weight); 
 
 
     for (UInt_t i = 0; i < nEv; i++){
@@ -602,15 +608,15 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     h_Electron_eta_weighted_from_W->Write();
 
     h_Muon_Electron_invariant_mass->Write();
+    h_Muon_Electron_invariant_mass_weighted->Write();
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
 
+    //fout->WriteObject(&Weight, "Weight");
+    //fout->WriteObject(&genEventSumw, "genEventSumw");
+    //fout->WriteObject(&crossSection, "xs");
+    //fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Write();
-
-    //write xs and sum of weights to the output file
-    fout->WriteObject(&genEventSumw, "genEventSumw");
-    fout->WriteObject(&crossSection, "xs");
-    fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Close();
     
 }
@@ -624,11 +630,13 @@ int main(int argc, char **argv)
     bool Signal = atoi(argv[5]);
     if (Signal)
     {
+        cout << "Signal" << endl;
         Mixed_Analysis(inputFile, outputFile, crossSection, IntLuminosity);
         return 1;
     }
     else
     {
+        cout << "Background analysis" << endl;
         Background_Analysis(inputFile, outputFile, crossSection, IntLuminosity);
         return 1;
     }
