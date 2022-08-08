@@ -10,9 +10,9 @@
 
 # sourde the CMSSW environment
 source /cvmfs/cms.cern.ch/cmsset_default.sh
+cd /eos/user/j/jowulff/TTbar/CMSSW_12_4_0/src && cmsenv && cd /eos/user/j/jowulff/TTbar || exit
 voms-proxy-init --rfc --voms cms -valid 192:00
 # exit if cd fails
-cd /eos/user/j/jowulff/TTbar/CMSSW_12_4_0/src && cmsenv && cd /eos/user/j/jowulff/TTbar || exit
 datafiles=$(dasgoclient -query="file dataset=$2")
 if [ ! -d "$3$2" ]; then
     mkdir -p $3$2 || exit 
