@@ -27,7 +27,7 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
 
 void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1 ){
 
-    if (crossSection < 0 || IntLuminosity < 0)
+    if (crossSection < 0. || IntLuminosity < 0.)
     {
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
     }
@@ -161,6 +161,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // create a new tree for the output
     TTree *tout = new TTree("tout","tout");
+    TTree *trun_out = new TTree("Run_out","Run_out");
     // set the branches for the output tree
     tout->Branch("leading_lepton_pt", &leading_lepton_pt);
     tout->Branch("invMass", &invMass);
@@ -168,12 +169,14 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     tout->Branch("electron_pt", &electron_pt);
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
+    tout->Branch("Weight", &Weight);
 
-    tout->Branch("genEventSumw", &genEventSumw);
-    tout->Branch("IntLumi", &IntLuminosity);
-    tout->Branch("xs", &crossSection);
+    trun_out->Branch("genEventSumw", &genEventSumw);
+    trun_out->Branch("IntLumi", &IntLuminosity);
+    trun_out->Branch("xs", &crossSection);
     //tout->Branch("nEvents", &nEv);
-    tout->Branch("Weight", &Weight); 
+     
+    trun_out->Fill(); //we already called trun->GetEntry(0);
 
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
@@ -304,6 +307,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         }
         // fill the tree
         tout->Fill();
+        
     }
     
     std::cout << "non_matching_muon = " << non_matching_muon << endl;
@@ -354,7 +358,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
 
 
 void Background_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1){
-    if (crossSection < 0 || IntLuminosity < 0){
+    if (crossSection < 0. || IntLuminosity < 0.){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
         return;
     }
@@ -468,6 +472,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // create a new tree for the output
     TTree *tout = new TTree("tout","tout");
+    TTree *trun_out = new TTree("Run_out","Run_out");
     // set the branches for the output tree
     tout->Branch("leading_lepton_pt", &leading_lepton_pt);
     tout->Branch("invMass", &invMass);
@@ -475,14 +480,13 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     tout->Branch("electron_pt", &electron_pt);
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
-    
-    tout->Branch("genEventSumw", &genEventSumw);
-    tout->Branch("IntLumi", &IntLuminosity);
-    tout->Branch("xs", &crossSection);
-    //tout->Branch("nEvents", &nEv);
-    tout->Branch("Weight", &Weight); 
+    tout->Branch("Weight", &Weight);
 
+    trun_out->Branch("genEventSumw", &genEventSumw);
+    trun_out->Branch("IntLumi", &IntLuminosity);
+    trun_out->Branch("xs", &crossSection);
 
+    trun_out->Fill(); //we already called trun->GetEntry(0);
     for (UInt_t i = 0; i < nEv; i++){
         tin->GetEntry(i);
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
@@ -577,6 +581,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
             h_Muon_Electron_invariant_mass_weighted->Fill(invMass,Weight);
         }
         tout->Fill();
+        trun_out->Fill();
     }
     
     std::cout << "Number of events discarded by trigger = " << trigger_dropped << endl;
