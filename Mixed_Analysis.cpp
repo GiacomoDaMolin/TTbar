@@ -187,12 +187,6 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
             trigger_dropped++;
             continue;
         };
-        // avoid cross triggers
-        if (HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
-        {
-            trigger_dropped++;
-            continue;
-        }
         
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
@@ -496,13 +490,6 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
             trigger_dropped++;
             continue;
         };
-        
-        // avoid cross triggers
-        if (HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
-        {
-            trigger_dropped++;
-            continue;
-        }
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         //bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);  
         //bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);

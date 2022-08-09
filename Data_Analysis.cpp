@@ -14,7 +14,7 @@ using namespace std;
 
 #define MAX_ARRAY_SIZE 128
 
-void DataAnalysis(string inputFile, string ofile)
+void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 {
 
     TFile *fin = TFile::Open(inputFile.c_str());
@@ -118,7 +118,7 @@ void DataAnalysis(string inputFile, string ofile)
         };
 
         // avoid cross triggers
-        if (HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
+        if (IsFirstDataSet &&HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
         {
             trigger_dropped++;
             continue;
