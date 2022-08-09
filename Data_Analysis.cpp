@@ -118,7 +118,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         };
 
         // avoid cross triggers
-        if (IsFirstDataSet &&HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
+        if (!IsFirstDataSet &&HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
         {
             trigger_dropped++;
             continue;
