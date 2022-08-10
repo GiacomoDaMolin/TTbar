@@ -1,4 +1,3 @@
-*.ipynb
 ## ignore root files
 *.root
 # igore compilation files
@@ -13,3 +12,5 @@
 
 output/**
 ROOT_tryouts/**
+Data/**
+
