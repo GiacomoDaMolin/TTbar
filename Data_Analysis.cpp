@@ -128,7 +128,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++)
         {
-            if ((Muon_pt[j] > 30. && abs(Muon_eta[j]) < 2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15))
+            if ((Muon_pt[j] > 27. && abs(Muon_eta[j]) < 2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15))
             {
                 muon_idx = j;
                 Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
@@ -138,7 +138,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++)
         {
-            if ((Electron_pt[j] > 37 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j]))
+            if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j]))
             {
                 electron_idx = j;
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
