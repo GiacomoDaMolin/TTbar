@@ -99,7 +99,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
-    int trigger_dropped = 0;
+    int trigger_dropped = 0,crosstrigger=0;
     const auto nEv = tin->GetEntries();
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
@@ -120,7 +120,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         // avoid cross triggers
         if (!IsFirstDataSet &&HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
         {
-            trigger_dropped++;
+            crosstrigger++;
             continue;
         }
 
@@ -197,6 +197,8 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     }
     std::cout << "Total number of events: " << nEv << std::endl;
     std::cout << "Number of events discarded by trigger = " << trigger_dropped << std::endl;
+    std:cout <<"Number of event removed by cross-triggering filter"<<crosstrigger<<std::endl;
+    trigger_dropped+=crosstrigger;
     std::cout << "Number of events discarded by selection = " << n_dropped << std::endl;
 
     std::cout << "Number of events passing triggers = " << (nEv - trigger_dropped) << std::endl;

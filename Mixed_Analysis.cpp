@@ -17,15 +17,14 @@ using namespace std;
 #define GEN_MAX_ARRAY_SIZE 1024
 
 // function to calculate the weight for each event
-// the weight is defined as the luminosity times the cross section divided by the number of generated events
-// in practive, we calculate it by the product of luminosity and cross section of the process times the genWeight,
-// divided by the number of generated events
+// the weight is calculated as the product of luminosity and cross section of the process times the genWeight,
+// LATER TO BE divided by the number of generated events OF ALL FILES OF THE DATASET(S)
 double getWeight(double luminosity, double crossSection, Float_t genWeight, double SumWeights)
 {
-    return (luminosity * crossSection * genWeight) / SumWeights;
+    return (luminosity * crossSection * genWeight);// / SumWeights;
 }
 
-void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1 ){
+void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=59.827879506 ){
 
     if (crossSection < 0. || IntLuminosity < 0.)
     {
@@ -131,7 +130,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     tin->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all);
     tin->SetBranchAddress("Electron_charge", &Electron_charge);
 
-    // Jet tagging , FlavB is the recomennded one, DeepB was used by Anup
+    // Jet tagging , FlavB is the recomended one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
     UInt_t nJet;
     tin->SetBranchStatus("Jet_btagDeepB", 1);
@@ -174,7 +173,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
     trun_out->Branch("xs", &crossSection);
-    //tout->Branch("nEvents", &nEv);
+    trun_out->Branch("nEvents", &nEv);
      
     trun_out->Fill(); //we already called trun->GetEntry(0);
 
@@ -340,18 +339,13 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
 
-    // throws an error saying type is unknown! really don't understand why this is the case
-    //fout->WriteObject(&Weight, "Weight");
-    //fout->WriteObject(&genEventSumw, "genEventSumw");
-    //fout->WriteObject(&crossSection, "xs");
-    //fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Write();
     fout->Close();
     
 }
 
 
-void Background_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=-1){
+void Background_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=59.827879506){
     if (crossSection < 0. || IntLuminosity < 0.){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
         return;
@@ -479,6 +473,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
     trun_out->Branch("xs", &crossSection);
+    trun_out->Branch("nEvents", &nEv);
 
     trun_out->Fill(); //we already called trun->GetEntry(0);
     for (UInt_t i = 0; i < nEv; i++){
@@ -604,10 +599,6 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
 
-    //fout->WriteObject(&Weight, "Weight");
-    //fout->WriteObject(&genEventSumw, "genEventSumw");
-    //fout->WriteObject(&crossSection, "xs");
-    //fout->WriteObject(&IntLuminosity, "IntLuminosity");
     fout->Write();
     fout->Close();
     
