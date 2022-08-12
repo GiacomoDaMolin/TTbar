@@ -1,6 +1,6 @@
 #se facessi uno script che fa condo_submit con argomenti diversi e uso come eseguibile uno script che semplicemente crea l'environment e chiama il .cc?"
 executable ="run_MC.sh"
-arguments=""
+arguments= $1
 
 output="/eos/user/g/gdamolin/TT2bbemu/output"
 error="/eos/user/g/gdamolin/TT2bbemu/error"

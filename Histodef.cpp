@@ -36,6 +36,6 @@
     TH1D* h_Muon_Muon_invariant_mass_weighted = new TH1D("Muon_Muon_invariant_mass_weighted", "Muon_Muon_invariant_mass_weighted", 100, 12, 412);
     TH1D* h_Electron_Electron_invariant_mass_weighted = new TH1D("Electron_Electron_invariant_mass_weighted", "Electron_Electron_invariant_mass_weighted", 100, 12, 412);
 
-    TH1D* h_leading_lepton_pt = new TH1D("leading_lepton_pt", "leading_lepton_pt", 100, 0, 200);
-    TH1D* h_leading_lepton_pt_weighted = new TH1D("leading_lepton_pt_weighted", "leading_lepton_pt_weighted", 100, 0, 200);
+    TH1D* h_leading_lepton_pt = new TH1D("leading_lepton_pt", "leading_lepton_pt", 45, 20, 200);
+    TH1D* h_leading_lepton_pt_weighted = new TH1D("leading_lepton_pt_weighted", "leading_lepton_pt_weighted", 45, 20, 200);
 #endif // Histodef_cpp
