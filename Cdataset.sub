@@ -1,7 +1,7 @@
-executable="/afs/cern.ch/user/g/gdamolin/TestTT/RunDataset.sh"
+executable="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RunDataset.sh"
 #add path to every executable ( we are doing cd in Prescript)
-+PreCmd="/afs/cern.ch/user/g/gdamolin/TestTT/PreScript.sh"
-+PostCmd="/afs/cern.ch/user/g/gdamolin/TestTT/PostScript.sh"
++PreCmd="/afs/cern.ch/user/g/gdamolin/Johan/TTbarPreScript.sh"
++PostCmd="/afs/cern.ch/user/g/gdamolin/Johan/TTbarPostScript.sh"
 +PostArguments=$(ClusterId)
 
 output                = output/hello.$(ClusterId).$(ProcId).out
@@ -10,5 +10,5 @@ log                   = log/hello.$(ClusterId).log
 
 +JobFlavour="tomorrow"
 queue transfer_input_files, arguments from (
-  /afs/cern.ch/user/g/gdamolin/TestTT/script.txt,/afs/cern.ch/user/g/gdamolin/TestTT/script.txt
+  /afs/cern.ch/user/g/gdamolin/Johan/TTbar/script.txt,/afs/cern.ch/user/g/gdamolin/Johan/TTbar/script.txt
   )
