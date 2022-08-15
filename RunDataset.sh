@@ -9,14 +9,14 @@
 # $6: the signal/bkgd flag
 
 # exit if cd fails
-datafiles=$(dasgoclient -query="file dataset=$1")
+datafiles=$(dasgoclient -query="file dataset=$2")
 
 for file in $datafiles; do
     #create the name of the output file: strip the path
     filename=$(echo $file | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
     ofilename=$3$2/$filename"_MA".root
     echo "$1 root://cms-xrd-global.cern.ch//$file $ofilename $4 $5 $6"
-    root 
+    #root 
     ".$1 root://cms-xrd-global.cern.ch//$file $ofilename $4 $5 $6"
-    .q 
+    #.q 
 done

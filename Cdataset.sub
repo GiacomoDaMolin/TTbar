@@ -1,8 +1,12 @@
-executable="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RunDataset.sh"
+executable=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RunDataset.sh
+
 #add path to every executable ( we are doing cd in Prescript)
-+PreCmd="/afs/cern.ch/user/g/gdamolin/Johan/TTbarPreScript.sh"
-+PostCmd="/afs/cern.ch/user/g/gdamolin/Johan/TTbarPostScript.sh"
-+PostArguments=$(ClusterId)
+
++PreCmd="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/PreScript.sh"
+
+#+PostArguments=$(ClusterId)
+#+PostCmd=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/PostScript.sh
+
 
 output                = output/hello.$(ClusterId).$(ProcId).out
 error                 = error/hello.$(ClusterId).$(ProcId).err
