@@ -1,0 +1,9 @@
+executable=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/j_RunDataset.sh 
+
+
+output                = /afs/cern.ch/user/g/gdamolin/Johan/output/hello.$(ClusterId).$(ProcId).out
+error                 = /afs/cern.ch/user/g/gdamolin/Johan/error/hello.$(ClusterId).$(ProcId).err
+log                   = /afs/cern.ch/user/g/gdamolin/Johan/log/hello.$(ClusterId).log
+
++JobFlavour="workday"
+queue

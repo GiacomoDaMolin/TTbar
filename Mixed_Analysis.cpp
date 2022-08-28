@@ -148,7 +148,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
     int trigger_dropped = 0;
-    const auto nEv = tin->GetEntries();
+    UInt_t nEv = tin->GetEntries();
+    unsigned int n_events=nEv;
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
 
@@ -173,7 +174,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
     trun_out->Branch("xs", &crossSection);
-    trun_out->Branch("nEvents", &nEv);
+    trun_out->Branch("nEv", &n_events);
      
     trun_out->Fill(); //we already called trun->GetEntry(0);
 
@@ -210,7 +211,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         // check the seleected objects for opposite charge
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
-        Float_t jet_btag_deepFlav_wp = 0.71;
+        Float_t jet_btag_deepFlav_wp = 0.2783; //old was 0.71
         // the wp are: (0.1355, 0.4506, 0.7738)
         //Float_t jet_btag_deep_wp = 0.4506;
         // cycle through btags and check if one passes the tagging WP
@@ -345,7 +346,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
 }
 
 
-void Background_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=59.827879506){
+void Background_Analysis(string inputFile, string ofile, double crossSection=-1, double IntLuminosity=59.827879506 ){
     if (crossSection < 0. || IntLuminosity < 0.){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
         return;
@@ -448,7 +449,8 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
     int trigger_dropped = 0;
-    const auto nEv = tin->GetEntries();
+    UInt_t nEv = tin->GetEntries();
+    unsigned int n_events=nEv;
     TLorentzVector *Muon_p4 = new TLorentzVector();
     TLorentzVector *Electron_p4 = new TLorentzVector();
 
@@ -473,7 +475,7 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
     trun_out->Branch("xs", &crossSection);
-    trun_out->Branch("nEvents", &nEv);
+    trun_out->Branch("nEv", &n_events);
 
     trun_out->Fill(); //we already called trun->GetEntry(0);
     for (UInt_t i = 0; i < nEv; i++){
@@ -615,12 +617,14 @@ int main(int argc, char **argv)
     {
         cout << "Signal" << endl;
         Mixed_Analysis(inputFile, outputFile, crossSection, IntLuminosity);
-        return 1;
+        return 0;
     }
-    else
+    if(!Signal)
     {
         cout << "Background analysis" << endl;
         Background_Analysis(inputFile, outputFile, crossSection, IntLuminosity);
-        return 1;
+        return 0;
     }
+  std:cout<<"Arguments not valid (Did you insert the last bool?)"<<std::endl;
+  return 1;
 }

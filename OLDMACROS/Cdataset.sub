@@ -1,0 +1,21 @@
+executable=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RunDataset.sh
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/script.txt, /afs/cern.ch/user/g/gdamolin/Johan/TTbar/PreScript.sh, /afs/cern.ch/user/g/gdamolin/private/x509up_u151129
+
+
+#add path to every executable (we are doing cd in Prescript)
+
+#+PreCmd="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/PreScript.sh"
+
+#+PostArguments=$(ClusterId)
+#+PostCmd=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/PostScript.sh
+
+
+output                = /afs/cern.ch/user/g/gdamolin/Johan/output/hello.$(ClusterId).$(ProcId).out
+error                 = /afs/cern.ch/user/g/gdamolin/Johan/error/hello.$(ClusterId).$(ProcId).err
+log                   = /afs/cern.ch/user/g/gdamolin/Johan/log/hello.$(ClusterId).log
+
++JobFlavour="workday"
+queue arguments from /afs/cern.ch/user/g/gdamolin/Johan/TTbar/script.txt
