@@ -56,7 +56,7 @@ test_input "Path to proxy" "$X509_USER_PROXY" "p"
 test_input "CMSSW" "$CMSSW" "c"
 
 #move file to eos
-outdir="/eos/user/g/gdamolin/TT2bbemu/temp"
+outdir="/afs/cern.ch/user/g/gdamolin/Johan/Savehere"
 
 #now test what has been asked to analyze
 #1. a single file run executable
@@ -67,7 +67,7 @@ if [[ "$DATASET" == *"root://"* ]]; then
 
   filename=$DATASET
   filestring=$(echo $filename | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
-  ofilename=${OUTPATH}/$filestring"_MA".root
+  ofilename=${outdir}/$filestring"_MA".root
 
   cd $CMSSW
   eval `scram r -sh`
@@ -78,7 +78,7 @@ if [[ "$DATASET" == *"root://"* ]]; then
   echo "PROXY is now set to $X509_USER_PROXY"
   echo "Executing analysis script as"
   ${EXE} $filename $ofilename ${XSEC} ${LUMI} ${SIGNAL}
-  mv $ofilename ${outdir}/${filestring}_MA.root
+  mv $ofilename ${OUTPATH}/${filestring}_MA.root
 
 else
 
