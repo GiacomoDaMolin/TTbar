@@ -461,16 +461,16 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
     //save the histograms in a new File
     TFile *fout =new TFile(ofile.c_str(),"RECREATE");
     // create a new tree for the output
-    TTree *tout = new TTree("tout","tout");
+   // TTree *tout = new TTree("tout","tout");
     TTree *trun_out = new TTree("Run_out","Run_out");
     // set the branches for the output tree
-    tout->Branch("leading_lepton_pt", &leading_lepton_pt);
+  /*  tout->Branch("leading_lepton_pt", &leading_lepton_pt);
     tout->Branch("invMass", &invMass);
     tout->Branch("electron_eta", &electron_eta);
     tout->Branch("electron_pt", &electron_pt);
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
-    tout->Branch("Weight", &Weight);
+    tout->Branch("Weight", &Weight);*/
 
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
@@ -564,8 +564,8 @@ void Background_Analysis(string inputFile, string ofile, double crossSection=-1,
             h_Muon_Electron_invariant_mass->Fill(invMass);
             h_Muon_Electron_invariant_mass_weighted->Fill(invMass,Weight);
         }
-        tout->Fill();
-        trun_out->Fill();
+        //tout->Fill();
+        
     }
     
     std::cout << "Number of events discarded by trigger = " << trigger_dropped << endl;
@@ -612,7 +612,8 @@ int main(int argc, char **argv)
     string outputFile = argv[2];
     double crossSection = atof(argv[3]);
     double IntLuminosity = atof(argv[4]);
-    bool Signal = atoi(argv[5]);
+    string boolstr=argv[5];
+    bool Signal = (boolstr=="true");
     if (Signal)
     {
         cout << "Signal" << endl;

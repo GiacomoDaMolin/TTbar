@@ -118,7 +118,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         };
 
         // avoid cross triggers
-        if (!IsFirstDataSet &&HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
+        if (!IsFirstDataSet && HLT_Ele32_WPTight_Gsf && HLT_IsoMu24)
         {
             crosstrigger++;
             continue;
@@ -149,7 +149,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         // check the seleected objects for opposite charge
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
-        Float_t jet_btag_deepFlav_wp = 0.71;
+        Float_t jet_btag_deepFlav_wp = 0.2783;
         // the wp are: (0.1355, 0.4506, 0.7738)
         // Float_t jet_btag_deep_wp = 0.4506;
         // cycle through btags and check if one passes the tagging WP
@@ -225,5 +225,7 @@ int main(int argc, char **argv)
 {
     string inputFile = argv[1];
     string outputFile = argv[2];
-    DataAnalysis(inputFile, outputFile);
+    string boolstr=argv[3];
+    bool IsFirstDataset= (boolstr=="true");
+    DataAnalysis(inputFile, outputFile, IsFirstDataset);
 }
