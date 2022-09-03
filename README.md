@@ -33,6 +33,7 @@ LAWS OF CONDOR:
 2) Thou cannot use mkdir while using condor.
 3) Thou need to create the c++ executable with THE SAME CMSSW CMSENV version of the one you put in full_path_to_cmssw
 4) I will share soon a file with all the commands for each dataset, possibly we can make a script from it
+5) Thou will help me make me a Postscript that "hadd"s all the output files in a single file because doing that manually is a pain
 
 
 
