@@ -32,7 +32,7 @@ LAWS OF CONDOR:
 1) Thou cannot put your logs/executable nor output files in eos, Condor will refuse to read it. You can however save them in afs and then move them in eos in the script.
 2) Thou cannot use mkdir while using condor.
 3) Thou need to create the c++ executable with THE SAME CMSSW CMSENV version of the one you put in full_path_to_cmssw
-4) 
+4) I will share soon a file with all the commands for each dataset, possibly we can make a script from it
 
 
 
