@@ -1,3 +1,41 @@
+# How to send jobs in Condor
+
+To create the description of the jobs needed to run over a dataset the following command can be used
+
+```
+sh RunDataset.sh -e myanalysis.py \
+    -d dataset_name \
+    -o output_dir
+    -x xsec \
+    -l integ_luminosity \
+    -s is_signal
+    -p full_path_to_proxy \
+    -c full_path_to_cmssw
+```
+NOTE: use RunDataset.sh if you want to run on MC, RunActualData.sh if you wish to run on Data.
+
+The output is a `jobdescription.txt` file which will list all the arguments to be used to process single files.
+This will be called when you launch the job on condor.
+Before submitting to condor, test locally that a single file will be processed as desired by doing
+
+```
+sh RunDataset.sh `head -n 1 jobdescription.txt`
+```
+
+If all looks good you can submit to condor by doing
+
+```
+condor_submit jobdescription.sub
+```
+
+LAWS OF CONDOR:
+1) Thou cannot put your logs/executable nor output files in eos, Condor will refuse to read it. You can however save them in afs and then move them in eos in the script.
+2) Thou cannot use mkdir while using condor.
+3) Thou need to create the c++ executable with THE SAME CMSSW CMSENV version of the one you put in full_path_to_cmssw
+4) 
+
+
+
 # Data 
 
 ## EGamma
