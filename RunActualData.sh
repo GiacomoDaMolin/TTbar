@@ -12,7 +12,7 @@
 echo "start"
 X509_USER_PROXY=/afs/cern.ch/user/g/gdamolin/private/x509up_u151129
 CMSSW=/afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
-while getopts "e:d:o:x:l:s:p:c:" opt; do
+while getopts "e:d:o:s:p:c:" opt; do
     case "$opt" in
         e) EXE=$OPTARG
             ;;
@@ -20,11 +20,7 @@ while getopts "e:d:o:x:l:s:p:c:" opt; do
             ;;
         o) OUTPATH=$OPTARG
             ;;
-        x) XSEC=$OPTARG
-            ;;
-        l) LUMI=$OPTARG
-            ;;
-        s) SIGNAL=$OPTARG
+        s) FIRSTDATASET=$OPTARG
             ;;
         p) X509_USER_PROXY=$OPTARG
             ;;
@@ -49,9 +45,7 @@ test_input () {
 test_input "Executable" "$EXE" "e"
 test_input "Dataset" "$DATASET" "d"
 test_input "Output path" "$OUTPATH" "o"
-test_input "Cross section" "$XSEC" "x"
-test_input "Integ. luminosity" "$LUMI" "l"
-test_input "Signal" "$SIGNAL" "s"
+test_input "Signal" "$FIRSTDATASET" "s"
 test_input "Path to proxy" "$X509_USER_PROXY" "p"
 test_input "CMSSW" "$CMSSW" "c"
 
@@ -77,7 +71,7 @@ if [[ "$DATASET" == *"root://"* ]]; then
   echo "CMSSW_BASE is now set to $CMSSW_BASE"
   echo "PROXY is now set to $X509_USER_PROXY"
   echo "Executing analysis script as"
-  ${EXE} $filename $ofilename ${XSEC} ${LUMI} ${SIGNAL}
+  ${EXE} $filename $ofilename ${FIRSTDATASET}
   mv $ofilename ${OUTPATH}/${filestring}_MA.root
 
 else
@@ -88,7 +82,7 @@ else
   jobdescription="jobdescription.txt"
   rm ${jobdescription}
   for file in ${datafiles[@]}; do
-      echo "-e ${EXE} -d root://cms-xrd-global.cern.ch//${file} -o ${OUTPATH} -x ${XSEC} -l ${LUMI} -s ${SIGNAL} -p ${X509_USER_PROXY} -c $CMSSW" >> ${jobdescription} 
+      echo "-e ${EXE} -d root://cms-xrd-global.cern.ch//${file} -o ${OUTPATH} -s ${FIRSTDATASET} -p ${X509_USER_PROXY} -c $CMSSW" >> ${jobdescription} 
   done
   echo "Use ${jobdescription} with your condor file"
 
