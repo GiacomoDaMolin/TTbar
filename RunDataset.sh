@@ -69,25 +69,28 @@ if [[ "$DATASET" == *"root://"* ]]; then
   filestring=$(echo $filename | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
   ofilename=${outdir}/$filestring"_MA".root
 
-  cd $CMSSW
+  cd "$CMSSW" || exit
   eval `scram r -sh`
   export X509_USER_PROXY=$X509_USER_PROXY
-  cd -
+  cd - || exit 
 
   echo "CMSSW_BASE is now set to $CMSSW_BASE"
   echo "PROXY is now set to $X509_USER_PROXY"
   echo "Executing analysis script as"
-  ${EXE} $filename $ofilename ${XSEC} ${LUMI} ${SIGNAL}
-  mv $ofilename ${OUTPATH}/${filestring}_MA.root
+  ${EXE} "$filename" "$ofilename" "${XSEC}" "${LUMI}" "${SIGNAL}"
+  mv "$ofilename" "${OUTPATH}"/"${filestring}"_MA.root
 
 else
 
   echo "Using dasgoclient to list files and create submission jobs"
 
-  datafiles=`dasgoclient -query="file dataset=${DATASET}"`
+  datafiles=$(dasgoclient -query="file dataset=${DATASET}")
   jobdescription="jobdescription.txt"
+  #if [[ -f ${jobdescription} ]];
+  #then
   rm ${jobdescription}
-  for file in ${datafiles[@]}; do
+  #fi
+  for file in "${datafiles[@]}"; do
       echo "-e ${EXE} -d root://cms-xrd-global.cern.ch//${file} -o ${OUTPATH} -x ${XSEC} -l ${LUMI} -s ${SIGNAL} -p ${X509_USER_PROXY} -c $CMSSW" >> ${jobdescription} 
   done
   echo "Use ${jobdescription} with your condor file"
