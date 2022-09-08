@@ -227,5 +227,7 @@ int main(int argc, char **argv)
     string outputFile = argv[2];
     string boolstr=argv[3];
     bool IsFirstDataset= (boolstr=="true");
+    if (IsFirstDataset) {std::cout<<"############## It is first dataset! ##################"<<std::endl;}
+    if (!IsFirstDataset) {std::cout<<"@@@@@@@@@@@@@@ NOT first dataset! @@@@@@@@@@@@@@@@@@"<<std::endl;}
     DataAnalysis(inputFile, outputFile, IsFirstDataset);
 }
