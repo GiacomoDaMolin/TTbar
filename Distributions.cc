@@ -10,7 +10,7 @@ void Normalize(TH1D *a, Double_t norm=1, int nbins = 5)
 	//a->Rebin(nbins);
 }
 void Distributions(){
- string startdir="/eos/user/g/gdamolin/TT2bbemu/RESULTS/Final/";
+ string startdir="/eos/user/g/gdamolin/TT2bbemu/RESULTS/Corr/NewFinal/";
  TFile *FileData = new TFile((startdir+"Out_Data.root").c_str());
 
  TFile *FileDB = new TFile((startdir+"Out_DB.root").c_str()); 
@@ -43,7 +43,7 @@ void Distributions(){
    //Normalize(Mupt[i]); Normalize(Mueta[i]); Normalize(Ept[i]); Normalize(Eeta[i]); Normalize(InvMass[i]); Normalize(LeadingPt[i]);
    }
  if(i>0) {
-  TTree * runout= static_cast<TTree *>(Files[i]->Get("Run_out"));
+ /* TTree * runout= static_cast<TTree *>(Files[i]->Get("Run_out"));
   Double_t singFile=0, TotW=0;
   runout->SetBranchStatus("*",0);
   runout->SetBranchStatus("genEventSumw",1);
@@ -52,14 +52,14 @@ void Distributions(){
    	runout->GetEntry(j);
     	TotW+=singFile;
 	//cout<<TotW<<endl;
-   	}
+   	}*/
   Mupt[i] = static_cast<TH1D *>(Files[i]->Get("h_Muon_pt_weighted"));
   Mueta[i] = static_cast<TH1D *>(Files[i]->Get("h_Muon_eta_weighted"));
   Ept[i] = static_cast<TH1D *>(Files[i]->Get("h_Electron_pt_weighted"));
   Eeta[i] = static_cast<TH1D *>(Files[i]->Get("h_Electron_eta_weighted"));
   InvMass[i] = static_cast<TH1D *>(Files[i]->Get("Muon_Electron_invariant_mass_weighted"));
   LeadingPt[i] = static_cast<TH1D *>(Files[i]->Get("leading_lepton_pt_weighted"));
-  Normalize(Mupt[i],TotW); Normalize(Mueta[i],TotW); Normalize(Ept[i],TotW); Normalize(Eeta[i],TotW); Normalize(InvMass[i],TotW); Normalize(LeadingPt[i],TotW);
+  //Normalize(Mupt[i],TotW); Normalize(Mueta[i],TotW); Normalize(Ept[i],TotW); Normalize(Eeta[i],TotW); Normalize(InvMass[i],TotW); Normalize(LeadingPt[i],TotW);
   }
  } 
 
@@ -96,7 +96,7 @@ void Distributions(){
 	/*Mueta[0]->SetLineWidth(3);
 	Mueta[0]->SetLineColor(kRed);*/
 	Mueta[0]->SetMarkerSize(2);
-	Mueta[0]->SetMarkerStyle(22);
+	Mueta[0]->SetMarkerStyle(2);
 	Mueta[0]->Draw("P SAME");
 	gPad->BuildLegend(0.7,0.7,0.9,0.9);
 	gPad->Update();
@@ -125,7 +125,7 @@ void Distributions(){
 	/*Mupt[0]->SetLineWidth(3);
 	Mupt[0]->SetLineColor(kRed);*/
 	Mupt[0]->SetMarkerSize(2);
-	Mupt[0]->SetMarkerStyle(22);
+	Mupt[0]->SetMarkerStyle(2);
 	Mupt[0]->Draw("P SAME");
 	gPad->BuildLegend(0.7,0.7,0.9,0.9);
 	gPad->Update();
@@ -154,7 +154,7 @@ void Distributions(){
 	/*Eeta[0]->SetLineWidth(3);
 	Eeta[0]->SetLineColor(kRed);*/
 	Eeta[0]->SetMarkerSize(2);
-	Eeta[0]->SetMarkerStyle(22);
+	Eeta[0]->SetMarkerStyle(2);
 	Eeta[0]->Draw("P SAME");
 	gPad->BuildLegend(0.7,0.7,0.9,0.9);
 	gPad->Update();
@@ -183,7 +183,7 @@ void Distributions(){
 	/*Ept[0]->SetLineWidth(3);
 	Ept[0]->SetLineColor(kRed);*/
 	Ept[0]->SetMarkerSize(2);
-	Ept[0]->SetMarkerStyle(22);
+	Ept[0]->SetMarkerStyle(2);
 	Ept[0]->Draw("P SAME");
 	gPad->BuildLegend(0.7,0.7,0.9,0.9);
 	gPad->Update();
@@ -212,7 +212,7 @@ void Distributions(){
 	/*LeadingPt[0]->SetLineWidth(3);
 	LeadingPt[0]->SetLineColor(kRed);*/
 	LeadingPt[0]->SetMarkerSize(2);
-	LeadingPt[0]->SetMarkerStyle(22);
+	LeadingPt[0]->SetMarkerStyle(2);
 	LeadingPt[0]->Draw("P SAME");
 	gPad->BuildLegend(0.7,0.7,0.9,0.9);
 	gPad->Update();
@@ -241,7 +241,7 @@ void Distributions(){
 	/*InvMass[0]->SetLineWidth(3);
 	InvMass[0]->SetLineColor(kRed);*/
 	InvMass[0]->SetMarkerSize(2);
-	InvMass[0]->SetMarkerStyle(22);
+	InvMass[0]->SetMarkerStyle(2);
 	InvMass[0]->Draw("P SAME");
 	gPad->BuildLegend(0.7,0.7,0.9,0.9);
 	gPad->Update();
