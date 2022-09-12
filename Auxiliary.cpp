@@ -55,4 +55,9 @@ void printMCTree(int size, Int_t *GenId, Int_t *GenParent, Int_t initialID)
 	}
 }
 
+double InvertPhi(double phi){
+ double invphi=phi+M_PI;
+ if (invphi>M_PI){invphi=invphi-2*M_PI;}
+ return invphi;
+}
 #endif // Auxiliary_cpp
