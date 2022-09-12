@@ -330,8 +330,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
         }
         //END only for signal
 
-	double dR_allJets=999, dR_lbJets=999, dR_mbJets=999;
-	double Apl_allJets=1.1,Apl_lbJets=1.1,minMbApl=1.1;
+	dR_allJets=999, dR_lbJets=999, dR_mbJets=999;
+	Apl_allJets=1.1,Apl_lbJets=1.1,Apl_mbJets=1.1;
 	bool ok1=false,ok2=false ,ok3=false;
 	for (size_t j = 0; j < nJet; j++){
 		if (j==id_m_jet) continue;
@@ -388,13 +388,18 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection=-1, doub
     std::cout << "non_matching_muon = " << non_matching_muon << endl;
     std::cout << "non_matching_electron = " << non_matching_electron << endl;
 
+    std::cout << "NeV = " << nEv << endl;
+    std::cout << "trigger dropped = " << trigger_dropped << endl;
+    std::cout << "selections dropped = " << n_dropped << endl;
+
+
     std::cout << "Fraction of events discarded by trigger = " << (trigger_dropped*1./nEv) << endl;
     std::cout << "Fraction of events discarded by selection = " << (n_dropped*1./nEv) << endl;
 
     std::cout << "Fraction of events passing triggers = " << (nEv - trigger_dropped)*1./nEv << endl;
     std::cout << "Fraction of events passing selection = " << (nEv - n_dropped)*1./nEv << endl;
 
-    std::cout << "Selected events over triggered events = " << (nEv - trigger_dropped - n_dropped)*1./(nEv - trigger_dropped) << endl;
+    std::cout << "Selected events over triggered events = " << (nEv - n_dropped)*1./(nEv - trigger_dropped) << endl;
     // Write the histograms to the file
     h_Muon_eta->Write(); 
     h_Muon_pt->Write();
