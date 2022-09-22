@@ -7,7 +7,8 @@
 // initialID: last index of the particle (ex: Electron_genPartIdx[j]=initialID)
 
 // should be called from func as isFromW(MAX_ARRAY_SIZE,GenPart_pdgId,GenPart_genPartIdxMother,Electron_genPartIdx[j])
-
+//arguments: (array of PdgID of Gen Particles (Int_t), array of GenParent of Gen Particles (Int_t, contains the index to the parent of the selected GenParticle
+// InitialID  is the index of the starting muon in the GenParticles array)
 bool isFromW(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 {
 	if (initialID < 0)
