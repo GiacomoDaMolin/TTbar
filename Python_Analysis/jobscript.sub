@@ -1,0 +1,15 @@
+basedir=/afs/cern.ch/user/j/jowulff/TTbar
+#if you need to run on MC
+#executable=$(basedir)/RunDataset.sh
+#if you need to run on Data
+executable=$(basedir)/RunActualData.sh
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+output                = $(basedir)/../output/hello.$(ClusterId).$(ProcId).out
+error                 = $(basedir)/../error/hello.$(ClusterId).$(ProcId).err
+log                   = $(basedir)/../log/hello.$(ClusterId).log
+
++JobFlavour = "longlunch"
+queue arguments from $(basedir)/jobdescription.txt

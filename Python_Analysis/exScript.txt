@@ -1,0 +1,66 @@
+#!/usr/bin/bash
+
+############ MC ##############
+./RunDataset.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Mixed_Analysis -d  /TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM -o /eos/user/g/gdamolin/TT2bbemu/TTLLorLTAUL -x 88290 -l 59.827879506 -s true -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunDataset.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Mixed_Analysis -d /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM -o /eos/user/g/gdamolin/TT2bbemu/TTSemileptonic -x 365340 -l 59.827879506 -s false -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunDataset.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Mixed_Analysis -d /TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM -o /eos/user/g/gdamolin/TT2bbemu/TThad -x 377960 -l 59.827879506 -s false -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+#DY
+
+
+"dataset": "/DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+#new
+
+
+
+#Wjets
+
+
+
+
+
+#new
+
+"dataset": "/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+"dataset": "/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+
+#singleT
+
+"dataset": "ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV_PDFWeights-powheg-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+"dataset": "ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV_PDFWeights-powheg-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+#Dibosons
+
+"dataset": "WW_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+"dataset": "WZ_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+"dataset": "ZZ_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM"
+
+#QCD
+
+
+
+
+########### Data #############
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /EGamma/Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18A_EG -s true -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /SingleMuon/Run2018A-UL2018_MiniAODv2_NanoAODv9-v2/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18A_SM -s false -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /EGamma/Run2018B-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18B_EG -s true -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /SingleMuon/Run2018B-UL2018_MiniAODv2_NanoAODv9-v2/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18B_SM -s false -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /EGamma/Run2018C-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18C_EG -s true -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /SingleMuon/Run2018C-UL2018_MiniAODv2_NanoAODv9-v2/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18C_SM -s false -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /EGamma/Run2018D-UL2018_MiniAODv2_NanoAODv9-v3/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18D_EG -s true -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
+
+./RunActualData.sh -e /afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis -d /SingleMuon/Run2018D-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD -o /eos/user/g/gdamolin/TT2bbemu/Data18D_SM -s false -p /afs/cern.ch/user/g/gdamolin/private/x509up_u151129 -c /afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src

@@ -1,0 +1,468 @@
+---
+driver=<class 'textual.drivers.linux_driver.LinuxDriver'>
+Load() >>> Browser(title='Textual')
+Mount() >>> Browser(title='uproot-browser')
+Mount() >>> DockView(name='DockView#1')
+Mount() >>> Header('')
+Mount() >>> ScrollView(name='ScrollView#1')
+Mount() >>> ScrollView(name='ScrollView#1')
+Mount() >>> WindowView(name='WindowView#1')
+Mount() >>> TreeView(name='test.root')
+TRANSLATING layout
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+Focus() >>> TreeView(name='test.root')
+MouseDown(x=23, y=2, screen_y=5, button=1) >>> TreeView(name='test.root')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+MouseUp(x=23, y=2, screen_y=5, button=1) >>> TreeView(name='test.root')
+Click(x=23, y=2, screen_y=5, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=1, label='//h_Electron_eta', data=UprootItem(path='//h_Electron_eta', item=<TH1D (version 3) at 0x7f285d9cf4f0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+CursorMove(TreeView(name='test.root')) >>> ScrollView(name='ScrollView#1')
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=22, y=4, screen_y=7, button=1) >>> TreeView(name='test.root')
+MouseUp(x=22, y=4, screen_y=7, button=1) >>> TreeView(name='test.root')
+Click(x=22, y=4, screen_y=7, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=3, label='//h_Electron_pt_weighted', data=UprootItem(path='//h_Electron_pt_weighted', item=<TH1D (version 3) at 0x7f285da198d0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=23, y=6, screen_y=9, button=1) >>> TreeView(name='test.root')
+MouseUp(x=23, y=6, screen_y=9, button=1) >>> TreeView(name='test.root')
+Click(x=23, y=6, screen_y=9, button=1) >>> TreeView(name='test.root')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=25, y=3, screen_y=6, button=1) >>> TreeView(name='test.root')
+MouseUp(x=25, y=3, screen_y=6, button=1) >>> TreeView(name='test.root')
+Click(x=25, y=3, screen_y=6, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=2, label='//h_Electron_pt', data=UprootItem(path='//h_Electron_pt', item=<TH1D (version 3) at 0x7f285da18760>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=36, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+MouseUp(x=36, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+Click(x=36, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=9, label='//h_Muon_pt_weighted', data=UprootItem(path='//h_Muon_pt_weighted', item=<TH1D (version 3) at 0x7f285d0501f0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=34, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+MouseUp(x=34, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+Click(x=34, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f285d051360>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=43, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+MouseUp(x=43, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+Click(x=43, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=11, label='//h_leading_lepton_pt_weighted', data=UprootItem(path='//h_leading_lepton_pt_weighted', item=<TH1D (version 3) at 0x7f285d052500>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=31, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+MouseUp(x=31, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+Click(x=31, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f285d051360>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=30, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+MouseUp(x=30, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+Click(x=30, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=9, label='//h_Muon_pt_weighted', data=UprootItem(path='//h_Muon_pt_weighted', item=<TH1D (version 3) at 0x7f285d0501f0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=30, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+MouseUp(x=30, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+Click(x=30, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f285d051360>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=29, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+MouseUp(x=29, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+Click(x=29, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=38, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+TRANSLATING layout
+MouseUp(x=33, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+Click(x=33, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f285d051360>))) >>> TreeView(name='test.root')
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+set_focus TreeView(name='test.root')
+MouseDown(x=33, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+MouseUp(x=33, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+Click(x=33, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f285d051360>))) >>> TreeView(name='test.root')
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=32, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+MouseUp(x=32, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+Click(x=32, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=11, label='//h_leading_lepton_pt_weighted', data=UprootItem(path='//h_leading_lepton_pt_weighted', item=<TH1D (version 3) at 0x7f285d052500>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=28, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+MouseUp(x=28, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+Click(x=28, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=11, label='//h_leading_lepton_pt_weighted', data=UprootItem(path='//h_leading_lepton_pt_weighted', item=<TH1D (version 3) at 0x7f285d052500>))) >>> TreeView(name='test.root')
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+set_focus TreeView(name='test.root')
+MouseDown(x=28, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+MouseUp(x=28, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+Click(x=28, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=11, label='//h_leading_lepton_pt_weighted', data=UprootItem(path='//h_leading_lepton_pt_weighted', item=<TH1D (version 3) at 0x7f285d052500>))) >>> TreeView(name='test.root')
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=26, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+MouseUp(x=26, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+Click(x=26, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f285d051360>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=23, y=10, screen_y=13, button=1) >>> TreeView(name='test.root')
+MouseUp(x=23, y=10, screen_y=13, button=1) >>> TreeView(name='test.root')
+Click(x=23, y=10, screen_y=13, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=7, label='//h_Muon_eta_weighted', data=UprootItem(path='//h_Muon_eta_weighted', item=<TH1D (version 3) at 0x7f285d035ed0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=20, y=9, screen_y=12, button=1) >>> TreeView(name='test.root')
+MouseUp(x=20, y=9, screen_y=12, button=1) >>> TreeView(name='test.root')
+Click(x=20, y=9, screen_y=12, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=6, label='//h_Muon_eta', data=UprootItem(path='//h_Muon_eta', item=<TH1D (version 3) at 0x7f285d034d60>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=19, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+MouseUp(x=19, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+Click(x=19, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=8, label='//h_Muon_pt', data=UprootItem(path='//h_Muon_pt', item=<TH1D (version 3) at 0x7f285d037040>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=16, y=9, screen_y=12, button=1) >>> TreeView(name='test.root')
+MouseUp(x=16, y=9, screen_y=12, button=1) >>> TreeView(name='test.root')
+Click(x=16, y=9, screen_y=12, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=6, label='//h_Muon_eta', data=UprootItem(path='//h_Muon_eta', item=<TH1D (version 3) at 0x7f285d034d60>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=19, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+MouseUp(x=19, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+Click(x=19, y=11, screen_y=14, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=8, label='//h_Muon_pt', data=UprootItem(path='//h_Muon_pt', item=<TH1D (version 3) at 0x7f285d037040>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=31, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+MouseUp(x=31, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+Click(x=31, y=13, screen_y=16, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f285d051360>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=28, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+MouseUp(x=28, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+Click(x=28, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=9, label='//h_Muon_pt_weighted', data=UprootItem(path='//h_Muon_pt_weighted', item=<TH1D (version 3) at 0x7f285d0501f0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+Leave() >>> Header('uproot-browser')
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=39, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+MouseUp(x=39, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+Click(x=39, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=11, label='//h_leading_lepton_pt_weighted', data=UprootItem(path='//h_leading_lepton_pt_weighted', item=<TH1D (version 3) at 0x7f285d052500>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=32, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+MouseUp(x=32, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+Click(x=32, y=12, screen_y=15, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=9, label='//h_Muon_pt_weighted', data=UprootItem(path='//h_Muon_pt_weighted', item=<TH1D (version 3) at 0x7f285d0501f0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=34, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+MouseUp(x=34, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+Click(x=34, y=14, screen_y=17, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=11, label='//h_leading_lepton_pt_weighted', data=UprootItem(path='//h_leading_lepton_pt_weighted', item=<TH1D (version 3) at 0x7f285d052500>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=28, y=10, screen_y=13, button=1) >>> TreeView(name='test.root')
+MouseUp(x=28, y=10, screen_y=13, button=1) >>> TreeView(name='test.root')
+Click(x=28, y=10, screen_y=13, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=7, label='//h_Muon_eta_weighted', data=UprootItem(path='//h_Muon_eta_weighted', item=<TH1D (version 3) at 0x7f285d035ed0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=33, y=7, screen_y=10, button=1) >>> TreeView(name='test.root')
+MouseUp(x=33, y=7, screen_y=10, button=1) >>> TreeView(name='test.root')
+Click(x=33, y=7, screen_y=10, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=5, label='//h_Muon_Electron_invariant_mass_weighted', data=UprootItem(path='//h_Muon_Electron_invariant_mass_weighted', item=<TH1D (version 3) at 0x7f285da1bbb0>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=27, y=5, screen_y=8, button=1) >>> TreeView(name='test.root')
+MouseUp(x=27, y=5, screen_y=8, button=1) >>> TreeView(name='test.root')
+Click(x=27, y=5, screen_y=8, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=4, label='//h_Muon_Electron_invariant_mass', data=UprootItem(path='//h_Muon_Electron_invariant_mass', item=<TH1D (version 3) at 0x7f285da1aa40>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=15, y=15, screen_y=18, button=1) >>> TreeView(name='test.root')
+MouseUp(x=15, y=15, screen_y=18, button=1) >>> TreeView(name='test.root')
+Click(x=15, y=15, screen_y=18, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=12, label='//tout', data=UprootItem(path='//tout', item=<TTree 'tout' (19 branches) at 0x7f285d053670>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+TRANSLATING layout
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='test.root')
+MouseDown(x=25, y=17, screen_y=20, button=1) >>> TreeView(name='test.root')
+MouseUp(x=25, y=17, screen_y=20, button=1) >>> TreeView(name='test.root')
+Click(x=25, y=17, screen_y=20, button=1) >>> TreeView(name='test.root')
+ACTION TreeView(name='test.root') click_label
+TreeClick(node=TreeNode(id=13, label='//tout/Electron_eta', data=UprootItem(path='//tout/Electron_eta', item=<TBranch 'Electron_eta' at 0x7f285d066290>))) >>> TreeView(name='test.root')
+TRANSLATING layout
+UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus Header('uproot-browser')
+Blur() >>> TreeView(name='test.root')
+MouseDown(x=3, y=1, button=1) >>> Header('uproot-browser')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+MouseUp(x=3, y=1, button=1) >>> Header('uproot-browser')
+Click(x=3, y=1, button=1) >>> Header('uproot-browser')
+Click(x=3, y=1, button=1) >>> Header('uproot-browser')
+ACTION Browser(title='uproot-browser') quit
+CLOSED Browser(title='uproot-browser')
+PROCESS END
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+CLOSED ScrollView(name='ScrollView#1')
+CLOSED TreeView(name='test.root')
+CLOSED WindowView(name='WindowView#1')
+CLOSED ScrollBar(virtual_size=47, window_size=48, position=0)
+CLOSED Footer(keys=[])
+CLOSED ScrollBar(virtual_size=37, window_size=34, position=0)
+CLOSED PlotWidget(name='PlotWidget#1')
+CLOSED Header('uproot-browser')

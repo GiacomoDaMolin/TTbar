@@ -1,3 +1,4 @@
+#!/afs/cern.ch/user/j/jowulff/miniconda3/envs/shep/bin/python
 import uproot
 import numpy as np
 import awkward as ak
@@ -6,59 +7,81 @@ import vector
 
 import hist
 from argparse import ArgumentParser
+import correctionlib
 
 
 def make_parser():
     parser = ArgumentParser()
-    parser.add_argument("-i", "--input", nargs='*',
+    parser.add_argument("-i", "--input", type=str, 
                         default=None, help='Input Root File')
-    parser.add_argument("-o", "--output", nargs=1,
+    parser.add_argument("-o", "--output", type=str,
                         default=None, help='Output File')
-    parser.add_argument("-x", "--cross_section", nargs=1,
+    parser.add_argument("-x", "--cross_section", type=float, nargs=1,
                         default=-1, help="Cross Section of MC Dataset")
-    parser.add_argument("-l", "--int_luminosity", nargs=1,
+    parser.add_argument("-l", "--int_luminosity", type=float, nargs=1,
                         default=-1, help="Integrated Lumi to scale to")
-    parser.add_argument("-m", "--mc", nargs=1,
-                        action='store_true', help='MC Flag. If set, mc==True')
+    parser.add_argument("-m", "--mc", action='store_true',
+                        help='MC Flag. If set, mc==True')
+    parser.add_argument("--first_data", help="Is this the first time", 
+                        action='store_true',)
     #parser.add_argument("-s", "--signal", nargs=1, action='store_true',
-                        #help='Signal Flag. If set, signal==True. Only allowed if mc == True.')
+    #help='Signal Flag. If set, signal==True. Only allowed if mc == True.')
     return parser
+
+
+def load_corrector(file,):
+    if file.endswith(".json.gz"):
+        import gzip
+        with gzip.open(file, 'rt') as file:
+            data = file.read().strip()
+            ceval = correctionlib.CorrectionSet.from_string(data)
+    else:
+        ceval = correctionlib.CorrectonSet.from_file(file)
+    return ceval
+
 
 
 def spacial_invert(vec):
     return -vec.to_Vector3D().to_Vector4D()+vector.obj(px=0, py=0, pz=0, E=vec.E)
 
 
-def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, ):
+def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=False):
     correctionfiles = {
-        'muon': "../corrections/muon_Z.json.gz",
-        'electron': "../corrections/electron.json.gz",
-        'pileup': "../corrections/puWeights.json.gz",
-        'jets': "../corrections/jet_jerc.json.gz",
-        'b_tag': "../corrections/btagging.json.gz"
+        'muon': "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/muon_Z.json.gz",
+        'electron': "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/electron.json.gz",
+        'pileup': "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/puWeights.json.gz",
+        'jets': "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/jet_jerc.json.gz",
+        'b_tag': "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/btagging.json.gz"
     }
 
     outfile = uproot.recreate(ofilename)
-    outfile.mktree("tout", {'Muon_pt': np.float64,
-                            'Muon_eta': np.float64,
-                            'Muon_phi': np.float64,
-                            'Muon_mass': np.float64,
-                            'Electron_pt':  np.float64,
-                            'Electron_eta': np.float64,
-                            'Electron_phi': np.float64,
-                            'Electron_mass': np.float64,
-                            'Jet_pt': np.float64,
-                            'Jet_eta': np.float64,
-                            'Jet_phi': np.float64,
-                            'Jet_mass': np.float64,
-                            'mu_e_inv_mass': np.float64,
-                            'leading_lepton_pt': np.float64,
-                            'N_jet_loose': np.int32,
-                            'N_jet_tight': np.int32,
-                            'N_jet_medium': np.int32,
-                            'N_gen': np.int32,
-                            'Sum_W': np.float64,
-                            })
+    out_dict = {'Muon_pt': np.float64,
+                'Muon_eta': np.float64,
+                'Muon_phi': np.float64,
+                'Muon_mass': np.float64,
+                'Electron_pt':  np.float64,
+                'Electron_eta': np.float64,
+                'Electron_phi': np.float64,
+                'Electron_mass': np.float64,
+                'Jet_pt': np.float64,
+                'Jet_eta': np.float64,
+                'Jet_phi': np.float64,
+                'Jet_mass': np.float64,
+                'mu_e_inv_mass': np.float64,
+                'leading_lepton_pt': np.float64,
+                'muon_corrections': np.float64,
+                'electron_corrections': np.float64,
+                'pu_corrections': np.float64,
+                'b_tag_corrections': np.float64,
+                'genWeight': np.float64,
+                'weight': np.float64,
+                'N_jet_loose': np.int32,
+                'N_jet_tight': np.int32,
+                'N_jet_medium': np.int32, }
+    if mc_flag:
+        out_dict['N_gen'] = np.int32
+        out_dict['Sum_w'] = np.float64
+    outfile.mktree("tout", out_dict)
     ## define histograms
     h_Muon_pt = hist.Hist(hist.axis.Regular(
         bins=100, start=0, stop=200, name="Muon pt"))
@@ -113,6 +136,10 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, ):
     for events in tree.iterate(
             filter_name=filter_names+mc_filter_names, cut=trigger_cut,
             entry_stop=100000):
+        if not mc_flag:
+            if not first_data:
+                cut = (events['HLT_IsoMu24']) & (events['HLT_Ele32_WPTight_Gsf'])
+                events = events[~(cut)]
         # apply muon and electron cuts
         m_pt_cut = events['Muon_pt']>27
         m_eta_cut = np.abs(events['Muon_eta'])<2.4
@@ -211,13 +238,16 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, ):
             mu_c_iso = muon_eval['NUM_TightRelIso_DEN_TightIDandIPCut'].evaluate(
                 '2018_UL', np.abs(muon_4d.eta), muon_4d.pt, 'sf')
             muon_c = mu_c_trigger*mu_c_id*mu_c_iso
+            events['muon_corrections'] = muon_c
             electron_eval = load_corrector(correctionfiles['electron'])
             ele_c = electron_eval['UL-Electron-ID-SF'].evaluate(
                 '2018', 'sf', 'Tight', electron_4d.eta, electron_4d.pt
             )
+            events['electron_corrections'] = ele_c
             pu_eval = load_corrector(correctionfiles['pileup'])
             pu_c = pu_eval['Collisions18_UltraLegacy_goldenJSON'].evaluate(
                 events['Pileup_nTrueInt'], 'nominal')
+            events['pu_corrections'] = pu_c
             #jet_eval = load_corrector(correctionfiles['jets'])
             #jet_c = jet_eval['deepJet_mujets'].evaluate(
             b_tag_eval = load_corrector(correctionfiles['b_tag'])
@@ -229,12 +259,10 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, ):
                     jet_4d.eta), jet_4d.pt, events['Jet_btagDeepFlavB']
             )
             b_tag_c = b_tag_c_shape*b_tag_c_wp
+            events['b_tag_corrections'] = b_tag_c
             corrections = muon_c * ele_c * pu_c * b_tag_c
 
-            weight = events['genWeight']*corrections
-
-        if mc_flag:
-            weight = events['genWeight']*lumi*xs*weight
+            events['weight'] = events['genWeight']*lumi*xs*corrections
 
         # fill the histograms
         h_Muon_pt.fill(muon_4d.pt)
@@ -248,34 +276,45 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, ):
         h_Muon_Electron_invariant_mass.fill(events['mu_e_inv_mass'],)
         h_leading_lepton_pt.fill(events['leading_lepton_pt'])
 
-        tout_dict = {i: events[i] for i in events[0].fields if i.endswith(('pt', 'eta',
-                                                                           'mass', 'phi', 'medium', 'loose', 'tight'))}
-        outfile['tout'].extend(tout_dict)
-        outfile['h_Muon_pt'] = h_Muon_pt
-        outfile['h_Muon_eta'] = h_Muon_eta
-        outfile['h_Electron_pt'] = h_Electron_pt
-        outfile['h_Electron_eta'] = h_Electron_eta
-        outfile['h_Muon_Electron_invariant_mass'] = h_Muon_Electron_invariant_mass
-        outfile['h_leading_lepton_pt'] = h_leading_lepton_pt
-
         if mc_flag:
+            events['N_gen'] = np.repeat(n_gen, len(events['Muon_pt']))
+            events['Sum_w'] = np.repeat(Sum_W, len(events['Muon_pt']))
+            tout_dict = {i: events[i] for i in events[0].fields if i.endswith(('pt', 'eta',
+                                                                            'mass', 'phi', 'medium', 'loose', 'tight',
+                                                                           'N_gen', 'Sum_w', 'weight', 'Weight', 'corrections'))}
+            outfile['tout'].extend(tout_dict)
             h_Muon_Electron_invariant_mass_weighted.fill(
-                events['mu_e_inv_mass'], weight=weight)
+                events['mu_e_inv_mass'], weight=events['weight'])
             h_leading_lepton_pt_weighted.fill(
-                events['leading_lepton_pt'], weight=weight)
+                events['leading_lepton_pt'], weight=events['weight'])
 
-            h_Muon_eta_weighted.fill(muon_4d.eta, weight=weight)
-            h_Muon_pt_weighted.fill(muon_4d.pt, weight=weight)
-            h_Electron_pt_weighted.fill(electron_4d.pt, weight=weight)
-            h_Electron_eta_weighted.fill(electron_4d.eta, weight=weight)
+            h_Muon_eta_weighted.fill(muon_4d.eta, weight=events['weight'])
+            h_Muon_pt_weighted.fill(muon_4d.pt, weight=events['weight'])
+            h_Electron_pt_weighted.fill(electron_4d.pt, weight=events['weight'])
+            h_Electron_eta_weighted.fill(electron_4d.eta, weight=events['weight'])
             outfile['h_Muon_pt_weighted'] = h_Muon_pt_weighted
             outfile['h_Muon_eta_weighted'] = h_Muon_eta_weighted
             outfile['h_Electron_pt_weighted'] = h_Electron_pt_weighted
             outfile['h_Muon_eta_weighted'] = h_Muon_eta_weighted
             outfile['h_Muon_Electron_invariant_mass_weighted'] = h_Muon_Electron_invariant_mass_weighted
             outfile['h_leading_lepton_pt_weighted'] = h_leading_lepton_pt_weighted
-            outfile['N_gen'] = np.repeat(n_gen, len(events['Muon_pt']))
-            outfile['Sum_w'] = np.repeat(Sum_W, len(events['Muon_pt']))
+            outfile['h_Muon_pt'] = h_Muon_pt
+            outfile['h_Muon_eta'] = h_Muon_eta
+            outfile['h_Electron_pt'] = h_Electron_pt
+            outfile['h_Electron_eta'] = h_Electron_eta
+            outfile['h_Muon_Electron_invariant_mass'] = h_Muon_Electron_invariant_mass
+            outfile['h_leading_lepton_pt'] = h_leading_lepton_pt
+
+        else:
+            tout_dict = {i: events[i] for i in events[0].fields if i.endswith(('pt', 'eta',
+                                                                            'mass', 'phi', 'medium', 'loose', 'tight',))}
+            outfile['tout'].extend(tout_dict)
+            outfile['h_Muon_pt'] = h_Muon_pt
+            outfile['h_Muon_eta'] = h_Muon_eta
+            outfile['h_Electron_pt'] = h_Electron_pt
+            outfile['h_Electron_eta'] = h_Electron_eta
+            outfile['h_Muon_Electron_invariant_mass'] = h_Muon_Electron_invariant_mass
+            outfile['h_leading_lepton_pt'] = h_leading_lepton_pt
 
 
 def main():
@@ -285,7 +324,8 @@ def main():
              ofilename=args.output,
              xs=args.cross_section,
              lumi=args.int_luminosity,
-             mc_flag=args.mc)
+             mc_flag=args.mc, 
+             first_data=args.first_data)
 
 
 if __name__ == "__main__":

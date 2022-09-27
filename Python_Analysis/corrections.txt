@@ -1,9 +1,11 @@
+# muons
+
 Correction NUM_GlobalMuons_DEN_genTracks has 4 inputs
    Input year (string): year/scenario: example 2016preVFP, 2017 etc
    Input abseta (real): Probe abseta
    Input pt (real): Probe pt
    Input ValType (string): sf or syst (currently 'sf' is nominal, and 'systup' and 'systdown' are up/down variations with total stat+syst uncertainties. Individual systs are also available (in these cases syst only, not sf +/- syst)
-   
+
 Correction NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight has 4 inputs
    Input year (string): year/scenario: example 2016preVFP, 2017 etc
    Input abseta (real): Probe abseta
