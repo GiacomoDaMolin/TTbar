@@ -1,5 +1,7 @@
 # How to send jobs in Condor
 
+##SFs in the region 1.44 < |η| < 1.57, corresponding to the transition between the barrel and endcaps of ECAL, are not provided by the EGM POG since this region is excluded by most physics analyses. 
+
 To create the description of the jobs needed to run over a dataset the following command can be used
 
 ```
