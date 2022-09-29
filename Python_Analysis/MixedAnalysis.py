@@ -124,7 +124,8 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
     mc_filter_names = ['/(Electron|Muon)_genPart(Idx|Flav)/',
                        '/GenPart_(pdgId|genPartIdxMother)/',
                        'nGenPart']
-    file = uproot.open(filename)
+    file_handler = uproot.MultithreadedFileSource
+    file = uproot.open(filename, file_handler=file_handler)
     tree = file['Events']
     # ^ is xor in python
     trigger_cut = "HLT_IsoMu24 | HLT_Ele32_WPTight_Gsf"

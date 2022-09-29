@@ -9,7 +9,7 @@
 # -p proxy path
 
 echo "start"
-usage() { echo "Usage: $0 [-e <executable> ] [-p <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-p <user_proxy>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-f <submitfile>] [-e <executable> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-p <user_proxy>]" 1>&2; exit 1; }
 while getopts "f:e:d:o:x:l:p:" opt; do
     case "$opt" in
 	f) SUBFILE=$OPTARG
