@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-usage() { echo "Usage: $0 [-e <executable> ] [-p <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-p <user_proxy>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-e <executable> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-p <user_proxy>]" 1>&2; exit 1; }
 while getopts "e:d:o:x:l:p:f:" opt; do
     case "$opt" in
         e) EXE=$OPTARG

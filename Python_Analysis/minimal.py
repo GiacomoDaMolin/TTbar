@@ -17,7 +17,7 @@ def make_parser():
 
 def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,):
     outfile = uproot.recreate(ofilename)
-    out_dict = {'Muon_pt': np.float64,}
+    out_dict = {'Muon_pt': 'var *float64'}
     outfile.mktree("tout", out_dict)
     filter_names = ['Muon_pt', ]
     #file_handler = uproot.MultithreadedFileSource
@@ -25,11 +25,9 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,):
     file = uproot.open(filename,)
     tree = file['Events']
     trigger_cut = "HLT_IsoMu24 | HLT_Ele32_WPTight_Gsf"
-    # get the sumW from the runs tree
     for events in tree.iterate(
             filter_name=filter_names, cut=trigger_cut,
             entry_stop=10000):
-        # apply muon and electron cuts
         tout_dict = {'Muon_pt': events['Muon_pt'],}
         outfile['tout'].extend(tout_dict)
 

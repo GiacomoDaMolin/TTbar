@@ -124,8 +124,7 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
     mc_filter_names = ['/(Electron|Muon)_genPart(Idx|Flav)/',
                        '/GenPart_(pdgId|genPartIdxMother)/',
                        'nGenPart']
-    file_handler = uproot.MultithreadedFileSource
-    file = uproot.open(filename, file_handler=file_handler)
+    file = uproot.open(filename,)
     tree = file['Events']
     # ^ is xor in python
     trigger_cut = "HLT_IsoMu24 | HLT_Ele32_WPTight_Gsf"
@@ -136,7 +135,7 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
         Sum_W = file['Runs']['genEventSumw'].array()
     for events in tree.iterate(
             filter_name=filter_names+mc_filter_names, cut=trigger_cut,
-            entry_stop=100000):
+            entry_stop=10000):
         if not mc_flag:
             if not first_data:
                 cut = (events['HLT_IsoMu24']) & (events['HLT_Ele32_WPTight_Gsf'])
@@ -242,7 +241,7 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
             events['muon_corrections'] = muon_c
             electron_eval = load_corrector(correctionfiles['electron'])
             ele_c = electron_eval['UL-Electron-ID-SF'].evaluate(
-                '2018', 'sf', 'Tight', electron_4d.eta, electron_4d.pt
+                '2018', 'sf', 'wp90iso', electron_4d.eta, electron_4d.pt
             )
             events['electron_corrections'] = ele_c
             pu_eval = load_corrector(correctionfiles['pileup'])
@@ -277,12 +276,34 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
         h_Muon_Electron_invariant_mass.fill(events['mu_e_inv_mass'],)
         h_leading_lepton_pt.fill(events['leading_lepton_pt'])
 
+        tout_dict = {'Muon_pt': events["Muon_pt"],
+                     'Muon_eta': events["Muon_eta"],
+                     'Muon_phi': events["Muon_phi"],
+                     'Muon_mass': events["Muon_mass"],
+                     'Electron_pt': events["Electron_pt"],
+                     'Electron_eta': events["Electron_eta"],
+                     'Electron_phi': events["Electron_phi"],
+                     'Electron_mass': events["Electron_mass"],
+                     'N_jet_loose': events["N_jet_loose"],
+                     'N_jet_medium': events["N_jet_medium"],
+                     'N_jet_tight': events["N_jet_tight"],
+                     'Jet_pt': events["Jet_pt"],
+                     'Jet_eta': events["Jet_eta"],
+                     'Jet_phi': events["Jet_phi"],
+                     'Jet_mass': events["Jet_mass"],
+                     'mu_e_inv_mass': events["mu_e_inv_mass"],
+                     'leading_lepton_pt': events["leading_lepton_pt"]}
         if mc_flag:
             events['N_gen'] = np.repeat(n_gen, len(events['Muon_pt']))
             events['Sum_w'] = np.repeat(Sum_W, len(events['Muon_pt']))
-            tout_dict = {i: events[i] for i in events[0].fields if i.endswith(('pt', 'eta',
-                                                                            'mass', 'phi', 'medium', 'loose', 'tight',
-                                                                           'N_gen', 'Sum_w', 'weight', 'Weight', 'corrections'))}
+            tout_dict['genWeight'] = events["genWeight"]
+            tout_dict['muon_corrections'] = events["muon_corrections"]
+            tout_dict['electron_corrections'] = events["electron_corrections"]
+            tout_dict['pu_corrections'] = events["pu_corrections"]
+            tout_dict['b_tag_corrections'] = events["b_tag_corrections"]
+            tout_dict['weight'] = events["weight"]
+            tout_dict['N_gen'] = events['N_gen']
+            tout_dict['Sum_w'] = events['Sum_w']
             outfile['tout'].extend(tout_dict)
             h_Muon_Electron_invariant_mass_weighted.fill(
                 events['mu_e_inv_mass'], weight=events['weight'])
@@ -307,8 +328,6 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
             outfile['h_leading_lepton_pt'] = h_leading_lepton_pt
 
         else:
-            tout_dict = {i: events[i] for i in events[0].fields if i.endswith(('pt', 'eta',
-                                                                            'mass', 'phi', 'medium', 'loose', 'tight',))}
             outfile['tout'].extend(tout_dict)
             outfile['h_Muon_pt'] = h_Muon_pt
             outfile['h_Muon_eta'] = h_Muon_eta
