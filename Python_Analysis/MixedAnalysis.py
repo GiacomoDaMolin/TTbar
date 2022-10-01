@@ -199,7 +199,8 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
         # first drop events where there is no jet that passes the wp
         b_tag_medium_cut = events['Jet_btagDeepFlavB']>btag_deepflav_wp['medium']
         b_tag_eta = np.abs(events['Jet_eta'])<2.4
-        events['b_tag_cut'] = b_tag_medium_cut&b_tag_eta
+        b_tag_pt = events['Jet_pt']>25
+        events['b_tag_cut'] = (b_tag_medium_cut)&(b_tag_eta)&(b_tag_pt)
         muon_4d=muon_4d[ak.any(events['b_tag_cut'], axis=1)]
         electron_4d=electron_4d[ak.any(events['b_tag_cut'], axis=1)]
         events = events[ak.any(events['b_tag_cut'], axis=1)]

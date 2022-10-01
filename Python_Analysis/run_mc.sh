@@ -1,11 +1,9 @@
 #!/usr/bin/bash
 
 usage() { echo "Usage: $0 [-e <executable> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-p <user_proxy>]" 1>&2; exit 1; }
-while getopts "e:d:o:x:l:p:f:" opt; do
+while getopts "i:o:x:l:p:" opt; do
     case "$opt" in
-        e) EXE=$OPTARG
-            ;;
-        d) DATASET=$OPTARG
+        i) INFILE=$OPTARG
             ;;
         o) OUTPATH=$OPTARG
             ;;
@@ -21,12 +19,19 @@ while getopts "e:d:o:x:l:p:f:" opt; do
     esac
 done
 outdir="/afs/cern.ch/user/j/jowulff/Condor/TTbar/MC"
-filename=$DATASET
+filename=$INFILE
 filestring=$(echo $filename | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
 ofilename=${outdir}/$filestring"_MA".root
+EXE="/afs/cern.ch/user/j/jowulff/Condor/TTbar/PythonAnalysis/MixedAnalysis.py"
 
 export X509_USER_PROXY=$X509_USER_PROXY
 
 echo "PROXY is now set to $X509_USER_PROXY"
-${EXE} -i $filename -o $ofilename -x $XSEC -l $LUMI -m 
+${EXE} -i $filename -o $ofilename -x $XSEC -l $LUMI -m  || { 
+    echo "${EXE} failed with file ${filename}, removing intermediate file" 1>&2; 
+    if [[ -f $ofilename ]]; then
+    rm "$ofilename"
+    fi
+    exit 1
+    }
 mv $ofilename ${OUTPATH}/${filestring}_MA.root
