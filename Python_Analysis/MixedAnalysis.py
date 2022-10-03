@@ -69,18 +69,18 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
                 'Jet_mass': np.float64,
                 'mu_e_inv_mass': np.float64,
                 'leading_lepton_pt': np.float64,
-                'muon_corrections': np.float64,
-                'electron_corrections': np.float64,
-                'pu_corrections': np.float64,
-                'b_tag_corrections': np.float64,
-                'genWeight': np.float64,
-                'weight': np.float64,
                 'N_jet_loose': np.int32,
                 'N_jet_tight': np.int32,
                 'N_jet_medium': np.int32, }
     if mc_flag:
         out_dict['N_gen'] = np.int32
         out_dict['Sum_w'] = np.float64
+        out_dict['muon_corrections'] = np.float64
+        out_dict['electron_corrections'] = np.float64
+        out_dict['pu_corrections'] = np.float64
+        out_dict['b_tag_corrections'] = np.float64
+        out_dict['genWeight'] = np.float64
+        out_dict['weight'] = np.float64
     outfile.mktree("tout", out_dict)
     ## define histograms
     h_Muon_pt = hist.Hist(hist.axis.Regular(

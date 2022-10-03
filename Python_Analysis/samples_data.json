@@ -1,0 +1,34 @@
+{
+    "EGamma_A": {
+        "dataset": "/EGamma/Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD",
+        "first_data": "True"
+    },
+    "EGamma_B": {
+        "dataset": "/EGamma/Run2018B-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD",
+        "first_data": "True"
+    },
+    "EGamma_C": {
+        "dataset": "/EGamma/Run2018C-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD",
+        "first_data": "True"
+    },
+    "EGamma_D": {
+        "dataset": "/EGamma/Run2018D-UL2018_MiniAODv2_NanoAODv9-v3/NANOAOD",
+        "first_data": "True"
+    },
+    "SingleMuon_A": {
+        "dataset": "/SingleMuon/Run2018A-UL2018_MiniAODv2_NanoAODv9-v2/NANOAOD",
+        "first_data": "False"
+    },
+    "SingleMuon_B": {
+        "dataset": "/SingleMuon/Run2018B-UL2018_MiniAODv2_NanoAODv9-v2/NANOAOD",
+        "first_data": "False"
+    },
+    "SingleMuon_C": {
+        "dataset": "/SingleMuon/Run2018C-UL2018_MiniAODv2_NanoAODv9-v2/NANOAOD",
+        "first_data": "False"
+    },
+    "SingleMuon_D": {
+        "dataset": "/SingleMuon/Run2018D-UL2018_MiniAODv2_NanoAODv9-v1/NANOAOD",
+        "first_data": "False"
+    }
+}
