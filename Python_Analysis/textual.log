@@ -7,7 +7,37 @@ Mount() >>> Header('')
 Mount() >>> ScrollView(name='ScrollView#1')
 Mount() >>> ScrollView(name='ScrollView#1')
 Mount() >>> WindowView(name='WindowView#1')
-Mount() >>> TreeView(name='test.root')
+Mount() >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+TRANSLATING layout
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+Leave() >>> Footer(keys=[])
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+Focus() >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+MouseDown(x=12, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+MouseUp(x=12, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+Click(x=12, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+ACTION TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root') click_label
+TreeClick(node=TreeNode(id=12, label='//tout', data=UprootItem(path='//tout', item=<TTree 'tout' (25 branches) at 0x7fa1956c7610>))) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+set_focus TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+TRANSLATING layout
+TRANSLATING layout
+MouseDown(x=12, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+CursorMove(TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')) >>> ScrollView(name='ScrollView#1')
+MouseUp(x=12, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+Click(x=12, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+ACTION TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root') click_label
+TreeClick(node=TreeNode(id=12, label='//tout', data=UprootItem(path='//tout', item=<TTree 'tout' (25 branches) at 0x7fa1956c7610>))) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+TRANSLATING layout
+set_focus TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+MouseDown(x=10, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+MouseUp(x=10, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+Click(x=10, y=16, screen_y=19, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+ACTION TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root') click_label
+TreeClick(node=TreeNode(id=12, label='//tout', data=UprootItem(path='//tout', item=<TTree 'tout' (25 branches) at 0x7fa1956c7610>))) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
 TRANSLATING layout
 WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
 WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
@@ -24,68 +54,46 @@ TRANSLATING layout
 TRANSLATING layout
 TRANSLATING layout
 TRANSLATING layout
-set_focus TreeView(name='test.root')
-Focus() >>> TreeView(name='test.root')
-MouseDown(x=16, y=15, screen_y=18, button=1) >>> TreeView(name='test.root')
+TRANSLATING layout
+set_focus TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+MouseDown(x=16, y=13, screen_y=16, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+MouseUp(x=16, y=13, screen_y=16, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+Click(x=16, y=13, screen_y=16, button=1) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+ACTION TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root') click_label
+TreeClick(node=TreeNode(id=8, label='//h_Muon_pt', data=UprootItem(path='//h_Muon_pt', item=<TH1D (version 3) at 0x7fa19611afe0>))) >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+TRANSLATING layout
+UprootClick(TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus Footer(keys=[])
+Blur() >>> TreeView(name='F7916D7F-D0C1-6C40-8B74-6DE00BC6F5B3_MA.root')
+MouseDown(x=29, y=0, screen_y=34, button=1) >>> Footer(keys=[])
 WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
-MouseUp(x=16, y=15, screen_y=18, button=1) >>> TreeView(name='test.root')
-Click(x=16, y=15, screen_y=18, button=1) >>> TreeView(name='test.root')
-ACTION TreeView(name='test.root') click_label
-TreeClick(node=TreeNode(id=12, label='//tout', data=UprootItem(path='//tout', item=<TTree 'tout' (25 branches) at 0x7fd153c87d30>))) >>> TreeView(name='test.root')
-TRANSLATING layout
-TRANSLATING layout
-CursorMove(TreeView(name='test.root')) >>> ScrollView(name='ScrollView#1')
-WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
-WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-MouseScrollUp() >>> ScrollView(name='ScrollView#1')
-TRANSLATING layout
-TRANSLATING layout
-set_focus TreeView(name='test.root')
-MouseDown(x=25, y=35, screen_y=26, button=1) >>> TreeView(name='test.root')
-MouseUp(x=25, y=35, screen_y=26, button=1) >>> TreeView(name='test.root')
-Click(x=25, y=35, screen_y=26, button=1) >>> TreeView(name='test.root')
-ACTION TreeView(name='test.root') click_label
-TreeClick(node=TreeNode(id=31, label='//tout/electron_corrections', data=UprootItem(path='//tout/electron_corrections', item=<TBranch 'electron_corrections' at 0x7fd153caf670>))) >>> TreeView(name='test.root')
-TRANSLATING layout
-UprootClick(TreeView(name='test.root')) >>> Browser(title='uproot-browser')
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-TRANSLATING layout
-set_focus Header('uproot-browser')
-Blur() >>> TreeView(name='test.root')
-MouseDown(x=1, y=1, button=1) >>> Header('uproot-browser')
-WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
-MouseUp(x=2, y=1, button=1) >>> Header('uproot-browser')
-Click(x=2, y=1, button=1) >>> Header('uproot-browser')
-Click(x=2, y=1, button=1) >>> Header('uproot-browser')
-ACTION Browser(title='uproot-browser') quit
+MouseUp(x=29, y=0, screen_y=34, button=1) >>> Footer(keys=[])
+Click(x=29, y=0, screen_y=34, button=1) >>> Footer(keys=[])
+ACTION Browser(title='uproot-browser') press
+ACTION Browser(title='uproot-browser') dump
 CLOSED Browser(title='uproot-browser')
 PROCESS END
-CLOSED DockView(name='DockView#1')
-WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
-CLOSED ScrollView(name='ScrollView#1')
+CLOSED ScrollBar(virtual_size=44, window_size=31, position=0)
+CLOSED WindowView(name='WindowView#1')
+CLOSED ScrollBar(virtual_size=47, window_size=48, position=0)
+CLOSED Footer(keys=[])
 CLOSED PlotWidget(name='PlotWidget#1')
-CLOSED TreeView(name='test.root')
+CLOSED DockView(name='DockView#1')
+CLOSED ScrollView(name='ScrollView#1')
 CLOSED Header('uproot-browser')

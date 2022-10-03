@@ -35,9 +35,9 @@ executable={executable}\n\
 should_transfer_files = YES\n\
 when_to_transfer_output = ON_EXIT\n\
 \n\
-output                = {base_dir}/out/$(JOBID).out\n\
-error                 = {base_dir}/err/$(JOBID).err\n\
-log                   = {base_dir}/log/$(JOBID).log\n\
+output                = {base_dir}/out/$(ClusterId).$(ProcId).out\n\
+error                 = {base_dir}/err/$(ClusterId).$(ProcId).err\n\
+log                   = {base_dir}/log/$(ClusterId).$(ProcId).log\n\
 \n\
 +JobFlavour = \"longlunch\"\n"+arguments+"\nqueue"
     return file_str
