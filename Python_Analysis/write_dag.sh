@@ -31,6 +31,7 @@ if [[ -f ${JOBFILE} ]]; then
     rm ${JOBFILE}
 fi
 MC=true
+nfiles=0
 if [[ -z ${XSEC} && -z ${LUMI} ]]; then 
     echo "No xsec and no lumi provided."
     echo "Writing a dag file with MC==False"
@@ -42,6 +43,7 @@ if [ "$MC" == true ]; then
         JOBID=${JOBID[-1]}
         echo "JOB ${JOBID} ${SUBFILE}" >> ${JOBFILE}
         echo "VARS ${JOBID} INFILE=\"root://cms-xrd-global.cern.ch//${file}\" OUTFILE=\"${OUTPATH}\" XS=\"${XSEC}\" LUMI=\"${LUMI}\" PROXY=\"${X509_USER_PROXY}\"" >> ${JOBFILE}
+        ((nfiles=nfiles+1))
     done
 else
     for file in ${datafiles[@]}; do
@@ -49,8 +51,10 @@ else
         JOBID=${JOBID[-1]}
         echo "JOB ${JOBID} ${SUBFILE}" >> ${JOBFILE}
         echo "VARS ${JOBID} INFILE=\"root://cms-xrd-global.cern.ch//${file}\" OUTFILE=\"${OUTPATH}\" FIRST_DATA=\"$FIRST_DATA\" PROXY=\"${X509_USER_PROXY}\"" >> ${JOBFILE}
+        ((nfiles=nfiles+1))
     done
 fi
+echo "$nfiles input files found for $JOBFILE"
 
 echo "execute jobs with 'condor_submit_dag -config dagman.config ${JOBFILE}'"
 echo "or just:"

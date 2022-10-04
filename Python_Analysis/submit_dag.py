@@ -60,44 +60,45 @@ def main():
     data_json = open(args.json)
     data = json.load(data_json)
     jobscript = '/eos/user/j/jowulff/TTbar/PythonAnalysis/write_dag.sh'
-    with open("./commands.txt", 'a') as commandfile:
-        for sample in data:
-            basedir = input_dir+f"/{sample}"
-            submit_file_str = return_subfile(input_dir=input_dir,
-                                            base_dir=basedir,
-                                            executable=executable, 
-                                            mc=mc)
-            for io_dir in [basedir, f"{output_dir}/{sample}"]:
-                if not os.path.exists(io_dir):
-                    print(f"{io_dir} does not exist. Creating it now")
-                    os.mkdir(io_dir)
-            dataset = data[sample]['dataset']
-            if mc==True:
-                xsec = data[sample]['xs']
-                lumi = 59.82
-                cmd = f"{jobscript} -s {basedir}/{sample}.submit \
+    for sample in data:
+        basedir = input_dir+f"/{sample}"
+        submit_file_str = return_subfile(input_dir=input_dir,
+                                        base_dir=basedir,
+                                        executable=executable, 
+                                        mc=mc)
+        for io_dir in [basedir, f"{output_dir}/{sample}"]:
+            if not os.path.exists(io_dir):
+                print(f"{io_dir} does not exist. Creating it now")
+                os.mkdir(io_dir)
+        dataset = data[sample]['dataset']
+        if mc==True:
+            xsec = data[sample]['xs']
+            lumi = 59.82
+            cmd = f"{jobscript} -s {basedir}/{sample}.submit \
 -j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
 -x {xsec} -l {lumi} -p {proxy}"
-            else:
-                first_data = data[sample]['first_data']
-                if first_data:
-                    cmd = f"{jobscript} -s {basedir}/{sample}.submit \
+        else:
+            first_data = data[sample]['first_data']
+            if first_data:
+                cmd = f"{jobscript} -s {basedir}/{sample}.submit \
 -j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
 -f true -p {proxy}"
-                else:
-                    cmd = f"{jobscript} -s {basedir}/{sample}.submit \
+            else:
+                cmd = f"{jobscript} -s {basedir}/{sample}.submit \
 -j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
 -p {proxy}"
-            print(cmd, file=commandfile)
-            write_dagfile = Popen(cmd.split(), stdout=subprocess.PIPE)
-            wd_out, wd_err = write_dagfile.communicate()
-            # 'x' file opening mode means exclusive creation. Fails if file exists
-            with open(f"{basedir}/{sample}.submit", 'x') as file:
-                print(submit_file_str, file=file)
+        print(cmd)
+        write_dagfile = Popen(cmd.split(), stdout=subprocess.PIPE)
+        wd_out, wd_err = write_dagfile.communicate()
+        # 'x' file opening mode means exclusive creation. Fails if file exists
+        print(wd_out)
+        print(wd_err)
+        with open(f"{basedir}/{sample}.submit", 'x') as file:
+            print(submit_file_str, file=file)
 
-            for directory in ['err', 'log', 'out']:
-                if not os.path.exists(f"{basedir}/{directory}"):
-                    os.mkdir(f"{basedir}/{directory}")
+        for directory in ['err', 'log', 'out']:
+            if not os.path.exists(f"{basedir}/{directory}"):
+                os.mkdir(f"{basedir}/{directory}")
 
 
 if __name__ == "__main__":

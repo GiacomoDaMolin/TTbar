@@ -1,0 +1,94 @@
+---
+driver=<class 'textual.drivers.linux_driver.LinuxDriver'>
+Load() >>> Browser(title='Textual')
+Mount() >>> Browser(title='uproot-browser')
+Mount() >>> DockView(name='DockView#1')
+Mount() >>> Header('')
+Mount() >>> ScrollView(name='ScrollView#1')
+Mount() >>> ScrollView(name='ScrollView#1')
+Mount() >>> WindowView(name='WindowView#1')
+Mount() >>> TreeView(name='Signal.root')
+TRANSLATING layout
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+Leave() >>> Footer(keys=[])
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='Signal.root')
+Focus() >>> TreeView(name='Signal.root')
+MouseDown(x=18, y=3, screen_y=6, button=1) >>> TreeView(name='Signal.root')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+MouseUp(x=18, y=3, screen_y=6, button=1) >>> TreeView(name='Signal.root')
+Click(x=18, y=3, screen_y=6, button=1) >>> TreeView(name='Signal.root')
+ACTION TreeView(name='Signal.root') click_label
+TreeClick(node=TreeNode(id=2, label='//h_Electron_pt', data=UprootItem(path='//h_Electron_pt', item=<TH1D (version 3) at 0x7f1ff7558730>))) >>> TreeView(name='Signal.root')
+TRANSLATING layout
+CursorMove(TreeView(name='Signal.root')) >>> ScrollView(name='ScrollView#1')
+UprootClick(TreeView(name='Signal.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus TreeView(name='Signal.root')
+MouseDown(x=24, y=13, screen_y=16, button=1) >>> TreeView(name='Signal.root')
+MouseUp(x=24, y=13, screen_y=16, button=1) >>> TreeView(name='Signal.root')
+Click(x=24, y=13, screen_y=16, button=1) >>> TreeView(name='Signal.root')
+ACTION TreeView(name='Signal.root') click_label
+TreeClick(node=TreeNode(id=10, label='//h_leading_lepton_pt', data=UprootItem(path='//h_leading_lepton_pt', item=<TH1D (version 3) at 0x7f1ff758d330>))) >>> TreeView(name='Signal.root')
+TRANSLATING layout
+UprootClick(TreeView(name='Signal.root')) >>> Browser(title='uproot-browser')
+TRANSLATING layout
+TRANSLATING layout
+Leave() >>> Footer(keys=[])
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+TRANSLATING layout
+set_focus Header('uproot-browser')
+Blur() >>> TreeView(name='Signal.root')
+MouseDown(x=3, y=1, button=1) >>> Header('uproot-browser')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+MouseUp(x=3, y=1, button=1) >>> Header('uproot-browser')
+Click(x=3, y=1, button=1) >>> Header('uproot-browser')
+Click(x=3, y=1, button=1) >>> Header('uproot-browser')
+ACTION Browser(title='uproot-browser') quit
+CLOSED Browser(title='uproot-browser')
+PROCESS END
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+WindowChange(WindowView(name='WindowView#1')) >>> ScrollView(name='ScrollView#1')
+CLOSED ScrollBar(virtual_size=33, window_size=33, position=0)
+CLOSED DockView(name='DockView#1')
+CLOSED WindowView(name='WindowView#1')
+CLOSED ScrollBar(virtual_size=48, window_size=48, position=0)
+CLOSED TreeView(name='Signal.root')
+CLOSED Footer(keys=[])
+CLOSED PlotWidget(name='PlotWidget#1')
+CLOSED ScrollView(name='ScrollView#1')
+CLOSED Header('uproot-browser')

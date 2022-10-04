@@ -199,8 +199,8 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
         # first drop events where there is no jet that passes the wp
         b_tag_medium_cut = events['Jet_btagDeepFlavB']>btag_deepflav_wp['medium']
         b_tag_eta = np.abs(events['Jet_eta'])<2.4
-        b_tag_pt = events['Jet_pt']>25
-        events['b_tag_cut'] = (b_tag_medium_cut)&(b_tag_eta)&(b_tag_pt)
+        #b_tag_pt = events['Jet_pt']>25
+        events['b_tag_cut'] = (b_tag_medium_cut)&(b_tag_eta)#&(b_tag_pt)
         muon_4d=muon_4d[ak.any(events['b_tag_cut'], axis=1)]
         electron_4d=electron_4d[ak.any(events['b_tag_cut'], axis=1)]
         events = events[ak.any(events['b_tag_cut'], axis=1)]
@@ -318,7 +318,7 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
             outfile['h_Muon_pt_weighted'] = h_Muon_pt_weighted
             outfile['h_Muon_eta_weighted'] = h_Muon_eta_weighted
             outfile['h_Electron_pt_weighted'] = h_Electron_pt_weighted
-            outfile['h_Muon_eta_weighted'] = h_Muon_eta_weighted
+            outfile['h_Electron_eta_weighted'] = h_Electron_eta_weighted
             outfile['h_Muon_Electron_invariant_mass_weighted'] = h_Muon_Electron_invariant_mass_weighted
             outfile['h_leading_lepton_pt_weighted'] = h_leading_lepton_pt_weighted
             outfile['h_Muon_pt'] = h_Muon_pt
@@ -327,7 +327,6 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
             outfile['h_Electron_eta'] = h_Electron_eta
             outfile['h_Muon_Electron_invariant_mass'] = h_Muon_Electron_invariant_mass
             outfile['h_leading_lepton_pt'] = h_leading_lepton_pt
-
         else:
             outfile['tout'].extend(tout_dict)
             outfile['h_Muon_pt'] = h_Muon_pt
