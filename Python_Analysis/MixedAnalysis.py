@@ -73,14 +73,16 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
                 'N_jet_tight': np.int32,
                 'N_jet_medium': np.int32, }
     if mc_flag:
-        out_dict['N_gen'] = np.int32
-        out_dict['Sum_w'] = np.float64
         out_dict['muon_corrections'] = np.float64
         out_dict['electron_corrections'] = np.float64
         out_dict['pu_corrections'] = np.float64
         out_dict['b_tag_corrections'] = np.float64
         out_dict['genWeight'] = np.float64
         out_dict['weight'] = np.float64
+
+        file_out_dict = {'SumW': np.float64,
+                         'nE': np.float64} 
+        outfile.mktree("Run_out", file_out_dict)
     outfile.mktree("tout", out_dict)
     ## define histograms
     h_Muon_pt = hist.Hist(hist.axis.Regular(
@@ -131,8 +133,9 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
     btag_deepflav_wp = {'loose': 0.0490, 'medium': 0.2783, 'tight': 0.71}
     # get the sumW from the runs tree
     if mc_flag:
-        n_gen = file['Runs']['genEventCount'].array()
-        Sum_W = file['Runs']['genEventSumw'].array()
+        nE = file['Runs']['genEventCount'].array()
+        SumW = file['Runs']['genEventSumw'].array()
+        outfile['Run_out'].extend({'nE': nE, 'SumW': SumW})
     for events in tree.iterate(
             filter_name=filter_names+mc_filter_names, cut=trigger_cut,
             entry_stop=10000):
@@ -295,16 +298,12 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
                      'mu_e_inv_mass': events["mu_e_inv_mass"],
                      'leading_lepton_pt': events["leading_lepton_pt"]}
         if mc_flag:
-            events['N_gen'] = np.repeat(n_gen, len(events['Muon_pt']))
-            events['Sum_w'] = np.repeat(Sum_W, len(events['Muon_pt']))
             tout_dict['genWeight'] = events["genWeight"]
             tout_dict['muon_corrections'] = events["muon_corrections"]
             tout_dict['electron_corrections'] = events["electron_corrections"]
             tout_dict['pu_corrections'] = events["pu_corrections"]
             tout_dict['b_tag_corrections'] = events["b_tag_corrections"]
             tout_dict['weight'] = events["weight"]
-            tout_dict['N_gen'] = events['N_gen']
-            tout_dict['Sum_w'] = events['Sum_w']
             outfile['tout'].extend(tout_dict)
             h_Muon_Electron_invariant_mass_weighted.fill(
                 events['mu_e_inv_mass'], weight=events['weight'])
