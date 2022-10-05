@@ -1,31 +1,61 @@
 from argparse import ArgumentParser
-from asyncio import subprocess
-from glob import glob
-from subprocess import Popen
+import os
+from subprocess import Popen, PIPE
+import json
+import sys
 
 
 def make_parser():
-    parser = ArgumentParser(description="Resubmit dags that created\
-a rescue file. Run this script on a directory and it will check it's\
-subdirectories for rescue00N files where N is an int.")
-    parser.add_argument('-d', '--directory', type=str, help='parent\
-directory to check subdirectories from.')
-    parser.add_argument('-n', '--number', type=int, help='the number added\
-at the end of the rescue dag file.')
+    parser = ArgumentParser(description="Resubmit dags that failed on some jobs.\
+This script checks if the number of files in the output dir matches the number\
+of files returned by dasgoclient")
+    parser.add_argument('-o', '--output_base_dir',
+                        type=str, help='output directory.')
+    parser.add_argument('-s', '--submit_base_dir', type=str,
+                        help='directory to submit from')
+    parser.add_argument('-j', '--json', type=str, help='json to read the dasgoclient\
+datsets and the names of the subdirs from')
     return parser
 
 
-def resubmit(directory: str, n: int):
-    if directory.endswith('/'):
-        directory = directory[:-1]
-    rescuefiles = glob(directory+f"/*/*.rescue00{n}")
-    print(f"Found {len(rescuefiles)} .rescue00{n}")
-    for rfile in rescuefiles:
-        dagfile = '.'.join(rfile.split('.')[:-1])
+def run_dasgoclient(dataset: str):
+    """
+    Runs dasgoclient and returns a list of files for a given dataset
+    """
+    cmd = f'dasgoclient -query="file dataset={dataset}"'
+    process = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, encoding='utf-8')
+    out, err = process.communicate()
+    if err:
+        print(err)
+        sys.exit(1)
+    else:
+        return out.split()
+
+
+def n_rootfiles_in_dir(directory: str):
+    """
+    returns the number of .root files within a given dir
+    """
+    cmd = f'find {directory} -type f -name "*.root" | wc -l'
+    process = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, encoding='utf-8')
+    out, err = process.communicate()
+    if err:
+        print(err)
+        sys.exit(1)
+    else:
+        return int(out)
+
+
+def submit(dagfile: str):
+    if not os.path.exists(dagfile):
+        raise ValueError(f"{dagfile} does not exist.")
+    else:
         cmd = f"condor_submit_dag {dagfile}"
         print(f"running: {cmd}")
         proc = Popen(cmd, shell=True,
-                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                     stdout=PIPE,
+                     stderr=PIPE,
+                     encoding='utf-8')
         out, err = proc.communicate()
         if err:
             print(err)
@@ -36,7 +66,22 @@ def resubmit(directory: str, n: int):
 def main():
     parser = make_parser()
     args = parser.parse_args()
-    resubmit(directory=args.directory, n=args.number)
+    output_base_dir = args.output_base_dir
+    submit_base_dir = args.submit_base_dir
+    f = open(args.json)
+    samples = json.load(f)
+    for sample in samples:
+        n_root = n_rootfiles_in_dir(directory=output_base_dir+f'/{sample}')
+        dataset = samples[sample]['dataset']
+        n_das = len(run_dasgoclient(dataset=dataset))
+        print(f"number of files in {output_base_dir}/{sample}: {n_root}")
+        print(f"number of files in {dataset}: {n_das}")
+        if n_root == n_das:
+            print(f"processing complete for {sample}!")
+        else:
+            print("Numbers don't match.. Resubmitting")
+            dagfile = f"{submit_base_dir}/{sample}/{sample}.dag"
+            submit(dagfile=dagfile)
 
 
 if __name__ == "__main__":
