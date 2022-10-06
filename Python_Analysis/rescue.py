@@ -8,7 +8,9 @@ import sys
 def make_parser():
     parser = ArgumentParser(description="Resubmit dags that failed on some jobs.\
 This script checks if the number of files in the output dir matches the number\
-of files returned by dasgoclient")
+of files returned by dasgoclient. Make sure you are in a workspace\
+that allows you to submit (/afs/). Running this script from eos will raise errors\
+when trying to submit.")
     parser.add_argument('-o', '--output_base_dir',
                         type=str, help='output directory.')
     parser.add_argument('-s', '--submit_base_dir', type=str,

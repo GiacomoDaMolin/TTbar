@@ -17,14 +17,14 @@ def normalise(filename: str,):
     sum_w = np.sum(file['Run_out']['SumW'].array())
     weights = file['tout']['weight'].array()
     gen_weights = file['tout']['genWeight'].array()
-    weights /= sum_w
-    gen_weights /= sum_w
+    weights = weights / sum_w
+    gen_weights = gen_weights/sum_w
     outfile = uproot.update(filename)
-    outfile['tout'] = {"normalised_weights": weights,
-                       "normalised_gen_weights", gen_weights}
+    outfile['weights'] = {"normalised_weights": weights,
+                          "normalised_gen_weights": gen_weights}
 
 
-def main(infiles list):
+def main():
     parser = make_parser()
     args = parser.parse_args()
     infiles = args.input_files

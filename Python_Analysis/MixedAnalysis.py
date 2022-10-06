@@ -138,7 +138,7 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False, first_data=
         outfile['Run_out'].extend({'nE': nE, 'SumW': SumW})
     for events in tree.iterate(
             filter_name=filter_names+mc_filter_names, cut=trigger_cut,
-            entry_stop=10000):
+            step_size=50000):
         if not mc_flag:
             if not first_data:
                 cut = (events['HLT_IsoMu24']) & (events['HLT_Ele32_WPTight_Gsf'])
