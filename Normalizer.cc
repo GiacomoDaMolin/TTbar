@@ -2,14 +2,14 @@
 #include<TH1.h>
 #include<TFile.h>
 
-void Normalize(TH1D *a, Double_t norm=1, int nbins = 5)
+void ormalize(TH1D *a, Double_t norm=1, int nbins = 5)
 {
-	a->Scale(1./norm*1000);
+	a->Scale(1./norm);
 	//a->Rebin(nbins);
 }
 
 void Normalizer(string infile){
- string startdir="/eos/user/g/gdamolin/TT2bbemu/RESULTS/";
+ string startdir="/afs/cern.ch/user/g/gdamolin/public/DR/";
  TFile *FileIn = new TFile((startdir+infile).c_str());
 
  TTree * runIn= static_cast<TTree *>(FileIn->Get("Run_out"));
@@ -29,7 +29,7 @@ void Normalizer(string infile){
  TH1D* InvMass = static_cast<TH1D *>(FileIn->Get("Muon_Electron_invariant_mass_weighted"));
  TH1D* LeadingPt = static_cast<TH1D *>(FileIn->Get("leading_lepton_pt_weighted"));
 
- Normalize(Mupt,TotW); Normalize(Mueta,TotW); Normalize(Ept,TotW); Normalize(Eeta,TotW); Normalize(InvMass,TotW); Normalize(LeadingPt,TotW);
+ ormalize(Mupt,TotW); ormalize(Mueta,TotW); ormalize(Ept,TotW); ormalize(Eeta,TotW); ormalize(InvMass,TotW); ormalize(LeadingPt,TotW);
 
  TFile *FileOut = new TFile((startdir+"Corr/"+infile).c_str(),"RECREATE");
  Mupt->Write();

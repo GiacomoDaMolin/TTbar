@@ -10,7 +10,7 @@ void Normalize(TH1D *a, Double_t norm=1, int nbins = 5)
 	//a->Rebin(nbins);
 }
 void Distributions(){
- string startdir="/eos/user/g/gdamolin/TT2bbemu/RESULTS/Corr/NewFinal/";
+ string startdir="/afs/cern.ch/user/g/gdamolin/public/DR/Corr/";
  TFile *FileData = new TFile((startdir+"Out_Data.root").c_str());
 
  TFile *FileDB = new TFile((startdir+"Out_DB.root").c_str()); 
