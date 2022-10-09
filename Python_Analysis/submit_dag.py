@@ -12,7 +12,8 @@ def make_parser():
     parser.add_argument('-o', "--output_dir", type=str,
                         help="/eos/ base dir to store data", default=None)
     parser.add_argument('-e', "--executable", type=str, default=None,
-                        help="full path to executable to run for each dag entry.")
+                        help="full path to executable to run for \
+each dag entry.")
     parser.add_argument('-j', "--json", type=str,
                         help="json file with datasets and xs..", default=None)
     parser.add_argument('-p', "--proxy", type=str,
@@ -24,11 +25,14 @@ def make_parser():
 
 def return_subfile(input_dir, base_dir, executable, mc):
     if not executable.startswith("/"):
-        executable = '/afs/cern.ch/user/j/jowulff/Condor/TTbar/PythonAnalysis/'+executable
+        executable = '/afs/cern.ch/user/j/jowulff/Condor/\
+TTbar/PythonAnalysis/'+executable
     if mc:
-        arguments='Arguments = -i $(INFILE) -o $(OUTFILE) -x $(XS) -l $(LUMI) -p $(PROXY)\n'
+        arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
+-x $(XS) -l $(LUMI) -p $(PROXY)\n'
     else:
-        arguments='Arguments = -i $(INFILE) -o $(OUTFILE) -f $(FIRST_DATA) -p $(PROXY)\n'
+        arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
+-f $(FIRST_DATA) -p $(PROXY)\n'
     file_str = f"basedir={input_dir}\n\
 \n\
 executable={executable}\n\
@@ -63,20 +67,21 @@ def main():
     for sample in data:
         basedir = input_dir+f"/{sample}"
         submit_file_str = return_subfile(input_dir=input_dir,
-                                        base_dir=basedir,
-                                        executable=executable, 
-                                        mc=mc)
+                                         base_dir=basedir,
+                                         executable=executable,
+                                         mc=mc)
         for io_dir in [basedir, f"{output_dir}/{sample}"]:
             if not os.path.exists(io_dir):
                 print(f"{io_dir} does not exist. Creating it now")
                 os.mkdir(io_dir)
         dataset = data[sample]['dataset']
-        if mc==True:
+        if mc is True:
             xsec = data[sample]['xs']
             lumi = 59.82
+            sum_w = data[sample]['Sum_w']
             cmd = f"{jobscript} -s {basedir}/{sample}.submit \
 -j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
--x {xsec} -l {lumi} -p {proxy}"
+-x {xsec} -l {lumi} -w {sum_w} -p {proxy}"
         else:
             first_data = data[sample]['first_data']
             if first_data:
@@ -88,11 +93,16 @@ def main():
 -j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
 -p {proxy}"
         print(cmd)
-        write_dagfile = Popen(cmd.split(), stdout=subprocess.PIPE)
+        write_dagfile = Popen(cmd.split(), shell=True,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE, encoding='utf-8')
         wd_out, wd_err = write_dagfile.communicate()
         # 'x' file opening mode means exclusive creation. Fails if file exists
-        print(wd_out)
-        print(wd_err)
+        if wd_out:
+            print(wd_out)
+        else:
+            print(wd_err)
+
         with open(f"{basedir}/{sample}.submit", 'x') as file:
             print(submit_file_str, file=file)
 

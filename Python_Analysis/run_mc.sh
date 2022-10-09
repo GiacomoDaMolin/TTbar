@@ -11,6 +11,8 @@ while getopts "i:o:x:l:p:" opt; do
             ;;
         l) LUMI=$OPTARG
             ;;
+        w) SUM_W=$OPTARG
+            ;;
         p) X509_USER_PROXY=$OPTARG
             ;;
         *)
@@ -27,7 +29,7 @@ EXE="/afs/cern.ch/user/j/jowulff/Condor/TTbar/PythonAnalysis/MixedAnalysis.py"
 export X509_USER_PROXY=$X509_USER_PROXY
 
 echo "PROXY is now set to $X509_USER_PROXY"
-${EXE} -i $filename -o $ofilename -x $XSEC -l $LUMI -m  || { 
+${EXE} -i $filename -o $ofilename -x $XSEC -l $LUMI -s $SUM_W -m  || { 
     echo "${EXE} failed with file ${filename}, removing intermediate file" 1>&2; 
     if [[ -f $ofilename ]]; then
     rm "$ofilename"

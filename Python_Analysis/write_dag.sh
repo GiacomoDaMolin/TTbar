@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
 echo "start"
-usage() { echo "Usage: $0 [-s <submitfile>] [-j <.dag jobfile> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-p <user_proxy>]" 1>&2; exit 1; }
-while getopts "s:j:d:o:x:l:f:p:" opt; do
+usage() { echo "Usage: $0 [-s <submitfile>] [-j <.dag jobfile> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-w <sum_w>] [-p <user_proxy>]" 1>&2; exit 1; }
+while getopts "s:j:d:o:x:l:w:f:p:" opt; do
     case "$opt" in
         s) SUBFILE=$OPTARG
             ;;
@@ -15,6 +15,8 @@ while getopts "s:j:d:o:x:l:f:p:" opt; do
         x) XSEC=$OPTARG
             ;;
         l) LUMI=$OPTARG
+            ;;
+        w) SUM_W=$OPTARG
             ;;
         f) FIRST_DATA=$OPTARG 
             ;;
@@ -42,7 +44,7 @@ if [ "$MC" == true ]; then
         JOBID=(${file//\// })
         JOBID=${JOBID[-1]}
         echo "JOB ${JOBID} ${SUBFILE}" >> ${JOBFILE}
-        echo "VARS ${JOBID} INFILE=\"root://cms-xrd-global.cern.ch//${file}\" OUTFILE=\"${OUTPATH}\" XS=\"${XSEC}\" LUMI=\"${LUMI}\" PROXY=\"${X509_USER_PROXY}\"" >> ${JOBFILE}
+        echo "VARS ${JOBID} INFILE=\"root://cms-xrd-global.cern.ch//${file}\" OUTFILE=\"${OUTPATH}\" XS=\"${XSEC}\" LUMI=\"${LUMI}\" SUM_W=\"${SUM_W}\" PROXY=\"${X509_USER_PROXY}\"" >> ${JOBFILE}
         ((nfiles=nfiles+1))
     done
 else

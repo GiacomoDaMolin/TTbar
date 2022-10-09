@@ -1,3 +1,4 @@
+#!/eos/user/j/jowulff/miniconda3/bin/python
 from argparse import ArgumentParser
 import os
 from subprocess import Popen, PIPE
