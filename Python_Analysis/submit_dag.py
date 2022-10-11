@@ -29,7 +29,7 @@ def return_subfile(input_dir, base_dir, executable, mc):
 TTbar/PythonAnalysis/'+executable
     if mc:
         arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) -p $(PROXY)\n'
+-x $(XS) -l $(LUMI) -w $(SUM_W) -p $(PROXY)\n'
     else:
         arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
 -f $(FIRST_DATA) -p $(PROXY)\n'
@@ -93,7 +93,7 @@ def main():
 -j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
 -p {proxy}"
         print(cmd)
-        write_dagfile = Popen(cmd.split(), shell=True,
+        write_dagfile = Popen(cmd, shell=True,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE, encoding='utf-8')
         wd_out, wd_err = write_dagfile.communicate()

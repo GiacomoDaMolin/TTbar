@@ -16,9 +16,9 @@ def make_parser():
                         default=None, help='Input Root File')
     parser.add_argument("-o", "--output", type=str,
                         default=None, help='Output File')
-    parser.add_argument("-x", "--cross_section", type=float, nargs=1,
+    parser.add_argument("-x", "--cross_section", type=float,
                         default=-1, help="Cross Section of MC Dataset")
-    parser.add_argument("-l", "--int_luminosity", type=float, nargs=1,
+    parser.add_argument("-l", "--int_luminosity", type=float,
                         default=-1, help="Integrated Lumi to scale to")
     parser.add_argument("-m", "--mc", action='store_true',
                         help='MC Flag. If set, mc==True')
@@ -55,30 +55,30 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
     }
 
     outfile = uproot.recreate(ofilename)
-    out_dict = {'Muon_pt': 'var * float64',
-                'Muon_eta': "var *float64",
-                'Muon_phi': "var *float64",
-                'Muon_mass': "var *float64",
-                'Electron_pt':  "var *float64",
-                'Electron_eta': "var *float64",
-                'Electron_phi': "var *float64",
-                'Electron_mass': "var *float64",
-                'Jet_pt': "var *float64",
-                'Jet_eta': "var *float64",
-                'Jet_phi': "var *float64",
-                'Jet_mass': "var *float64",
-                'mu_e_inv_mass': "var *float64",
-                'leading_lepton_pt': "var *float64",
-                'N_jet_loose': "var *int32",
-                'N_jet_tight': "var *int32",
-                'N_jet_medium': "var *int32", }
+    out_dict = {'Muon_pt': np.float64,
+                'Muon_eta': np.float64,
+                'Muon_phi': np.float64,
+                'Muon_mass': np.float64,
+                'Electron_pt': np. float64,
+                'Electron_eta': np.float64,
+                'Electron_phi': np.float64,
+                'Electron_mass': np.float64,
+                'Jet_pt': np.float64,
+                'Jet_eta': np.float64,
+                'Jet_phi': np.float64,
+                'Jet_mass': np.float64,
+                'mu_e_inv_mass': np.float64,
+                'leading_lepton_pt': np.float64,
+                'N_jet_loose': np.int32,
+                'N_jet_tight': np.int32,
+                'N_jet_medium': np.int32, }
     if mc_flag:
-        out_dict['muon_corrections'] = "var *float64"
-        out_dict['electron_corrections'] = "var *float64"
-        out_dict['pu_corrections'] = "var *float64"
-        out_dict['b_tag_corrections'] = "var *float64"
-        out_dict['genWeight'] = "var *float64"
-        out_dict['weight'] = "var *float64"
+        out_dict['muon_corrections'] = np.float64
+        out_dict['electron_corrections'] = np.float64
+        out_dict['pu_corrections'] = np.float64
+        out_dict['b_tag_corrections'] = np.float64
+        out_dict['genWeight'] = np.float64
+        out_dict['weight'] = np.float64
 
         file_out_dict = {'SumW': np.float64,
                          'nE': np.float64}
@@ -123,12 +123,7 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
     mc_filter_names = ['/(Electron|Muon)_genPart(Idx|Flav)/',
                        '/GenPart_(pdgId|genPartIdxMother)/',
                        'nGenPart']
-    while True:
-        try:
-            file = uproot.open(filename)
-        except OSError:
-            continue
-        break
+    file = uproot.open(filename)
     tree = file['Events']
     # ^ is xor in python
     trigger_cut = "HLT_IsoMu24 | HLT_Ele32_WPTight_Gsf"
@@ -173,7 +168,7 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
         # the pt cuts make sure of this: we only have events left where we have
         # at least one electron and at leats one muon
         charge_cut = (events['Muon_charge', events['muon_cuts']][:, 0]
-                      * events['Electron_charge', events['electron_cuts']][:, 0]) < 0
+                    * events['Electron_charge', events['electron_cuts']][:, 0]) < 0
         events = events[charge_cut]
         # create four-vectors
         events['Muon_pt'] = events['Muon_pt', events['muon_cuts']][:, 0]
@@ -181,13 +176,13 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
         events['Muon_phi'] = events['Muon_phi', events['muon_cuts']][:, 0]
         events['Muon_mass'] = events['Muon_mass', events['muon_cuts']][:, 0]
         events['Electron_pt'] = events['Electron_pt',
-                                       events['electron_cuts']][:, 0]
+                                    events['electron_cuts']][:, 0]
         events['Electron_eta'] = events['Electron_eta',
                                         events['electron_cuts']][:, 0]
         events['Electron_phi'] = events['Electron_phi',
                                         events['electron_cuts']][:, 0]
         events['Electron_mass'] = events['Electron_mass',
-                                         events['electron_cuts']][:, 0]
+                                        events['electron_cuts']][:, 0]
         # objects are ordered by pt. If there was more than one mu/e that passed all
         # requirements we take index 0 for highest pt
         muon_4d = vector.array({'pt': events['Muon_pt'],
@@ -228,11 +223,11 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
         events['Jet_phi'] = events['Jet_phi', events['b_tag_cut']][:, 0]
         events['Jet_mass'] = events['Jet_mass', events['b_tag_cut']][:, 0]
         events['Jet_btagDeepFlavB'] = events['Jet_btagDeepFlavB',
-                                             events['b_tag_cut']][:, 0]
+                                            events['b_tag_cut']][:, 0]
         jet_4d = vector.array({'pt': events['Jet_pt'],
-                               'eta': events['Jet_eta'],
-                               'phi': events['Jet_phi'],
-                               'mass': events['Jet_mass'], })
+                            'eta': events['Jet_eta'],
+                            'phi': events['Jet_phi'],
+                            'mass': events['Jet_mass'], })
         #opposite_jet = spacial_invert(jet_4d)
         dR_mu_jet = muon_4d.deltaR(jet_4d)
         dR_e_jet = electron_4d.deltaR(jet_4d)
@@ -281,13 +276,14 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
             events['b_tag_corrections'] = b_tag_c_wp
             corrections = muon_c * ele_c * pu_c * b_tag_c_wp
 
-            events['weight'] = events['genWeight']*(lumi*xs*corrections)/(sum_w)
+            weights = (lumi*xs*corrections)/(sum_w)
+            events['weight'] = events['genWeight']*weights
 
         # fill the histograms
-        h_Muon_pt.fill(muon_4d.pt)
-        h_Muon_eta.fill(muon_4d.eta)
-        h_Electron_pt.fill(electron_4d.pt)
-        h_Electron_eta.fill(electron_4d.eta)
+        h_Muon_pt.fill(events['Muon_pt'])
+        h_Muon_eta.fill(events['Muon_eta'])
+        h_Electron_pt.fill(events['Electron_pt'])
+        h_Electron_eta.fill(events['Electron_eta'])
 
         events['mu_e_inv_mass'] = (muon_4d + electron_4d).M
         events['leading_lepton_pt'] = np.max(
@@ -322,28 +318,43 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
             h_Muon_Electron_invariant_mass_weighted.fill(
                 events['mu_e_inv_mass'], weight=events['weight'])
             h_leading_lepton_pt_weighted.fill(events['leading_lepton_pt'], weight=events['weight'])
-            h_Muon_eta_weighted.fill(events['muon_eta'], weight=events['weight'])
-            h_Muon_pt_weighted.fill(events['muon_pt'], weight=events['weight'])
-            h_Electron_pt_weighted.fill(events['electron_pt'], weight=events['weight'])
-            h_Electron_eta_weighted.fill(events['electron_eta'], weight=events['weight'])
+            h_Muon_eta_weighted.fill(events['Muon_eta'], weight=events['weight'])
+            h_Muon_pt_weighted.fill(events['Muon_pt'], weight=events['weight'])
+            h_Electron_pt_weighted.fill(events['Electron_pt'], weight=events['weight'])
+            h_Electron_eta_weighted.fill(events['Electron_eta'], weight=events['weight'])
         outfile['tout'].extend(tout_dict)
+    file.close()
     outfile['h_Muon_pt'] = h_Muon_pt
     outfile['h_Muon_eta'] = h_Muon_eta
     outfile['h_Electron_pt'] = h_Electron_pt
     outfile['h_Electron_eta'] = h_Electron_eta
     outfile['h_Muon_Electron_invariant_mass'] = h_Muon_Electron_invariant_mass
     outfile['h_leading_lepton_pt'] = h_leading_lepton_pt
+    if mc_flag is True:
+        outfile['h_Muon_pt_weighted'] = h_Muon_pt_weighted
+        outfile['h_Muon_eta_weighted'] = h_Muon_eta_weighted
+        outfile['h_Electron_pt_weighted'] = h_Electron_pt_weighted
+        outfile['h_Electron_eta_weighted'] = h_Electron_eta_weighted
+        outfile['h_Muon_Electron_invariant_mass_weighted'] = h_Muon_Electron_invariant_mass_weighted
+        outfile['h_leading_lepton_pt_weighted'] = h_leading_lepton_pt_weighted
+    outfile.close()
 
 
 def main():
     parser = make_parser()
     args = parser.parse_args()
-    skimming(filename=args.input,
-             ofilename=args.output,
-             xs=args.cross_section,
-             lumi=args.int_luminosity,
-             mc_flag=args.mc,
-             first_data=args.first_data)
+    while True:
+        try:
+            skimming(filename=args.input,
+                     ofilename=args.output,
+                     xs=args.cross_section,
+                     lumi=args.int_luminosity,
+                     sum_w=args.sum_w,
+                     mc_flag=args.mc,
+                     first_data=args.first_data)
+        except OSError:
+            continue
+        break
 
 
 if __name__ == "__main__":

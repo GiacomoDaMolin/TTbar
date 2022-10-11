@@ -16,6 +16,8 @@ of files returned by dasgoclient")
                         help='directory to submit from')
     parser.add_argument('-j', '--json', type=str, help='json to read the dasgoclient\
 datsets and the names of the subdirs from')
+    parser.add_argument("-r", "--resubmit", action='store_true',
+                        help="If set, resubmit datasets which aren't complete")
     return parser
 
 
@@ -71,6 +73,7 @@ def main():
     args = parser.parse_args()
     output_base_dir = args.output_base_dir
     submit_base_dir = args.submit_base_dir
+    resubmit = args.resubmit
     f = open(args.json)
     samples = json.load(f)
     for sample in samples:
@@ -82,9 +85,12 @@ def main():
         if n_root == n_das:
             print(f"processing complete for {sample}!")
         else:
-            print("Numbers don't match.. Resubmitting")
-            dagfile = f"{submit_base_dir}/{sample}/{sample}.dag"
-            submit(dagfile=dagfile)
+            if resubmit is True:
+                print("Numbers don't match.. Resubmitting")
+                dagfile = f"{submit_base_dir}/{sample}/{sample}.dag"
+                submit(dagfile=dagfile)
+            else:
+                print(f"Numbers don't match for {sample}!")
 
 
 if __name__ == "__main__":

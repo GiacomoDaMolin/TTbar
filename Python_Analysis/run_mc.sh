@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-usage() { echo "Usage: $0 [-e <executable> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-p <user_proxy>]" 1>&2; exit 1; }
-while getopts "i:o:x:l:p:" opt; do
+usage() { echo "Usage: $0 [-e <executable> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-w <sum_w>] [-p <user_proxy>]" 1>&2; exit 1; }
+while getopts "i:o:x:l:w:p:" opt; do
     case "$opt" in
         i) INFILE=$OPTARG
             ;;
