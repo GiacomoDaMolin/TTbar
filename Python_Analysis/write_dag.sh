@@ -52,7 +52,7 @@ else
         JOBID=(${file//\// })
         JOBID=${JOBID[-1]}
         echo "JOB ${JOBID} ${SUBFILE}" >> ${JOBFILE}
-        echo "VARS ${JOBID} INFILE=\"root://cms-xrd-global.cern.ch//${file}\" OUTFILE=\"${OUTPATH}\" FIRST_DATA=\"$FIRST_DATA\" PROXY=\"${X509_USER_PROXY}\"" >> ${JOBFILE}
+        echo "VARS ${JOBID} INFILE=\"root://cms-xrd-global.cern.ch//${file}\" OUTFILE=\"${OUTPATH}\" FIRST_DATA=\"${FIRST_DATA}\" PROXY=\"${X509_USER_PROXY}\"" >> ${JOBFILE}
         ((nfiles=nfiles+1))
     done
 fi
