@@ -134,15 +134,20 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
     tin->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all);
     tin->SetBranchAddress("Electron_charge", &Electron_charge);
 
-    // Jet tagging , FlavB is the recomended one, DeepB was used by Anup
+    // Jet tagging and ID, FlavB is the recomended one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
     UInt_t nJet;
+    Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Jet_btagDeepB", 1);
     tin->SetBranchStatus("Jet_btagDeepFlavB", 1);
     tin->SetBranchStatus("nJet", 1);
+    tin->SetBranchStatus("Jet_jetId", 1);
+    tin->SetBranchStatus("Jet_puId", 1);
     tin->SetBranchAddress("nJet", &nJet);
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
-    tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
+    tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);   
+    tin->SetBranchAddress("Jet_jetId", &Jet_jetId);
+    tin->SetBranchAddress("Jet_puId", &Jet_puId);
 
     // pu stuff
     Float_t N_pu_vertices;
@@ -286,25 +291,29 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
         Nloose = 0, Nmedium = 0, Ntight = 0;
         for (size_t j = 0; j < nJet; j++)
         {
-            if ((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp) && (abs(Jet_eta[j]) > 2.4))
+            if((abs(Jet_eta[j]) > 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId==7))
             {
-                if (!one_Bjet)
-                {
-                    MainBjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
-                    OppositeBjet_p4->SetPtEtaPhiM(Jet_pt[j], -1 * Jet_eta[j], InvertPhi(Jet_phi[j]), Jet_mass[j]);
+              if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp)  
+              {
+                 if (!one_Bjet)
+                 {
+                      MainBjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
+                      OppositeBjet_p4->SetPtEtaPhiM(Jet_pt[j], -1 * Jet_eta[j], InvertPhi(Jet_phi[j]), Jet_mass[j]);
 
-                    if (MainBjet_p4->DeltaR(*Muon_p4) < 0.4 || MainBjet_p4->DeltaR(*Electron_p4) < 0.4)
-                        continue;
-                    one_Bjet = true;
-                    id_m_jet = j;
-                }
+                      if (MainBjet_p4->DeltaR(*Muon_p4) < 0.4 || MainBjet_p4->DeltaR(*Electron_p4) < 0.4)
+                              continue;
+                      one_Bjet = true;
+                      id_m_jet = j;
+                  }
+               }
+                
+               if (Jet_btagDeepFlavB[j] > 0.0490)
+                   Nloose++;
+               if (Jet_btagDeepFlavB[j] > 0.2783)
+                   Nmedium++;
+               if (Jet_btagDeepFlavB[j] > 0.71)
+                   Ntight++;
             }
-            if (Jet_btagDeepFlavB[j] > 0.0490)
-                Nloose++;
-            if (Jet_btagDeepFlavB[j] > 0.2783)
-                Nmedium++;
-            if (Jet_btagDeepFlavB[j] > 0.71)
-                Ntight++;
         }
         selection = selection && (one_Bjet);
         if (!selection)
