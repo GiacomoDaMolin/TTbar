@@ -159,9 +159,6 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
         events['electron_cuts'] = electron_cuts
         events = events[ak.any(electron_cuts, axis=1)]
 
-        b_cut = events['Jet_btagDeepFlavB'] > btag_deepflav_wp['medium']
-        b_tag_eta = events['Jet_eta']
-        events = events[ak.any(b_cut, axis=1)]
         # make sure that muon and electron are of opposite charge
         # this cut is applied after the others because you can only
         # multiply two arrays if they both have at least one entry along the first dim
@@ -199,6 +196,12 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
         muon_4d = muon_4d[delta_r_cut]
         electron_4d = electron_4d[delta_r_cut]
         events = events[delta_r_cut]
+        # jet cuts
+        jet_cut = (events['Jet_jetId'] == 2) | (events['Jet_jetId'] == 6) 
+        jet_pu_cut = (events['Jet_puId'] == 7) | (events['Jet_pt']>50) 
+        jet_cuts = (jet_cut) & (jet_pu_cut)
+        events['jet_cuts'] = jet_cuts
+        events = events[ak.any(events['jet_cuts'], axis=1)]
         # how many jets would we have if we took other wp's?
         events['N_jet_loose'] = ak.sum(
             events['Jet_btagDeepFlavB'] > btag_deepflav_wp['loose'], axis=1)
@@ -209,8 +212,8 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
         # first drop events where there is no jet that passes the wp
         b_tag_medium_cut = events['Jet_btagDeepFlavB'] > btag_deepflav_wp['medium']
         b_tag_eta = np.abs(events['Jet_eta']) < 2.4
-        #b_tag_pt = events['Jet_pt']>25
-        events['b_tag_cut'] = (b_tag_medium_cut) & (b_tag_eta)  # &(b_tag_pt)
+        b_tag_pt = events['Jet_pt']>25
+        events['b_tag_cut'] = (b_tag_medium_cut) & (b_tag_eta) & (b_tag_pt)
         muon_4d = muon_4d[ak.any(events['b_tag_cut'], axis=1)]
         electron_4d = electron_4d[ak.any(events['b_tag_cut'], axis=1)]
         events = events[ak.any(events['b_tag_cut'], axis=1)]
@@ -255,7 +258,10 @@ def skimming(filename, ofilename, xs=None, lumi=None, mc_flag=False,
             ele_c = electron_eval['UL-Electron-ID-SF'].evaluate(
                 '2018', 'sf', 'wp90iso', electron_4d.eta, electron_4d.pt
             )
-            events['electron_corrections'] = ele_c
+            ele_reco = electron_eval['UL-Electron-ID-SF'].evaluate(
+                '2018', 'sf', 'RecoAbove20', electron_4d.eta, electron_4d.pt
+            )
+            events['electron_corrections'] = ele_c*ele_reco
             pu_eval = load_corrector(correctionfiles['pileup'])
             pu_c = pu_eval['Collisions18_UltraLegacy_goldenJSON'].evaluate(
                 events['Pileup_nTrueInt'], 'nominal')

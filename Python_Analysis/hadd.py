@@ -29,6 +29,9 @@ def run_hadd(outfile: str, infiles: str):
         print(out)
 
 
+def get_branch
+
+
 def main():
     parser = make_parser()
     args = parser.parse_args()
