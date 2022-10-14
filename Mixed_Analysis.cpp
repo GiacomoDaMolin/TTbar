@@ -173,6 +173,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
     Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
     float Weight;
+    
+    
     // save the histograms in a new File
     TFile *fout = new TFile(ofile.c_str(), "RECREATE");
     // create a new tree for the output
@@ -234,6 +236,9 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
 
     auto b_tag = btag_c_set->at("deepJet_mujets");
     auto pu_correction = pu_c_set->at("Collisions18_UltraLegacy_goldenJSON");
+    
+    TFile *fecorr_trig = TFile::Open("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
+    TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
 
     for (UInt_t i = 0; i < nEv; i++)
     {
