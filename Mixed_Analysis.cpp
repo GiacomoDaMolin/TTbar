@@ -4,6 +4,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1D.h"
+#include "TH2F.h"
 #include "TCanvas.h"
 #include "TLorentzVector.h"
 
@@ -224,9 +225,9 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
     string b_tag_json = "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/btagging.json.gz";
     auto ele_c_set = CorrectionSet::from_file(electron_json);
     auto muon_c_set = CorrectionSet::from_file(muon_json);
-    auto btag_c_set = CorrectionSet::from_file(btag_json);
-    auto pu_c_set = CorrectionSet::from_file(pu_json);
-    auto jet_c_set = CorrectionSet::from_file(jet_json);
+    auto btag_c_set = CorrectionSet::from_file(b_tag_json);
+    auto pu_c_set = CorrectionSet::from_file(pileup_json);
+    auto jet_c_set = CorrectionSet::from_file(jets_json);
 
     auto muon_trigger = muon_c_set->at("NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight");
     auto muon_id = muon_c_set->at("NUM_TightID_DEN_genTracks");
@@ -296,7 +297,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
         Nloose = 0, Nmedium = 0, Ntight = 0;
         for (size_t j = 0; j < nJet; j++)
         {
-            if((abs(Jet_eta[j]) > 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId==7))
+            if((abs(Jet_eta[j]) > 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7))
             {
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp)  
               {
@@ -343,7 +344,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
         Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
         if(HLT_Ele32_WPTight_Gsf) {
             //retrieve Histo
-            int bin = GetBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
+            int bin = EleTrigHisto->GetBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
             float temp= EleTrigHisto->GetBinContent(bin);
             Weight*=temp;
             }
