@@ -330,12 +330,18 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
         // corrections
 
-        Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
+        if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
         Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
 
         Weight *= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
-        Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
+        Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
+        if(HLT_Ele32_WPTight_Gsf) {
+            //retrieve Histo
+            int bin = GetBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
+            float temp= EleTrigHisto->GetBinContent(bin);
+            Weight*=temp;
+            }
 
         Weight *= b_tag->evaluate({"central", "M", 5, abs(Jet_eta[id_m_jet]), Jet_pt[id_m_jet]}); 
 
