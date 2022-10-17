@@ -2,8 +2,8 @@
 echo "start"
 X509_USER_PROXY=/afs/cern.ch/user/g/gdamolin/private/x509up_u151129
 CMSSW=/afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
-usage() { echo "Usage: $0 [-e <executable> ] [-d <dataset>] [-o <outpath>] [-x xsec] [-l <lumi>] [-w <sum_w>] [-p <user_proxy>]" 1>&2; exit 1; }
-while getopts "i:o:x:l:w:p:" opt; do
+usage() { echo "Usage: $0 [-i <input file> ] [-o <outpath>] [-x xsec] [-l <lumi>] [-s <Signal bool>] [-p <user_proxy>]" 1>&2; exit 1; }
+while getopts "i:o:x:l:s:p:" opt; do
     case "$opt" in
         i) INFILE=$OPTARG
             ;;
@@ -13,7 +13,7 @@ while getopts "i:o:x:l:w:p:" opt; do
             ;;
         l) LUMI=$OPTARG
             ;;
-        w) SUM_W=$OPTARG
+        s) SIGNAL=$OPTARG
             ;;
         p) X509_USER_PROXY=$OPTARG
             ;;

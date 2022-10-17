@@ -72,19 +72,14 @@ def write_dag(dagfile, subfile: str,
               mc: bool,
               xs: float = None,
               lumi: int = None,
-              sum_w: float = None):
+              signal: bool = False,):
     jobid = infile.split('/')[-1]
     infile = f"root://cms-xrd-global.cern.ch//{infile}"
     print(f"JOB {jobid} {subfile}", file=dagfile)
     if mc:
-        if sum_w != None:
-            print(f"VARS {jobid} INFILE=\"{infile}\" \
+        print(f"VARS {jobid} INFILE=\"{infile}\" \
 OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
-SUM_W=\"{sum_w}\" PROXY=\"{proxy}\"", file=dagfile)
-        else:
-            print(f"VARS {jobid} INFILE=\"{infile}\" \
-OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
-PROXY=\"{proxy}\"", file=dagfile)
+SIGNAL=\"{signal}\" PROXY=\"{proxy}\"", file=dagfile)
     else:
         print(f"VARS {jobid} INFILE=\"{infile}\" \
 OUTFILE=\"{outfile}\" -f {first_data} PROXY=\"{proxy}\"", file=dagfile)
@@ -120,14 +115,15 @@ def main():
         if mc is True:
             xsec = data[sample]['xs']
             lumi = 59.82
-            sum_w = data[sample]['Sum_w']
+            signal = data[sample]['signal']
             datafiles = run_dasgoclient(dataset=dataset)
             with open(f"{basedir}/{sample}.dag") as dagfile:
                 for file in datafiles:
                     write_dag(dagfile=dagfile,
                               subfile=f"{basedir}/{sample}.submit",
                               infile=file, outfile=f"{output_dir}/{sample}",
-                              proxy=proxy, mc=mc, xs=xsec, lumi=lumi)
+                              proxy=proxy, mc=mc, signal=signal,
+                              xs=xsec, lumi=lumi)
         else:
             first_data = data[sample]['first_data']
             with open(f"{basedir}/{sample}.dag") as dagfile:
