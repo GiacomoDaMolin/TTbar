@@ -30,10 +30,10 @@ TTbar/PythonAnalysis/'+executable
     if mc:
         if sum_w is False:
             arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) \n'
+-x $(XS) -l $(LUMI) -s $(SIGNAL) \n'
         else:
             arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) -w $(SUM_W) \n'
+-x $(XS) -l $(LUMI) -w $(SUM_W) -s $(SIGNAL) \n'
     else:
         arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
 -f $(FIRST_DATA) \n'
