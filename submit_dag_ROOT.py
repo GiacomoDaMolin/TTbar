@@ -67,7 +67,6 @@ def run_dasgoclient(dataset: str):
 
 def write_dag(dagfile, subfile: str,
               infile: str, outfile: str,
-              proxy: str,
               first_data: bool,
               mc: bool,
               xs: float = None,
@@ -79,10 +78,10 @@ def write_dag(dagfile, subfile: str,
     if mc:
         print(f"VARS {jobid} INFILE=\"{infile}\" \
 OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
-SIGNAL=\"{signal}\" PROXY=\"{proxy}\"", file=dagfile)
+SIGNAL=\"{signal}\" ", file=dagfile)
     else:
         print(f"VARS {jobid} INFILE=\"{infile}\" \
-OUTFILE=\"{outfile}\" -f {first_data} PROXY=\"{proxy}\"", file=dagfile)
+OUTFILE=\"{outfile}\" -f {first_data} ", file=dagfile)
 
 
 def main():
@@ -92,10 +91,7 @@ def main():
     output_dir = args.output_dir
     executable = args.executable
     mc = args.mc
-    proxy = args.proxy
-    if not proxy.startswith("/"):
-        proxy = input_dir+'/'+proxy
-    for fd in [input_dir, output_dir, proxy, executable]:
+    for fd in [input_dir, output_dir, executable]:
         if not os.path.exists(fd):
             raise ValueError(f"{fd} does not exist.\
     Check your input or create it first.")
@@ -122,7 +118,7 @@ def main():
                     write_dag(dagfile=dagfile,
                               subfile=f"{basedir}/{sample}.submit",
                               infile=file, outfile=f"{output_dir}/{sample}",
-                              proxy=proxy, mc=mc, signal=signal,
+                              mc=mc, signal=signal,
                               xs=xsec, lumi=lumi)
         else:
             first_data = data[sample]['first_data']
@@ -133,7 +129,6 @@ def main():
                               infile=file,
                               outfile=f"{output_dir}/{sample}",
                               first_data=first_data,
-                              proxy=proxy,
                               mc=mc)
         with open(f"{basedir}/{sample}.submit", 'x') as file:
             print(submit_file_str, file=file)
