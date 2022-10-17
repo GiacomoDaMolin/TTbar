@@ -67,8 +67,8 @@ def run_dasgoclient(dataset: str):
 
 def write_dag(dagfile, subfile: str,
               infile: str, outfile: str,
-              first_data: bool,
               mc: bool,
+              first_data: bool = False,
               xs: float = None,
               lumi: int = None,
               signal: bool = False,):
