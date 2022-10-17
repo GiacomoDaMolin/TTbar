@@ -30,13 +30,13 @@ TTbar/PythonAnalysis/'+executable
     if mc:
         if sum_w is False:
             arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) -p $(PROXY)\n'
+-x $(XS) -l $(LUMI) \n'
         else:
             arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) -w $(SUM_W) -p $(PROXY)\n'
+-x $(XS) -l $(LUMI) -w $(SUM_W) \n'
     else:
         arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--f $(FIRST_DATA) -p $(PROXY)\n'
+-f $(FIRST_DATA) \n'
     file_str = f"basedir={input_dir}\n\
 \n\
 executable={executable}\n\
