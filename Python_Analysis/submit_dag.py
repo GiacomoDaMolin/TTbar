@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 from subprocess import Popen, PIPE
 import sys
-import subprocess
 import os
 import json
 
@@ -64,24 +63,27 @@ def run_dasgoclient(dataset: str):
 
 def write_dag(dagfile, subfile: str,
               infile: str, outfile: str,
-              proxy: str, mc: bool,
-              xs: float,
-              lumi: int, sum_w: float = None):
+              proxy: str,
+              first_data: bool,
+              mc: bool,
+              xs: float = None,
+              lumi: int = None,
+              sum_w: float = None):
     jobid = infile.split('/')[-1]
     infile = f"root://cms-xrd-global.cern.ch//{infile}"
     print(f"JOB {jobid} {subfile}", file=dagfile)
     if mc:
         if sum_w != None:
             print(f"VARS {jobid} INFILE=\"{infile}\" \
-    OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
-    SUM_W=\"{sum_w}\" PROXY=\"{proxy}\"", file=dagfile)
+OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
+SUM_W=\"{sum_w}\" PROXY=\"{proxy}\"", file=dagfile)
         else:
             print(f"VARS {jobid} INFILE=\"{infile}\" \
-    OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
-    PROXY=\"{proxy}\"", file=dagfile)
+OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
+PROXY=\"{proxy}\"", file=dagfile)
     else:
         print(f"VARS {jobid} INFILE=\"{infile}\" \
-OUTFILE=\"{outfile}\" PROXY=\"{proxy}\"", file=dagfile)
+OUTFILE=\"{outfile}\" -f {first_data} PROXY=\"{proxy}\"", file=dagfile)
 
 
 def main():
@@ -100,7 +102,6 @@ def main():
     Check your input or create it first.")
     data_json = open(args.json)
     data = json.load(data_json)
-    jobscript = '/eos/user/j/jowulff/TTbar/PythonAnalysis/write_dag.sh'
     for sample in data:
         basedir = input_dir+f"/{sample}"
         submit_file_str = return_subfile(input_dir=input_dir,
@@ -119,31 +120,21 @@ def main():
             datafiles = run_dasgoclient(dataset=dataset)
             with open(f"{basedir}/{sample}.dag") as dagfile:
                 for file in datafiles:
-                    write_dag(dagfile=dagfile, 
-                    subfile=f"{basedir}/{sample}.submit",
-                    infile=file, outfile=f"{output_dir}/{sample}",
-                    proxy=proxy)
+                    write_dag(dagfile=dagfile,
+                              subfile=f"{basedir}/{sample}.submit",
+                              infile=file, outfile=f"{output_dir}/{sample}",
+                              proxy=proxy, mc=mc, xs=xsec, lumi=lumi)
         else:
             first_data = data[sample]['first_data']
-            if first_data:
-                cmd = f"{jobscript} -s {basedir}/{sample}.submit \
--j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
--f true -p {proxy}"
-            else:
-                cmd = f"{jobscript} -s {basedir}/{sample}.submit \
--j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
--p {proxy}"
-        print(cmd)
-        write_dagfile = Popen(cmd, shell=True,
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE, encoding='utf-8')
-        wd_out, wd_err = write_dagfile.communicate()
-        # 'x' file opening mode means exclusive creation. Fails if file exists
-        if wd_out:
-            print(wd_out)
-        else:
-            print(wd_err)
-
+            with open(f"{basedir}/{sample}.dag") as dagfile:
+                for file in datafiles:
+                    write_dag(dagfile=dagfile,
+                              subfile=f"{basedir}/{sample}.submit",
+                              infile=file,
+                              outfile=f"{output_dir}/{sample}",
+                              first_data=first_data,
+                              proxy=proxy,
+                              mc=mc)
         with open(f"{basedir}/{sample}.submit", 'x') as file:
             print(submit_file_str, file=file)
 
