@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
+from subprocess import Popen, PIPE
+import sys
 import subprocess
-from subprocess import Popen
 import os
 import json
 
@@ -47,6 +48,42 @@ log                   = {base_dir}/log/$(ClusterId).$(ProcId).log\n\
     return file_str
 
 
+def run_dasgoclient(dataset: str):
+    """
+    Runs dasgoclient and returns a list of files for a given dataset
+    """
+    cmd = f'dasgoclient -query="file dataset={dataset}"'
+    process = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, encoding='utf-8')
+    out, err = process.communicate()
+    if err:
+        print(err)
+        sys.exit(1)
+    else:
+        return out.split()
+
+
+def write_dag(dagfile, subfile: str,
+              infile: str, outfile: str,
+              proxy: str, mc: bool,
+              xs: float,
+              lumi: int, sum_w: float = None):
+    jobid = infile.split('/')[-1]
+    infile = f"root://cms-xrd-global.cern.ch//{infile}"
+    print(f"JOB {jobid} {subfile}", file=dagfile)
+    if mc:
+        if sum_w != None:
+            print(f"VARS {jobid} INFILE=\"{infile}\" \
+    OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
+    SUM_W=\"{sum_w}\" PROXY=\"{proxy}\"", file=dagfile)
+        else:
+            print(f"VARS {jobid} INFILE=\"{infile}\" \
+    OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
+    PROXY=\"{proxy}\"", file=dagfile)
+    else:
+        print(f"VARS {jobid} INFILE=\"{infile}\" \
+OUTFILE=\"{outfile}\" PROXY=\"{proxy}\"", file=dagfile)
+
+
 def main():
     parser = make_parser()
     args = parser.parse_args()
@@ -79,9 +116,13 @@ def main():
             xsec = data[sample]['xs']
             lumi = 59.82
             sum_w = data[sample]['Sum_w']
-            cmd = f"{jobscript} -s {basedir}/{sample}.submit \
--j {basedir}/{sample}.dag -d {dataset} -o {output_dir}/{sample} \
--x {xsec} -l {lumi} -w {sum_w} -p {proxy}"
+            datafiles = run_dasgoclient(dataset=dataset)
+            with open(f"{basedir}/{sample}.dag") as dagfile:
+                for file in datafiles:
+                    write_dag(dagfile=dagfile, 
+                    subfile=f"{basedir}/{sample}.submit",
+                    infile=file, outfile=f"{output_dir}/{sample}",
+                    proxy=proxy)
         else:
             first_data = data[sample]['first_data']
             if first_data:
