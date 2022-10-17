@@ -8,21 +8,21 @@
 #define NMCFILES 6
 
 void Distributions(){
- string startdir="/afs/cern.ch/user/g/gdamolin/public/DR/Corr/";
- TFile *FileData = new TFile((startdir+"Out_Data.root").c_str());
+ string startdir="/afs/cern.ch/user/g/gdamolin/Johan/Temp/";
+ TFile *FileData = new TFile((startdir+"Data.root").c_str());
 
- TFile *FileDB = new TFile((startdir+"Out_DB.root").c_str());
- TFile *FileDY = new TFile((startdir+"Out_DY.root").c_str());
- TFile *FileST = new TFile((startdir+"Out_ST.root").c_str());
- TFile *FileTT = new TFile((startdir+"Out_TTbkg.root").c_str());
- TFile *FileW = new TFile((startdir+"Out_W.root").c_str());
- TFile *FileSig = new TFile((startdir+"Out_Signal.root").c_str());
+ TFile *FileDB = new TFile((startdir+"Diboson.root").c_str());
+ TFile *FileDY = new TFile((startdir+"DY.root").c_str());
+ TFile *FileST = new TFile((startdir+"ST.root").c_str());
+ TFile *FileTT = new TFile((startdir+"TTbkgd.root").c_str());
+ TFile *FileW = new TFile((startdir+"W.root").c_str());
+ TFile *FileSig = new TFile((startdir+"TTLLorLTAUL.root").c_str());
 
  array<TFile*, NFILES> Files={FileData,FileDB,FileDY, FileST, FileTT,FileW,FileSig};
  array<TH1D*,NFILES> Mupt;
  array<TH1D*,NFILES> Mueta;
  array<TH1D*,NFILES> Ept;
- array<TH1D* NFILES> Eeta;
+ array<TH1D*,NFILES> Eeta;
  array<TH1D*,NFILES> LeadingPt;
  array<TH1D*,NFILES> InvMass;
 
@@ -32,20 +32,20 @@ void Distributions(){
   //cout<<"########### File "<< i <<endl;
   TTree * tout= static_cast<TTree *>(Files[i]->Get("tout"));
   if(i==0){
-   tout->Draw("Muon_pt>>Mupt[i]","",“goff”);
-   tout->Draw("Muon_eta>>Mueta[i]","",“goff”);
-   tout->Draw("Electron_pt>>Ept[i]","",“goff”);
-   tout->Draw("Electron_eta>>Eeta[i]","",“goff”);
-   tout->Draw("mu_e_inv_mass>>InvMass[i]","",“goff”);
-   tout->Draw("leading_lepton_pt>>LeadingPt[i]","",“goff”);
+   tout->Draw("Muon_pt>>Mupt[i]","","goff");
+   tout->Draw("Muon_eta>>Mueta[i]","","goff");
+   tout->Draw("Electron_pt>>Ept[i]","","goff");
+   tout->Draw("Electron_eta>>Eeta[i]","","goff");
+   tout->Draw("mu_e_inv_mass>>InvMass[i]","","goff");
+   tout->Draw("leading_lepton_pt>>LeadingPt[i]","","goff");
    }
  if(i>0) {
-  tout->Draw("Muon_pt>>Mupt[i]","norm_W>>Mupt[i]",“goff”);
-  tout->Draw("Muon_eta>>Mueta[i]","norm_W>>Mueta[i]",“goff”);
-  tout->Draw("Electron_pt>>Ept[i]","norm_W>>Ept[i]",“goff”);
-  tout->Draw("Electron_eta>>Eeta[i]","norm_W>>Eeta[i]",“goff”);
-  tout->Draw("mu_e_inv_mass>>InvMass[i]","norm_W>>InvMass[i]",“goff”);
-  tout->Draw("leading_lepton_pt>>LeadingPt[i]","norm_W>>LeadingPt[i]",“goff”);
+  tout->Draw("Muon_pt>>Mupt[i]","norm_W>>Mupt[i]","goff");
+  tout->Draw("Muon_eta>>Mueta[i]","norm_W>>Mueta[i]","goff");
+  tout->Draw("Electron_pt>>Ept[i]","norm_W>>Ept[i]","goff");
+  tout->Draw("Electron_eta>>Eeta[i]","norm_W>>Eeta[i]","goff");
+  tout->Draw("mu_e_inv_mass>>InvMass[i]","norm_W>>InvMass[i]","goff");
+  tout->Draw("leading_lepton_pt>>LeadingPt[i]","norm_W>>LeadingPt[i]","goff");
   }
  }
 
@@ -90,10 +90,4 @@ void Distributions(){
 
 
 return;
-}
-
-
-
-
- return;
 }

@@ -11,6 +11,7 @@
 // include user defined histograms and auxiliary macros
 #include "Auxiliary.cpp"
 #include "Histodef.cpp"
+#include "roccor/RoccoR.cc"
 
 // correctionlib
 #include "correction.h"
@@ -241,6 +242,10 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
     TFile *fecorr_trig = TFile::Open("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
     TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
 
+
+    RoccoR rc;
+    rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RoccoR2018UL.txt");
+
     for (UInt_t i = 0; i < nEv; i++)
     {
         tin->GetEntry(i);
@@ -335,6 +340,9 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
 
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
         // corrections
+
+	double scmMC=rc.kScaleMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
+        Muon_pt[muon_idx]*= scmMC;
 
         if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 

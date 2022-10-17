@@ -10,6 +10,7 @@
 // include user defined histograms and auxiliary macros
 #include "Histodef.cpp"
 #include "Auxiliary.cpp"
+#include "roccor/RoccoR.cc"
 
 using namespace std;
 
@@ -140,6 +141,10 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tout->Branch("Nloose", &Nloose);
     tout->Branch("Nmedium", &Nmedium);
     tout->Branch("Ntight", &Ntight);
+
+    RoccoR rc;
+    rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RoccoR2018UL.txt");
+    
     for (UInt_t i = 0; i < nEv; i++)
     {
         tin->GetEntry(i);
@@ -209,6 +214,11 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
             continue;
         }
         PTbjet=MainBjet_p4->Pt();
+
+	double scmDT=rc.kScaleDT(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
+        Muon_pt[muon_idx]*= scmDT;
+	Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
+        
 
         dR_mujet=Muon_p4->DeltaR(*MainBjet_p4);
 	dR_ejet=Electron_p4->DeltaR(*MainBjet_p4);
