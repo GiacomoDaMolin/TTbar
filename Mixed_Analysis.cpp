@@ -11,7 +11,7 @@
 // include user defined histograms and auxiliary macros
 #include "Auxiliary.cpp"
 #include "Histodef.cpp"
-#include "roccor/RoccoR.cc"
+#include "Python_Analysis/corrections/roccor/RoccoR.cc"
 
 // correctionlib
 #include "correction.h"
@@ -219,32 +219,31 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
     trun_out->Fill(); // we already called trun->GetEntry(0);
 
     // open correctionfiles
-    string muon_json = "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/muon_Z.json.gz";
-    string electron_json = "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/electron.json.gz";
-    string pileup_json = "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/puWeights.json.gz";
-    string jets_json = "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/jet_jerc.json.gz";
-    string b_tag_json = "/afs/cern.ch/user/j/jowulff/Condor/TTbar/corrections/btagging.json.gz";
-    auto ele_c_set = CorrectionSet::from_file(electron_json);
+    
+    string muon_json = "Python_Analysis/corrections/muon_Z.json.gz";
+    string electron_json = "Python_Analysis/corrections/electron.json.gz";
+    string jets_json = "Python_Analysis/corrections/jet_jerc.json.gz";
+    string b_tag_json = "Python_Analysis/corrections/btagging.json.gz";
+    string pileup_json = "Python_Analysis/corrections/puWeights.json.gz";
+    
     auto muon_c_set = CorrectionSet::from_file(muon_json);
+    auto ele_c_set = CorrectionSet::from_file(electron_json);
+    auto jet_c_set = CorrectionSet::from_file(jets_json);
     auto btag_c_set = CorrectionSet::from_file(b_tag_json);
     auto pu_c_set = CorrectionSet::from_file(pileup_json);
-    auto jet_c_set = CorrectionSet::from_file(jets_json);
 
     auto muon_trigger = muon_c_set->at("NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight");
     auto muon_id = muon_c_set->at("NUM_TightID_DEN_genTracks");
     auto muon_iso = muon_c_set->at("NUM_TightRelIso_DEN_TightIDandIPCut");
-
-    auto electron_id = ele_c_set->at("UL_Electron-ID-SF");
-
+    auto electron_id = ele_c_set->at("UL-Electron-ID-SF");
     auto b_tag = btag_c_set->at("deepJet_mujets");
     auto pu_correction = pu_c_set->at("Collisions18_UltraLegacy_goldenJSON");
     
-    TFile *fecorr_trig = TFile::Open("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
+    TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
     TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
 
-
     RoccoR rc;
-    rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RoccoR2018UL.txt");
+    rc.init("Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
 
     for (UInt_t i = 0; i < nEv; i++)
     {
@@ -302,7 +301,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
         Nloose = 0, Nmedium = 0, Ntight = 0;
         for (size_t j = 0; j < nJet; j++)
         {
-            if((abs(Jet_eta[j]) > 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7))
+            if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7))
             {
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp)  
               {
@@ -356,6 +355,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
             float temp= EleTrigHisto->GetBinContent(bin);
             Weight*=temp;
             }
+
 
         Weight *= b_tag->evaluate({"central", "M", 5, abs(Jet_eta[id_m_jet]), Jet_pt[id_m_jet]}); 
 

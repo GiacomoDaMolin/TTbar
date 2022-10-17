@@ -10,7 +10,7 @@
 // include user defined histograms and auxiliary macros
 #include "Histodef.cpp"
 #include "Auxiliary.cpp"
-#include "roccor/RoccoR.cc"
+#include "Python_Analysis/corrections/roccor/RoccoR.cc"
 
 using namespace std;
 
@@ -143,7 +143,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tout->Branch("Ntight", &Ntight);
 
     RoccoR rc;
-    rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/RoccoR2018UL.txt");
+    rc.init("Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
     
     for (UInt_t i = 0; i < nEv; i++)
     {
@@ -194,6 +194,8 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         int id_m_jet=-1;
 	Nloose=0, Nmedium=0, Ntight=0;
         for (size_t j = 0; j < nJet; j++){
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7))
+            {
             if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp){
 		if(!one_Bjet) {
 			MainBjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
@@ -206,6 +208,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
             if (Jet_btagDeepFlavB[j] > 0.0490)	Nloose++;
 	    if (Jet_btagDeepFlavB[j] > 0.2783)	Nmedium++;
 	    if (Jet_btagDeepFlavB[j] > 0.71)	Ntight++;
+	    }
         }
         selection = selection && (one_Bjet);
         if (!selection)
