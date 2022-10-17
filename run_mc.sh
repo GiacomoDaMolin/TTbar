@@ -2,8 +2,8 @@
 echo "start"
 X509_USER_PROXY=/afs/cern.ch/user/g/gdamolin/private/x509up_u151129
 CMSSW=/afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
-usage() { echo "Usage: $0 [-i <input file> ] [-o <outpath>] [-x xsec] [-l <lumi>] [-s <Signal bool>] [-p <user_proxy>]" 1>&2; exit 1; }
-while getopts "i:o:x:l:s:p:" opt; do
+usage() { echo "Usage: $0 [-i <input file> ] [-o <outpath>] [-x xsec] [-l <lumi>] [-s <Signal bool>]" 1>&2; exit 1; }
+while getopts "i:o:x:l:s:" opt; do
     case "$opt" in
         i) INFILE=$OPTARG
             ;;
@@ -15,15 +15,13 @@ while getopts "i:o:x:l:s:p:" opt; do
             ;;
         s) SIGNAL=$OPTARG
             ;;
-        p) X509_USER_PROXY=$OPTARG
-            ;;
         *)
         usage
         ;;
     esac
 done
-EXE="/eos/user/g/gdamolin/Johan/TTbar/Mixed_Analysis"
-outdir="/afs/cern.ch/g/gdamolin/Condor/TTbar/Data"
+EXE="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Mixed_Analysis"
+outdir="/afs/cern.ch/user/g/gdamolin/Johan/MC"
 filename=$INFILE
 filestring=$(echo $filename | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
 ofilename=${outdir}/$filestring"_MA".root

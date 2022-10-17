@@ -2,17 +2,14 @@
 echo "start"
 X509_USER_PROXY=/afs/cern.ch/user/g/gdamolin/private/x509up_u151129
 CMSSW=/afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
-while getopts "i:o:f:p:c:" opt; do
+usage() { echo "Usage: $0 [-i <input file> ] [-o <outpath>] [-f first_dataset?]" 1>&2; exit 1; }
+while getopts "i:o:f:" opt; do
     case "$opt" in
         i) INFILE=$OPTARG
             ;;
         o) OUTPATH=$OPTARG
             ;;
         f) FIRST_DATA=$OPTARG
-            ;;
-        p) X509_USER_PROXY=$OPTARG
-            ;;
-        c) CMSSW=$OPTARG
             ;;
         *)
             echo "Invalid argument $OPTARG" 1>&2;
@@ -21,8 +18,8 @@ while getopts "i:o:f:p:c:" opt; do
 done
 
 
-EXE="/eos/user/g/gdamolin/Johan/TTbar/Mixed_Analysis"
-outdir="/afs/cern.ch/g/gdamolin/Condor/TTbar/Data"
+EXE="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Data_Analysis"
+outdir="/afs/cern.ch/user/g/gdamolin/Johan/Data"
 filename=$INFILE
 filestring=$(echo $filename | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
 ofilename=${outdir}/$filestring"_MA".root
