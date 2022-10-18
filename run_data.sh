@@ -12,7 +12,7 @@ while getopts "i:o:f:" opt; do
         f) FIRST_DATA=$OPTARG
             ;;
         *)
-            echo "Invalid argument $OPTARG" 1>&2;
+            echo "Invalid argument $OPTARG" 1>&2
             exit 1
     esac
 done
@@ -31,7 +31,8 @@ cd -
 
 echo "CMSSW_BASE is now set to $CMSSW_BASE"
 echo "PROXY is now set to $X509_USER_PROXY"
-echo "Executing analysis script as"
+echo "executing script as:"
+echo "${EXE} $filename $ofilename ${FIRSTDATASET}"
 ${EXE} $filename $ofilename ${FIRSTDATASET} || {
     echo "${EXE} failed with file ${filename}, removing intermediate file" 1>&2; 
     if [[ -f $ofilename ]]; then

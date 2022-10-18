@@ -33,7 +33,8 @@ cd -
 
 echo "CMSSW_BASE is now set to $CMSSW_BASE"
 echo "PROXY is now set to $X509_USER_PROXY"
-echo "Executing analysis script as"
+echo "executing script as"
+echo "${EXE} $filename $ofilename ${XSEC} ${LUMI} ${SIGNAL}"
 ${EXE} $filename $ofilename ${XSEC} ${LUMI} ${SIGNAL} || {
     echo "${EXE} failed with file ${filename}, removing intermediate file" 1>&2; 
     if [[ -f $ofilename ]]; then
