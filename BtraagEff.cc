@@ -1,17 +1,19 @@
 #include<TH2F.h>
 #include<TFile.h>
 #include<TTree.h>
+#include<string>
 
 #define MAX_ARRAY_SIZE 128
 
 
-void EffComputer(){
- TFile *fin= new TFile();
+void EffComputer(string infile){
+ TFile *fin= new TFile(infile.c_str());
  TTree *tin = static_cast<TTree *>(fin->Get("Events"));
  tin->SetBranchStatus("*", 0);
  Float_t Jet_eta[MAX_ARRAY_SIZE],Jet_btagDeepFlavB[MAX_ARRAY_SIZE],Jet_pt[MAX_ARRAY_SIZE];
  UInt_t nJet;
- Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE]; 
+ Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE];
+ Int_t Jet_hadronFlavour[MAX_ARRAY_SIZE];
  
  tin->SetBranchStatus("Jet_pt", 1);
  tin->SetBranchAddress("Jet_pt", &Jet_pt);
@@ -25,6 +27,8 @@ void EffComputer(){
  tin->SetBranchStatus("Jet_puId", 1);
  tin->SetBranchAddress("Jet_jetId", &Jet_jetId);
  tin->SetBranchAddress("Jet_puId", &Jet_puId);
+ tin->SetBranchStatus("Jet_hadronFlavour", 1);
+ tin->SetBranchAddress("Jet_hadronFlavour", &Jet_hadronFlavour);
  
  TH2D  *h2_BTaggingEff_Denom_b;
  TH2D  *h2_BTaggingEff_Denom_c;
@@ -37,9 +41,7 @@ void EffComputer(){
   tin->GetEntry(i);
   for (UInt_t j=0; j<nJet;j++){
     if((abs(Jet_eta[j]) > 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
-    //READ FLAVOUR
-    
-    
+    int flav=Jet_hadronFlavour[j];
     if(flav==5) h2_BTaggingEff_Denom_b->Fill(Jet_pt[j],Jet_eta[j]);
     if(flav==4) h2_BTaggingEff_Denom_c->Fill(Jet_pt[j],Jet_eta[j]);
     if(flav==0) h2_BTaggingEff_Denom_udsg->Fill(Jet_pt[j],Jet_eta[j]);
@@ -51,8 +53,9 @@ void EffComputer(){
    } 
   }
  }
- 
- TFile *a=new TFile(,"Write");
+ string outfile="Out_"+infile; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
+
+ TFile *a=new TFile(outfile.c_str(),"Write");
  h2_BTaggingEff_Denom_b->Write();
  h2_BTaggingEff_Denom_c->Write();
  h2_BTaggingEff_Denom_udsg->Write();

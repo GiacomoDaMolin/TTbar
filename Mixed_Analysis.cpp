@@ -37,6 +37,8 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
     }
 
+cout<<"Call completed!"<<endl;
+
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *trun = static_cast<TTree *>(fin->Get("Runs"));
     Long64_t genEventCount;
@@ -47,7 +49,9 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
     trun->SetBranchAddress("genEventSumw", &genEventSumw);
     trun->SetBranchAddress("genEventCount", &genEventCount);
 
+
     trun->GetEntry(0);
+cout<<"trun->GetEntry(0)"<<endl;
 
     TTree *tin = static_cast<TTree *>(fin->Get("Events"));
 
@@ -175,10 +179,47 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
     Float_t leading_lepton_pt, invMass, electron_eta, electron_pt, muon_eta, muon_pt;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
     float Weight;
+
+    // open correctionfiles
+    
+    string muon_json = "./Python_Analysis/corrections/muon_Z.json.gz";
+    string electron_json = "./Python_Analysis/corrections/electron.json.gz";
+    string jets_json = "./Python_Analysis/corrections/jet_jerc.json.gz";
+    string b_tag_json = "./Python_Analysis/corrections/btagging.json.gz";
+    string pileup_json = "./Python_Analysis/corrections/puWeights.json.gz";
+
+    cout<<"Opening correction files..."<<endl;
+    
+    auto muon_c_set = CorrectionSet::from_file(muon_json);
+    auto ele_c_set = CorrectionSet::from_file(electron_json);
+    auto jet_c_set = CorrectionSet::from_file(jets_json);
+    auto btag_c_set = CorrectionSet::from_file(b_tag_json);
+    auto pu_c_set = CorrectionSet::from_file(pileup_json);
+
+    cout<<"DONE!.......Defining correction functions"<<endl;
+
+    auto muon_trigger = muon_c_set->at("NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight");
+    auto muon_id = muon_c_set->at("NUM_TightID_DEN_genTracks");
+    auto muon_iso = muon_c_set->at("NUM_TightRelIso_DEN_TightIDandIPCut");
+    auto electron_id = ele_c_set->at("UL-Electron-ID-SF");
+    auto b_tag = btag_c_set->at("deepJet_mujets");
+    auto pu_correction = pu_c_set->at("Collisions18_UltraLegacy_goldenJSON");
+
+    cout<<"DONE!.......Opening correction TH2s"<<endl;
+    
+    TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
+    TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
+
+    cout<<"DONE!.......Creating Rochester correction class"<<endl;
+
+    RoccoR rc;
+    rc.init("./Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
     
     
     // save the histograms in a new File
+
     TFile *fout = new TFile(ofile.c_str(), "RECREATE");
+    
     // create a new tree for the output
     TTree *tout = new TTree("tout", "tout");
     TTree *trun_out = new TTree("Run_out", "Run_out");
@@ -218,34 +259,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
 
     trun_out->Fill(); // we already called trun->GetEntry(0);
 
-    // open correctionfiles
-    
-    string muon_json = "Python_Analysis/corrections/muon_Z.json.gz";
-    string electron_json = "Python_Analysis/corrections/electron.json.gz";
-    string jets_json = "Python_Analysis/corrections/jet_jerc.json.gz";
-    string b_tag_json = "Python_Analysis/corrections/btagging.json.gz";
-    string pileup_json = "Python_Analysis/corrections/puWeights.json.gz";
-    
-    auto muon_c_set = CorrectionSet::from_file(muon_json);
-    auto ele_c_set = CorrectionSet::from_file(electron_json);
-    auto jet_c_set = CorrectionSet::from_file(jets_json);
-    auto btag_c_set = CorrectionSet::from_file(b_tag_json);
-    auto pu_c_set = CorrectionSet::from_file(pileup_json);
-
-    auto muon_trigger = muon_c_set->at("NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight");
-    auto muon_id = muon_c_set->at("NUM_TightID_DEN_genTracks");
-    auto muon_iso = muon_c_set->at("NUM_TightRelIso_DEN_TightIDandIPCut");
-    auto electron_id = ele_c_set->at("UL-Electron-ID-SF");
-    auto b_tag = btag_c_set->at("deepJet_mujets");
-    auto pu_correction = pu_c_set->at("Collisions18_UltraLegacy_goldenJSON");
-    
-    TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
-    TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
-
-    RoccoR rc;
-    rc.init("Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
-
-    for (UInt_t i = 0; i < nEv; i++)
+    for (UInt_t i = 0; i <nEv; i++)
     {
         tin->GetEntry(i);
         if (i % 100000 == 0)
@@ -523,20 +537,22 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
         tout->Fill();
     }
 
+    delete fecorr_trig;
+
     std::cout << "non_matching_muon = " << non_matching_muon << endl;
     std::cout << "non_matching_electron = " << non_matching_electron << endl;
 
     std::cout << "NeV = " << nEv << endl;
     std::cout << "trigger dropped = " << trigger_dropped << endl;
-    std::cout << "selections dropped = " << n_dropped << endl;
+    std::cout << "selections dropped = " << n_dropped << endl; //remember the cross trigger in Data
 
     std::cout << "Fraction of events discarded by trigger = " << (trigger_dropped * 1. / nEv) << endl;
-    std::cout << "Fraction of events discarded by selection = " << (n_dropped * 1. / nEv) << endl;
+    int Rem_trigger=nEv-trigger_dropped; //remember the cross trigger in Data
+    std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
+    std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
 
-    std::cout << "Fraction of events passing triggers = " << (nEv - trigger_dropped) * 1. / nEv << endl;
-    std::cout << "Fraction of events passing selection = " << (nEv - n_dropped) * 1. / nEv << endl;
-
-    std::cout << "Selected events over triggered events = " << (nEv - n_dropped) * 1. / (nEv - trigger_dropped) << endl;
+    tout->Write();
+    trun_out->Write();
     // Write the histograms to the file
     h_Muon_eta->Write();
     h_Muon_pt->Write();
@@ -569,6 +585,7 @@ void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, do
 
 int main(int argc, char **argv)
 {
+
     string inputFile = argv[1];
     string outputFile = argv[2];
     double crossSection = atof(argv[3]);
