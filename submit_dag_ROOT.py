@@ -115,7 +115,7 @@ def main():
             lumi = 59.82
             signal = data[sample]['signal']
             datafiles = run_dasgoclient(dataset=dataset)
-            with open(f"{basedir}/{sample}.dag", 'x') as dagfile:
+            with open(f"{basedir}/{sample}.dag", 'w') as dagfile:
                 for file in datafiles:
                     write_dag(dagfile=dagfile,
                               subfile=f"{basedir}/{sample}.submit",
@@ -124,7 +124,7 @@ def main():
                               xs=xsec, lumi=lumi)
         else:
             first_data = data[sample]['first_data']
-            with open(f"{basedir}/{sample}.dag", 'x') as dagfile:
+            with open(f"{basedir}/{sample}.dag", 'w') as dagfile:
                 for file in datafiles:
                     write_dag(dagfile=dagfile,
                               subfile=f"{basedir}/{sample}.submit",
@@ -132,7 +132,7 @@ def main():
                               outfile=f"{output_dir}/{sample}",
                               first_data=first_data,
                               mc=mc)
-        with open(f"{basedir}/{sample}.submit", 'x') as file:
+        with open(f"{basedir}/{sample}.submit", 'w') as file:
             print(submit_file_str, file=file)
 
         for directory in ['err', 'log', 'out']:
