@@ -30,13 +30,13 @@ TTbar/PythonAnalysis/'+executable
     if mc:
         if sum_w is False:
             arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) -s $(SIGNAL) \n'
+-x $(XS) -l $(LUMI) -s $(SIGNAL)'
         else:
             arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) -w $(SUM_W) -s $(SIGNAL) \n'
+-x $(XS) -l $(LUMI) -w $(SUM_W) -s $(SIGNAL)'
     else:
         arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--f $(FIRST_DATA) \n'
+-f $(FIRST_DATA)'
     file_str = f"basedir={input_dir}\n\
 \n\
 executable={executable}\n\
@@ -47,7 +47,9 @@ output                = {base_dir}/out/$(ClusterId).$(ProcId).out\n\
 error                 = {base_dir}/err/$(ClusterId).$(ProcId).err\n\
 log                   = {base_dir}/log/$(ClusterId).$(ProcId).log\n\
 \n\
-+JobFlavour = \"longlunch\"\n"+arguments+"\nqueue"
++JobFlavour = \"longlunch\"\n\
+{arguments}\n\
+queue"
     return file_str
 
 
