@@ -182,11 +182,11 @@ cout<<"trun->GetEntry(0)"<<endl;
 
     // open correctionfiles
     
-    string muon_json = "./Python_Analysis/corrections/muon_Z.json.gz";
-    string electron_json = "./Python_Analysis/corrections/electron.json.gz";
-    string jets_json = "./Python_Analysis/corrections/jet_jerc.json.gz";
-    string b_tag_json = "./Python_Analysis/corrections/btagging.json.gz";
-    string pileup_json = "./Python_Analysis/corrections/puWeights.json.gz";
+    string muon_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/muon_Z.json.gz";
+    string electron_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/electron.json.gz";
+    string jets_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/jet_jerc.json.gz";
+    string b_tag_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/btagging.json.gz";
+    string pileup_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/puWeights.json.gz";
 
     cout<<"Opening correction files..."<<endl;
     
@@ -213,7 +213,7 @@ cout<<"trun->GetEntry(0)"<<endl;
     cout<<"DONE!.......Creating Rochester correction class"<<endl;
 
     RoccoR rc;
-    rc.init("./Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
+    rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
     
     
     // save the histograms in a new File
