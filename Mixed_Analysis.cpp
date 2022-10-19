@@ -210,6 +210,15 @@ cout<<"trun->GetEntry(0)"<<endl;
     TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
     TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
 
+    TFile *fpuId_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/effcyPUID_81Xtraining.root");
+    TH2F * puId_eff= static_cast<TH2F *>(fpuId_eff->Get("h2_eff_mc2018_T")); //for jet matching PV jets
+    TH2F * puId_mis= static_cast<TH2F *>(fpuId_eff->Get("h2_mistag_mc2018_T")); //for jets coming from PileUP
+
+    TFile *fpuId_scf = new TFile("/afs/cern.ch/user/g/gdamolin/public/scalefactorsPUID_81Xtraining.root");
+    TH2F * puId_SFeff= static_cast<TH2F *>(fpuId_scf->Get("h2_eff_sf2018_T")); //for jet matching PV jets
+    TH2F * puId_SFmis= static_cast<TH2F *>(fpuId_scf->Get("h2_mistag_sf2018_T")); //for jets coming from PileUP
+   
+
     cout<<"DONE!.......Creating Rochester correction class"<<endl;
 
     RoccoR rc;
@@ -306,13 +315,15 @@ cout<<"trun->GetEntry(0)"<<endl;
         // check the seleected objects for opposite charge
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
-        Float_t jet_btag_deepFlav_wp = 0.2783; // old was 0.71
-        // the wp are: (0.1355, 0.4506, 0.7738)
-        // Float_t jet_btag_deep_wp = 0.4506;
+        Float_t jet_btag_deepFlav_wp = 0.2783;
         // cycle through btags and check if one passes the tagging WP
         bool one_Bjet = false;
         int id_m_jet = -1;
         Nloose = 0, Nmedium = 0, Ntight = 0;
+	//vectors for applying b-tag corrections
+	vector<int> njet_in_collection;
+	vector<int> flavor;
+	vector<bool> tagged;
         for (size_t j = 0; j < nJet; j++)
         {
             if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7))
@@ -339,6 +350,7 @@ cout<<"trun->GetEntry(0)"<<endl;
                    Ntight++;
             }
         }
+        //TO DO: ADD HISTO HERE SO THAT I SAVE Nloose, Nmedium, Ntight, before selections
         selection = selection && (one_Bjet);
         if (!selection)
         {
