@@ -356,6 +356,7 @@ cout<<"trun->GetEntry(0)"<<endl;
 
 	double scmMC=rc.kScaleMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
         Muon_pt[muon_idx]*= scmMC;
+        Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
 
         if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
@@ -380,6 +381,7 @@ cout<<"trun->GetEntry(0)"<<endl;
         {
             // fill the hist
             leading_lepton_pt = Muon_p4->Pt();
+            h_leading_lepton_pt->Fill(leading_lepton_pt);
             h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
         }
         else
