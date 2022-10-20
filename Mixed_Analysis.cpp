@@ -98,7 +98,7 @@ cout<<"trun->GetEntry(0)"<<endl;
 
     // get gen quantities
     Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE];
-    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE]; // These last guys are actually huge, better be careful!
+    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE], Jet_genJetIdx[MAX_ARRAY_SIZE};
     UChar_t Muon_genPartFlav[MAX_ARRAY_SIZE], Electron_genPartFlav[MAX_ARRAY_SIZE];
     UInt_t nGenPart;
     tin->SetBranchStatus("Electron_genPartIdx", 1);
@@ -108,6 +108,7 @@ cout<<"trun->GetEntry(0)"<<endl;
     tin->SetBranchStatus("GenPart_pdgId", 1);
     tin->SetBranchStatus("GenPart_genPartIdxMother", 1);
     tin->SetBranchStatus("nGenPart", 1);
+    tin->SetBranchStatus("Jet_genJetIdx",1);
     tin->SetBranchAddress("nGenPart", &nGenPart);
     tin->SetBranchAddress("Electron_genPartIdx", &Electron_genPartIdx);
     tin->SetBranchAddress("Electron_genPartFlav", &Electron_genPartFlav);
@@ -115,6 +116,7 @@ cout<<"trun->GetEntry(0)"<<endl;
     tin->SetBranchAddress("Muon_genPartFlav", &Muon_genPartFlav);
     tin->SetBranchAddress("GenPart_pdgId", &GenPart_pdgId);
     tin->SetBranchAddress("GenPart_genPartIdxMother", &GenPart_genPartIdxMother);
+    tin->SetBranchAddress("Jet_genJetIdx",&Jet_genJetIdx);
 
     // collect the trigger information
     Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf;
@@ -143,17 +145,19 @@ cout<<"trun->GetEntry(0)"<<endl;
     // Jet tagging and ID, FlavB is the recomended one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
     UInt_t nJet;
-    Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE];
+    Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE],Jet_hadronFlavour[MAX_ARRAY_SIZE};
     tin->SetBranchStatus("Jet_btagDeepB", 1);
     tin->SetBranchStatus("Jet_btagDeepFlavB", 1);
     tin->SetBranchStatus("nJet", 1);
     tin->SetBranchStatus("Jet_jetId", 1);
     tin->SetBranchStatus("Jet_puId", 1);
+    tin->SetBranchStatus("Jet_hadronFlavour", 1);
     tin->SetBranchAddress("nJet", &nJet);
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
     tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);   
     tin->SetBranchAddress("Jet_jetId", &Jet_jetId);
     tin->SetBranchAddress("Jet_puId", &Jet_puId);
+    tin->SetBranchAddress("Jet_hadronFlavour", &Jet_hadronFlavour);
 
     // pu stuff
     Float_t N_pu_vertices;
@@ -281,9 +285,6 @@ cout<<"trun->GetEntry(0)"<<endl;
             continue;
         };
 
-        // loop over the muons and electrons and only keep the fist ones that pass the requirements
-        // bool muon_selection = (Muon_pt[0]>30. && abs(Muon_eta[0])<2.4 && Muon_tightId[0] && Muon_pfRelIso04_all[0] < 0.15);
-        // bool electron_selection = (Electron_pt[0]>37 && abs(Electron_eta[0])<2.4 && Electron_mvaFall17V2Iso_WP90[0]);
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++)
         {
@@ -324,10 +325,38 @@ cout<<"trun->GetEntry(0)"<<endl;
 	vector<int> njet_in_collection;
 	vector<int> flavor;
 	vector<bool> tagged;
+	double t_weight=1.;
         for (size_t j = 0; j < nJet; j++)
         {
-            if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7))
+            if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6)){
+            
+            //correction for pileupID
+            int MC_pu = Jet_genJetIdx[j];
+            int binSF,binEff;
+            float tempSF,tempEff;
+            //if is pileUpjet
+            if (MC_pu<0) {
+            	binSF = puId_SFmis->GetBin(Jet_pt[j],Jet_eta[j]);
+            	tempSF= puId_SFmis->GetBinContent(binSF);
+            	binEff= puId_mis->GetBin(Jet_pt[j],Jet_eta[j]);
+            	tempEff= puId_mis->GetBinContent(binEff);
+            	}
+            //if is truly a jet
+            else {
+            	binSF = puId_SFeff->GetBin(Jet_pt[j],Jet_eta[j]);
+            	tempSF= puId_SFeff->GetBinContent(binSF);
+            	binEff= puId_eff->GetBin(Jet_pt[j],Jet_eta[j]);
+            	tempEff= puId_eff->GetBinContent(binEff);
+            	}
+            if(!(Jet_pt[j]>50 || Jet_puId[j]==7))	t_weight*=(1-tempSF*tempEff)/(1-tempEff);
+            if((Jet_pt[j]>50 || Jet_puId[j]==7))
             {
+             t_weight*=tempSF;
+             //correction for b-tag
+             njet_in_collection.push_back(j);
+             flavor.push_back(Jet_hadronFlavour[j]);
+             tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
+            
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp)  
               {
                  if (!one_Bjet)
@@ -348,6 +377,7 @@ cout<<"trun->GetEntry(0)"<<endl;
                    Nmedium++;
                if (Jet_btagDeepFlavB[j] > 0.71)
                    Ntight++;
+            }
             }
         }
         //TO DO: ADD HISTO HERE SO THAT I SAVE Nloose, Nmedium, Ntight, before selections
@@ -382,9 +412,26 @@ cout<<"trun->GetEntry(0)"<<endl;
             float temp= EleTrigHisto->GetBinContent(bin);
             Weight*=temp;
             }
+         //corrections of jets already applied 
+        Weight*=t_weight; 
+            
+	for(int jj=0;jj<flavor.size();jj++){
+		int convflav=flavor[jj];
+		if (flavor[jj]<4) convflav==0;
+		if (!(convflav==0 || convflav==4 || convflav==5)) {cout<<"Something weird in the flavor of jet"<<endl;}
+		if(tagged[jj]){ Weight *= b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]}); continue;}
 
+		//if not tagged
+		if(!tagged[jj]) {
+			double SF=b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
+			//Get Eff
+			Weight*=(1-SF*Eff)/(1-Eff);
+			}
+		
+		}
+	
 
-        Weight *= b_tag->evaluate({"central", "M", 5, abs(Jet_eta[id_m_jet]), Jet_pt[id_m_jet]}); 
+        
 
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"}); 
 
