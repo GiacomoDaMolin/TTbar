@@ -34,14 +34,23 @@ void EffComputer(std::string infile){
  tin->SetBranchStatus("Jet_hadronFlavour", 1);
  tin->SetBranchAddress("Jet_hadronFlavour", &Jet_hadronFlavour);
  
+ double ptbins[9]={25,40,60,80,100,140,180,260,1000};
+ double etabins[7]={-2.4,-1.6,0.8,0,0.8,1.6,2.4};
+ 
  //make unequal size bins: you have to have a bin for every pT. so a very large bin for very large pT is needed
- TH2D  *h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta",//rest of the constructor);
- TH2D  *h2_BTaggingEff_Denom_c;
- TH2D  *h2_BTaggingEff_Denom_udsg;
- TH2D  *h2_BTaggingEff_Num_b;
- TH2D  *h2_BTaggingEff_Num_c;
- TH2D  *h2_BTaggingEff_Num_udsg;
+ TH2D  *h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D  *h2_BTaggingEff_Denom_c= new TH2D("c_jets","c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D  *h2_BTaggingEff_Denom_udsg= new TH2D("l_jets","l_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D  *h2_BTaggingEff_Num_b= new TH2D("b_jets_tagged","Tagged b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D  *h2_BTaggingEff_Num_c= new TH2D("c_jets_tagged","Tagged c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D  *h2_BTaggingEff_Num_udsg= new TH2D("l_jets_tagged","Tagged light_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
 
+ h2_BTaggingEff_Denom_b->Sumw2();
+ h2_BTaggingEff_Denom_c->Sumw2();
+ h2_BTaggingEff_Denom_udsg->Sumw2();
+ h2_BTaggingEff_Num_b->Sumw2();
+ h2_BTaggingEff_Num_c->Sumw2();
+ h2_BTaggingEff_Num_udsg->Sumw2();
  
 
  //#pragma omp parallel for
