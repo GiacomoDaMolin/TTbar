@@ -6,6 +6,7 @@
 
 #define MAX_ARRAY_SIZE 128
 
+using std::abs;
 
 void EffComputer(std::string infile){
  std::cout<<"Starting the function"<<std::endl;
@@ -34,16 +35,17 @@ void EffComputer(std::string infile){
  tin->SetBranchAddress("Jet_hadronFlavour", &Jet_hadronFlavour);
  
  double ptbins[9]={25,40,60,80,100,140,180,260,1000};
- double etabins[7]={-2.4,-1.6,-0.8,0,0.8,1.6,2.4};
+
+ double etabins[5]={0, 0.6, 1.2, 1.8, 2.4};
 
  std::cout<<"Create histos"<<std::endl; 
  //make unequal size bins: you have to have a bin for every pT. so a very large bin for very large pT is needed
- TH2D * h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Denom_c= new TH2D("c_jets","c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Denom_udsg= new TH2D("l_jets","l_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Num_b= new TH2D("b_jets_tagged","Tagged b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Num_c= new TH2D("c_jets_tagged","Tagged c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Num_udsg= new TH2D("l_jets_tagged","Tagged light_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,4,etabins);
+ TH2D * h2_BTaggingEff_Denom_c= new TH2D("c_jets","c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,4,etabins);
+ TH2D * h2_BTaggingEff_Denom_udsg= new TH2D("l_jets","l_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,4,etabins);
+ TH2D * h2_BTaggingEff_Num_b= new TH2D("b_jets_tagged","Tagged b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,4,etabins);
+ TH2D * h2_BTaggingEff_Num_c= new TH2D("c_jets_tagged","Tagged c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,4,etabins);
+ TH2D * h2_BTaggingEff_Num_udsg= new TH2D("l_jets_tagged","Tagged light_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,4,etabins);
 
  h2_BTaggingEff_Denom_b->Sumw2();
  h2_BTaggingEff_Denom_c->Sumw2();
@@ -58,23 +60,25 @@ void EffComputer(std::string infile){
   tin->GetEntry(i);
   if (i % 100000 == 0)
             std::cout << "Processing entry " << i << " of " << tin->GetEntries() << std::endl;
-  for (UInt_t j=0; j<nJet;j++){
+  for (int j=0; j<nJet;j++){
     if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
     int flav=Jet_hadronFlavour[j];
-    if(flav==5) h2_BTaggingEff_Denom_b->Fill(Jet_pt[j],Jet_eta[j]);
-    if(flav==4) h2_BTaggingEff_Denom_c->Fill(Jet_pt[j],Jet_eta[j]);
-    if(flav==0) h2_BTaggingEff_Denom_udsg->Fill(Jet_pt[j],Jet_eta[j]);
+    /*if((abs(abs(Jet_eta[j])-1.5)<0.3)) {std::cout<<Jet_eta[j]<<std::endl;
+	std::cout<<abs(abs(Jet_eta[j])-1.5)<<std::endl;}*/
+    if(flav==5) h2_BTaggingEff_Denom_b->Fill(Jet_pt[j],abs(Jet_eta[j]));
+    if(flav==4) h2_BTaggingEff_Denom_c->Fill(Jet_pt[j],abs(Jet_eta[j]));
+    if(flav==0) h2_BTaggingEff_Denom_udsg->Fill(Jet_pt[j],abs(Jet_eta[j]));
     if(Jet_btagDeepFlavB[j]>0.2783){
-    if(flav==5) h2_BTaggingEff_Num_b->Fill(Jet_pt[j],Jet_eta[j]);
-    if(flav==4) h2_BTaggingEff_Num_c->Fill(Jet_pt[j],Jet_eta[j]);
-    if(flav==0) h2_BTaggingEff_Num_udsg->Fill(Jet_pt[j],Jet_eta[j]);
+    if(flav==5) h2_BTaggingEff_Num_b->Fill(Jet_pt[j],abs(Jet_eta[j]));
+    if(flav==4) h2_BTaggingEff_Num_c->Fill(Jet_pt[j],abs(Jet_eta[j]));
+    if(flav==0) h2_BTaggingEff_Num_udsg->Fill(Jet_pt[j],abs(Jet_eta[j]));
     }
    } 
   }
  }
  auto const pos = infile.find_last_of('/');
  std::string inname=infile.substr(pos + 1);
- std::string outfile="/eos/user/g/gdamolin/EFF/b-tag/Out_"+infile; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
+ std::string outfile="/eos/user/g/gdamolin/EFF/b-tag/Out_"+inname; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
  std::cout<<outfile<<std::endl;
  TFile *a=TFile::Open(outfile.c_str(),"recreate");
  h2_BTaggingEff_Denom_b->Write();
@@ -84,7 +88,7 @@ void EffComputer(std::string infile){
  h2_BTaggingEff_Num_c->Write();
  h2_BTaggingEff_Num_udsg->Write();
  
- a->Write(); a->Close();
+ a->Close();
 }
 
 
