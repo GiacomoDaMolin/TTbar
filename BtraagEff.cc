@@ -8,9 +8,8 @@
 
 
 void EffComputer(std::string infile){
-
- 
- TFile *fin= new TFile(infile.c_str());
+ std::cout<<"Starting the function"<<std::endl;
+ TFile *fin= TFile::Open(infile.c_str());
 //TFile *fin= TFile::Open("root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/270000/A62BD1E4-52E1-F64F-9F99-894D7A4B19D1.root");
  TTree *tin = static_cast<TTree *>(fin->Get("Events"));
  tin->SetBranchStatus("*", 0);
@@ -18,7 +17,7 @@ void EffComputer(std::string infile){
  UInt_t nJet;
  Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE];
  Int_t Jet_hadronFlavour[MAX_ARRAY_SIZE];
- 
+ std::cout<<"Set branches"<<std::endl;
  tin->SetBranchStatus("Jet_pt", 1);
  tin->SetBranchAddress("Jet_pt", &Jet_pt);
  tin->SetBranchStatus("Jet_eta", 1);
@@ -35,15 +34,16 @@ void EffComputer(std::string infile){
  tin->SetBranchAddress("Jet_hadronFlavour", &Jet_hadronFlavour);
  
  double ptbins[9]={25,40,60,80,100,140,180,260,1000};
- double etabins[7]={-2.4,-1.6,0.8,0,0.8,1.6,2.4};
- 
+ double etabins[7]={-2.4,-1.6,-0.8,0,0.8,1.6,2.4};
+
+ std::cout<<"Create histos"<<std::endl; 
  //make unequal size bins: you have to have a bin for every pT. so a very large bin for very large pT is needed
- TH2D  *h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D  *h2_BTaggingEff_Denom_c= new TH2D("c_jets","c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D  *h2_BTaggingEff_Denom_udsg= new TH2D("l_jets","l_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D  *h2_BTaggingEff_Num_b= new TH2D("b_jets_tagged","Tagged b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D  *h2_BTaggingEff_Num_c= new TH2D("c_jets_tagged","Tagged c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
- TH2D  *h2_BTaggingEff_Num_udsg= new TH2D("l_jets_tagged","Tagged light_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Denom_c= new TH2D("c_jets","c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Denom_udsg= new TH2D("l_jets","l_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Num_b= new TH2D("b_jets_tagged","Tagged b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Num_c= new TH2D("c_jets_tagged","Tagged c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Num_udsg= new TH2D("l_jets_tagged","Tagged light_jets vs pt and eta; p_T [GeV]; Pseudorapidity",8,ptbins,6,etabins);
 
  h2_BTaggingEff_Denom_b->Sumw2();
  h2_BTaggingEff_Denom_c->Sumw2();
@@ -56,6 +56,8 @@ void EffComputer(std::string infile){
  //#pragma omp parallel for
  for(int i=0; i<tin->GetEntries(); i++){
   tin->GetEntry(i);
+  if (i % 100000 == 0)
+            std::cout << "Processing entry " << i << " of " << tin->GetEntries() << std::endl;
   for (UInt_t j=0; j<nJet;j++){
     if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
     int flav=Jet_hadronFlavour[j];
@@ -70,10 +72,11 @@ void EffComputer(std::string infile){
    } 
   }
  }
-
+ auto const pos = infile.find_last_of('/');
+ std::string inname=infile.substr(pos + 1);
  std::string outfile="/eos/user/g/gdamolin/EFF/b-tag/Out_"+infile; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
-
- TFile *a=new TFile(outfile.c_str(),"Write");
+ std::cout<<outfile<<std::endl;
+ TFile *a=TFile::Open(outfile.c_str(),"recreate");
  h2_BTaggingEff_Denom_b->Write();
  h2_BTaggingEff_Denom_c->Write();
  h2_BTaggingEff_Denom_udsg->Write();
@@ -89,7 +92,7 @@ int main(int argc, char **argv)
 {
 
     std::string inputFile = argv[1];
-    
+    std::cout << inputFile.c_str() <<std::endl;
     EffComputer(inputFile);
 
     return 0;
