@@ -10,7 +10,7 @@ using std::abs;
 
 void EffComputer(std::string infile){
  std::cout<<"Starting the function"<<std::endl;
- TFile *fin= TFile::Open(infile.c_str());
+ TFile *fin= TFile::Open(("root://cms-xrd-global.cern.ch/"+infile).c_str());
 //TFile *fin= TFile::Open("root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/270000/A62BD1E4-52E1-F64F-9F99-894D7A4B19D1.root");
  TTree *tin = static_cast<TTree *>(fin->Get("Events"));
  tin->SetBranchStatus("*", 0);
@@ -78,7 +78,7 @@ void EffComputer(std::string infile){
  }
  auto const pos = infile.find_last_of('/');
  std::string inname=infile.substr(pos + 1);
- std::string outfile="/eos/user/g/gdamolin/EFF/b-tag/Out_"+inname; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
+ std::string outfile="/afs/cern.ch/user/g/gdamolin/public/tempB/Out_"+inname; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
  std::cout<<outfile<<std::endl;
  TFile *a=TFile::Open(outfile.c_str(),"recreate");
  h2_BTaggingEff_Denom_b->Write();

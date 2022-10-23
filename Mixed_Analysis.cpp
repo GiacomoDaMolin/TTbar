@@ -221,6 +221,11 @@ cout<<"trun->GetEntry(0)"<<endl;
     TFile *fpuId_scf = new TFile("/afs/cern.ch/user/g/gdamolin/public/scalefactorsPUID_81Xtraining.root");
     TH2F * puId_SFeff= static_cast<TH2F *>(fpuId_scf->Get("h2_eff_sf2018_T")); //for jet matching PV jets
     TH2F * puId_SFmis= static_cast<TH2F *>(fpuId_scf->Get("h2_mistag_sf2018_T")); //for jets coming from PileUP
+
+    TFile *fb_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/Beff.root");
+    TH2D * l_eff= static_cast<TH2D *>(fb_eff->Get("l_jets_tagged")); 
+    TH2D * c_eff= static_cast<TH2D *>(fb_eff->Get("c_jets_tagged")); 
+    TH2D * b_eff= static_cast<TH2D *>(fb_eff->Get("b_jets_tagged")); 
    
 
     cout<<"DONE!.......Creating Rochester correction class"<<endl;
@@ -354,7 +359,7 @@ cout<<"trun->GetEntry(0)"<<endl;
              t_weight*=tempSF;
              //correction for b-tag
              njet_in_collection.push_back(j);
-             flavor.push_back(Jet_hadronFlavour[j]);
+             flavor.push_back(abs(Jet_hadronFlavour[j]));
              tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
             
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp)  
@@ -423,8 +428,21 @@ cout<<"trun->GetEntry(0)"<<endl;
 
 		//if not tagged
 		if(!tagged[jj]) {
+			double Eff=1.;
 			double SF=b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
 			//Get Eff
+			if(covflav==0) {
+				int bin =l_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
+				Eff=l_eff->GetBinContent(bin);
+				}
+			if(covflav==4) {
+				int bin =c_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
+				Eff=c_eff->GetBinContent(bin);
+				}
+			if(covflav==5) {
+				int bin =b_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
+				Eff=b_eff->GetBinContent(bin);
+				}
 			Weight*=(1-SF*Eff)/(1-Eff);
 			}
 		
