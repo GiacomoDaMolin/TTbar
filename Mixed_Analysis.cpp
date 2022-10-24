@@ -207,6 +207,7 @@ cout<<"trun->GetEntry(0)"<<endl;
     auto muon_iso = muon_c_set->at("NUM_TightRelIso_DEN_TightIDandIPCut");
     auto electron_id = ele_c_set->at("UL-Electron-ID-SF");
     auto b_tag = btag_c_set->at("deepJet_mujets");
+    auto b_mistag= btag_c_set->at("deepJet_incl"); //only for light jets
     auto pu_correction = pu_c_set->at("Collisions18_UltraLegacy_goldenJSON");
 
     cout<<"DONE!.......Opening correction TH2s"<<endl;
@@ -424,12 +425,18 @@ cout<<"trun->GetEntry(0)"<<endl;
 		int convflav=flavor[jj];
 		if (flavor[jj]<4) convflav==0;
 		if (!(convflav==0 || convflav==4 || convflav==5)) {cout<<"Something weird in the flavor of jet"<<endl;}
-		if(tagged[jj]){ Weight *= b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]}); continue;}
+		if(tagged[jj]){
+			if (convflav!=0) Weight *= b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
+			else  Weight *= b_mistag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
+			continue;}
 
 		//if not tagged
 		if(!tagged[jj]) {
 			double Eff=1.;
-			double SF=b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
+			double SF=1;
+			if (convflav!=0) SF=b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
+			else SF=b_mistag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
+			
 			//Get Eff
 			if(convflav==0) {
 				int bin =l_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
