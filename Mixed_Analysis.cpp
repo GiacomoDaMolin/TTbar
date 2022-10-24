@@ -98,7 +98,7 @@ cout<<"trun->GetEntry(0)"<<endl;
 
     // get gen quantities
     Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE];
-    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE], Jet_genJetIdx[MAX_ARRAY_SIZE};
+    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE], Jet_genJetIdx[MAX_ARRAY_SIZE];
     UChar_t Muon_genPartFlav[MAX_ARRAY_SIZE], Electron_genPartFlav[MAX_ARRAY_SIZE];
     UInt_t nGenPart;
     tin->SetBranchStatus("Electron_genPartIdx", 1);
@@ -145,7 +145,7 @@ cout<<"trun->GetEntry(0)"<<endl;
     // Jet tagging and ID, FlavB is the recomended one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
     UInt_t nJet;
-    Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE],Jet_hadronFlavour[MAX_ARRAY_SIZE};
+    Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE],Jet_hadronFlavour[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Jet_btagDeepB", 1);
     tin->SetBranchStatus("Jet_btagDeepFlavB", 1);
     tin->SetBranchStatus("nJet", 1);
@@ -431,15 +431,15 @@ cout<<"trun->GetEntry(0)"<<endl;
 			double Eff=1.;
 			double SF=b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
 			//Get Eff
-			if(covflav==0) {
+			if(convflav==0) {
 				int bin =l_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
 				Eff=l_eff->GetBinContent(bin);
 				}
-			if(covflav==4) {
+			if(convflav==4) {
 				int bin =c_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
 				Eff=c_eff->GetBinContent(bin);
 				}
-			if(covflav==5) {
+			if(convflav==5) {
 				int bin =b_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
 				Eff=b_eff->GetBinContent(bin);
 				}

@@ -92,12 +92,17 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     // Jet tagging , FlavB is the recomennded one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
     UInt_t nJet;
+    Int_t Jet_jetId[MAX_ARRAY_SIZE], Jet_puId[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Jet_btagDeepB", 1);
     tin->SetBranchStatus("Jet_btagDeepFlavB", 1);
     tin->SetBranchStatus("nJet", 1);
+    tin->SetBranchStatus("Jet_jetId", 1);
+    tin->SetBranchStatus("Jet_puId", 1);
     tin->SetBranchAddress("nJet", &nJet);
     tin->SetBranchAddress("Jet_btagDeepFlavB", &Jet_btagDeepFlavB);
-    tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);
+    tin->SetBranchAddress("Jet_btagDeepB", &Jet_btagDeepB);   
+    tin->SetBranchAddress("Jet_jetId", &Jet_jetId);
+    tin->SetBranchAddress("Jet_puId", &Jet_puId);
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
@@ -218,7 +223,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 
 	double scmDT=rc.kScaleDT(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
         Muon_pt[muon_idx]*= scmDT;
-	Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
+	Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
         
 
         dR_mujet=Muon_p4->DeltaR(*MainBjet_p4);
@@ -300,12 +305,14 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	tout->Fill();
     }
     std::cout << "Total number of events: " << nEv << std::endl;
+    int NumbEv=nEv;
     std::cout << "Removed because in another sample = " << crosstrigger << endl;
     std::cout << "trigger dropped = " << trigger_dropped << endl;
     std::cout << "selections dropped = " << n_dropped << endl; //remember the cross trigger in Data
 
-    std::cout << "Fraction of events discarded by trigger = " << (trigger_dropped * 1. / nEv) << endl;
-    int Rem_trigger=nEv-trigger_dropped; //remember the cross trigger in Data
+    NumbEv-=crosstrigger;
+    std::cout << "Fraction of events discarded by trigger = " << (trigger_dropped * 1. / NumbEv) << endl;
+    int Rem_trigger=NumbEv-trigger_dropped; //remember the cross trigger in Data
     std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
     std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
     // Write the histograms to the file
