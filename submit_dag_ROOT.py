@@ -124,6 +124,7 @@ def main():
                               xs=xsec, lumi=lumi)
         else:
             first_data = data[sample]['first_data']
+            datafiles = run_dasgoclient(dataset=dataset)
             with open(f"{basedir}/{sample}.dag", 'w') as dagfile:
                 for file in datafiles:
                     write_dag(dagfile=dagfile,
