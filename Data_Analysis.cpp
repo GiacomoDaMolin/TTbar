@@ -187,8 +187,6 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
         Float_t jet_btag_deepFlav_wp = 0.2783;
-        // the wp are: (0.1355, 0.4506, 0.7738)
-        // Float_t jet_btag_deep_wp = 0.4506;
         // cycle through btags and check if one passes the tagging WP
         bool one_Bjet = false;
         int id_m_jet=-1;
@@ -302,15 +300,14 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	tout->Fill();
     }
     std::cout << "Total number of events: " << nEv << std::endl;
-    std::cout << "Number of events discarded by trigger = " << trigger_dropped << std::endl;
-    std:cout <<"Number of event removed by cross-triggering filter"<<crosstrigger<<std::endl;
-    trigger_dropped+=crosstrigger;
-    std::cout << "Number of events discarded by selection = " << n_dropped << std::endl;
+    std::cout << "Removed because in another sample = " << crosstrigger << endl;
+    std::cout << "trigger dropped = " << trigger_dropped << endl;
+    std::cout << "selections dropped = " << n_dropped << endl; //remember the cross trigger in Data
 
-    std::cout << "Number of events passing triggers = " << (nEv - trigger_dropped) << std::endl;
-    std::cout << "Number of events passing selection = " << (nEv - trigger_dropped) - n_dropped << std::endl;
-
-    std::cout << "Selected events over triggered events = " << (nEv - n_dropped) * 1. / (nEv - trigger_dropped) << std::endl;
+    std::cout << "Fraction of events discarded by trigger = " << (trigger_dropped * 1. / nEv) << endl;
+    int Rem_trigger=nEv-trigger_dropped; //remember the cross trigger in Data
+    std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
+    std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
     // Write the histograms to the file
     h_Muon_eta->Write();
     h_Muon_pt->Write();
