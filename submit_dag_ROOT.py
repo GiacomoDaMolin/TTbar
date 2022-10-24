@@ -83,7 +83,7 @@ OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
 SIGNAL=\"{signal}\" ", file=dagfile)
     else:
         print(f"VARS {jobid} INFILE=\"{infile}\" \
-OUTFILE=\"{outfile}\" -f {first_data} ", file=dagfile)
+OUTFILE=\"{outfile}\" FIRST_DATA=\"{first_data}\" ", file=dagfile)
 
 
 def main():
