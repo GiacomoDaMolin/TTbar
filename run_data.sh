@@ -23,6 +23,7 @@ outdir="/afs/cern.ch/user/g/gdamolin/Johan/Data"
 filename=$INFILE
 filestring=$(echo $filename | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
 ofilename=${outdir}/$filestring"_MA".root
+FIRSTDATASET=$FIRST_DATA
 
 cd $CMSSW
 eval `scram r -sh`

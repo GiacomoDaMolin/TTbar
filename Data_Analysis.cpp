@@ -10,7 +10,7 @@
 // include user defined histograms and auxiliary macros
 #include "Histodef.cpp"
 #include "Auxiliary.cpp"
-#include "Python_Analysis/corrections/roccor/RoccoR.cc"
+#include "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR.cc"
 
 using namespace std;
 
@@ -148,7 +148,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tout->Branch("Ntight", &Ntight);
 
     RoccoR rc;
-    rc.init("Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
+    rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
     
     for (UInt_t i = 0; i < nEv; i++)
     {
