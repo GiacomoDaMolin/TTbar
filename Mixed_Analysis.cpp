@@ -51,7 +51,6 @@ cout<<"Call completed!"<<endl;
 
 
     trun->GetEntry(0);
-cout<<"trun->GetEntry(0)"<<endl;
 
     TTree *tin = static_cast<TTree *>(fin->Get("Events"));
 
@@ -192,15 +191,12 @@ cout<<"trun->GetEntry(0)"<<endl;
     string b_tag_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/btagging.json.gz";
     string pileup_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/puWeights.json.gz";
 
-    cout<<"Opening correction files..."<<endl;
     
     auto muon_c_set = CorrectionSet::from_file(muon_json);
     auto ele_c_set = CorrectionSet::from_file(electron_json);
     auto jet_c_set = CorrectionSet::from_file(jets_json);
     auto btag_c_set = CorrectionSet::from_file(b_tag_json);
     auto pu_c_set = CorrectionSet::from_file(pileup_json);
-
-    cout<<"DONE!.......Defining correction functions"<<endl;
 
     auto muon_trigger = muon_c_set->at("NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight");
     auto muon_id = muon_c_set->at("NUM_TightID_DEN_genTracks");
@@ -209,8 +205,6 @@ cout<<"trun->GetEntry(0)"<<endl;
     auto b_tag = btag_c_set->at("deepJet_mujets");
     auto b_mistag= btag_c_set->at("deepJet_incl"); //only for light jets
     auto pu_correction = pu_c_set->at("Collisions18_UltraLegacy_goldenJSON");
-
-    cout<<"DONE!.......Opening correction TH2s"<<endl;
     
     TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
     TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
@@ -229,7 +223,7 @@ cout<<"trun->GetEntry(0)"<<endl;
     TH2D * b_eff= static_cast<TH2D *>(fb_eff->Get("b_jets_tagged")); 
    
 
-    cout<<"DONE!.......Creating Rochester correction class"<<endl;
+
 
     RoccoR rc;
     rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
@@ -335,29 +329,30 @@ cout<<"trun->GetEntry(0)"<<endl;
         for (size_t j = 0; j < nJet; j++)
         {
             if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6)){
-            
             //correction for pileupID
             int MC_pu = Jet_genJetIdx[j];
             int binSF,binEff;
             float tempSF,tempEff;
             //if is pileUpjet
             if (MC_pu<0) {
-            	binSF = puId_SFmis->GetBin(Jet_pt[j],Jet_eta[j]);
+            	binSF = puId_SFmis->FindBin(Jet_pt[j],Jet_eta[j]);
             	tempSF= puId_SFmis->GetBinContent(binSF);
-            	binEff= puId_mis->GetBin(Jet_pt[j],Jet_eta[j]);
+            	binEff= puId_mis->FindBin(Jet_pt[j],Jet_eta[j]);
             	tempEff= puId_mis->GetBinContent(binEff);
             	}
             //if is truly a jet
             else {
-            	binSF = puId_SFeff->GetBin(Jet_pt[j],Jet_eta[j]);
+            	binSF = puId_SFeff->FindBin(Jet_pt[j],Jet_eta[j]);
             	tempSF= puId_SFeff->GetBinContent(binSF);
-            	binEff= puId_eff->GetBin(Jet_pt[j],Jet_eta[j]);
+            	binEff= puId_eff->FindBin(Jet_pt[j],Jet_eta[j]);
             	tempEff= puId_eff->GetBinContent(binEff);
             	}
-            if(!(Jet_pt[j]>50 || Jet_puId[j]==7))	t_weight*=(1-tempSF*tempEff)/(1-tempEff);
+		
+            if(!(Jet_pt[j]>50 || Jet_puId[j]==7))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); }
             if((Jet_pt[j]>50 || Jet_puId[j]==7))
-            {
+            { 
              t_weight*=tempSF;
+	     if(Jet_pt[j]>50) t_weight=1.;
              //correction for b-tag
              njet_in_collection.push_back(j);
              flavor.push_back(abs(Jet_hadronFlavour[j]));
@@ -401,7 +396,6 @@ cout<<"trun->GetEntry(0)"<<endl;
 
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
         // corrections
-
 	double scmMC=rc.kScaleMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
         Muon_pt[muon_idx]*= scmMC;
         Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
@@ -414,10 +408,11 @@ cout<<"trun->GetEntry(0)"<<endl;
         Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
         if(HLT_Ele32_WPTight_Gsf) {
             //retrieve Histo
-            int bin = EleTrigHisto->GetBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
+            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
             float temp= EleTrigHisto->GetBinContent(bin);
             Weight*=temp;
             }
+
          //corrections of jets already applied 
         Weight*=t_weight; 
             
@@ -439,15 +434,15 @@ cout<<"trun->GetEntry(0)"<<endl;
 			
 			//Get Eff
 			if(convflav==0) {
-				int bin =l_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
+				int bin =l_eff->FindBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
 				Eff=l_eff->GetBinContent(bin);
 				}
 			if(convflav==4) {
-				int bin =c_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
+				int bin =c_eff->FindBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
 				Eff=c_eff->GetBinContent(bin);
 				}
 			if(convflav==5) {
-				int bin =b_eff->GetBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
+				int bin =b_eff->FindBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
 				Eff=b_eff->GetBinContent(bin);
 				}
 			Weight*=(1-SF*Eff)/(1-Eff);
@@ -456,7 +451,6 @@ cout<<"trun->GetEntry(0)"<<endl;
 		}
 	
 
-        
 
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"}); 
 
