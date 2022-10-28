@@ -1,6 +1,19 @@
-# How to send jobs in Condor
-
+#TO DO LIST:
 ##SFs in the region 1.44 < |η| < 1.57, corresponding to the transition between the barrel and endcaps of ECAL, are not provided by the EGM POG since this region is excluded by most physics analyses. 
+
+1) find a way to plot from TTree, basically remake normalizer but better
+2) after (1), store in the trees all observables AFTER the selections and in Histos the ones before
+
+3)Multithreading: at some point speed might become an issue
+OR
+4) pre skimming: triggers already discard a lot of events: store nanoaod skimmed somewhere
+
+5) separate TT Tau->l from l
+
+
+
+
+# How to send jobs in Condor
 
 To create the description of the jobs needed to run over a dataset the following command can be used
 
