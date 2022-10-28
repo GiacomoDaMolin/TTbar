@@ -295,6 +295,18 @@ cout<<"Call completed!"<<endl;
                 break;
             }
         }
+        if (muon_idx==-1) continue;
+        Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
+        Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"}); 
+
+        double scmMC=rc.kScaleMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
+        Muon_pt[muon_idx]*= scmMC;
+        Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
+
+        if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
+        Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
+        Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
+        
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++)
         {
@@ -312,6 +324,17 @@ cout<<"Call completed!"<<endl;
                 }
             }
         }
+        if (electron_idx==-1) continue;
+
+        Weight *= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
+        Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
+        if(HLT_Ele32_WPTight_Gsf) {
+            //retrieve Histo
+            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
+            float temp= EleTrigHisto->GetBinContent(bin);
+            Weight*=temp;
+            }
+
         bool selection = ((muon_idx > -1) && (electron_idx > -1));
         // check the seleected objects for opposite charge
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
@@ -351,8 +374,7 @@ cout<<"Call completed!"<<endl;
             if(!(Jet_pt[j]>50 || Jet_puId[j]==7))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); }
             if((Jet_pt[j]>50 || Jet_puId[j]==7))
             { 
-             t_weight*=tempSF;
-	     if(Jet_pt[j]>50) t_weight=1.;
+             if(Jet_pt[j]<=50) t_weight*=tempSF; //else you are in pT>50 case: apply no sf
              //correction for b-tag
              njet_in_collection.push_back(j);
              flavor.push_back(abs(Jet_hadronFlavour[j]));
@@ -381,39 +403,7 @@ cout<<"Call completed!"<<endl;
             }
             }
         }
-        //TO DO: ADD HISTO HERE SO THAT I SAVE Nloose, Nmedium, Ntight, before selections
-        selection = selection && (one_Bjet);
-        if (!selection)
-        {
-            n_dropped++;
-            continue;
-        }
-        PTbjet = MainBjet_p4->Pt();
-
-        dR_mujet = Muon_p4->DeltaR(*MainBjet_p4);
-        dR_ejet = Electron_p4->DeltaR(*MainBjet_p4);
-        dR_muE = Muon_p4->DeltaR(*Electron_p4);
-
-        Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
-        // corrections
-	double scmMC=rc.kScaleMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
-        Muon_pt[muon_idx]*= scmMC;
-        Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
-
-        if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
-        Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
-        Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
-
-        Weight *= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
-        Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
-        if(HLT_Ele32_WPTight_Gsf) {
-            //retrieve Histo
-            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
-            float temp= EleTrigHisto->GetBinContent(bin);
-            Weight*=temp;
-            }
-
-         //corrections of jets already applied 
+          //corrections of jets already applied 
         Weight*=t_weight; 
             
 	for(int jj=0;jj<flavor.size();jj++){
@@ -449,10 +439,22 @@ cout<<"Call completed!"<<endl;
 			}
 		
 		}
-	
+      
+        h_LooseJets->Fill(Nloose, Weight);
+        h_MediumJets->Fill(Nmedium, Weight);
+        h_TightJets->Fill(Ntight, Weight);
+        selection = selection && (one_Bjet);
+        if (!selection)
+        {
+            n_dropped++;
+            continue;
+        }
+        PTbjet = MainBjet_p4->Pt();
 
+        dR_mujet = Muon_p4->DeltaR(*MainBjet_p4);
+        dR_ejet = Electron_p4->DeltaR(*MainBjet_p4);
+        dR_muE = Muon_p4->DeltaR(*Electron_p4);
 
-        Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"}); 
 
         // check whether muon or electron is the leading one
         if (Muon_p4->Pt() > Electron_p4->Pt())

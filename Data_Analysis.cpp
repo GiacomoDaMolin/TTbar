@@ -179,6 +179,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
                 break;
             }
         }
+        if (muon_idx==-1) continue;
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++){
             if ((Electron_pt[j]>35 && abs(Electron_eta[j])<2.4 && Electron_mvaFall17V2Iso_WP90[j])){
@@ -187,6 +188,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
                 else {electron_idx = j; break;}
             }
         }
+        if (electron_idx==-1) continue;
         bool selection = ((muon_idx > -1) && (electron_idx > -1));
         // check the seleected objects for opposite charge
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
@@ -214,6 +216,11 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	    }
         }
         selection = selection && (one_Bjet);
+
+        h_LooseJets->Fill(Nloose);
+        h_MediumJets->Fill(Nmedium);
+        h_TightJets->Fill(Ntight);
+
         if (!selection)
         {
             n_dropped++;
