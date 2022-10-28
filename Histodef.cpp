@@ -38,4 +38,24 @@
 
     TH1D* h_leading_lepton_pt = new TH1D("leading_lepton_pt", "leading_lepton_pt", 45, 20, 200);
     TH1D* h_leading_lepton_pt_weighted = new TH1D("leading_lepton_pt_weighted", "leading_lepton_pt_weighted", 45, 20, 200);
+    // other histos (weighted only)
+    TH1I *h_LooseJets = new TH1I("N_looseJets","N_looseJets",12,0,12);
+    TH1I *h_MediumJets = new TH1I("N_mediumJets","N_mediumJets",8,0,8);
+    TH1I *h_TightJets = new TH1I("N_tightJets","N_tightJets",6,0,6);
+
+	TH1D* h_dR_allJets = new TH1D("h_dR_allJets","h_dR_allJets",50,3,4);
+	TH1D* h_dR_lbJets = new TH1D("h_dR_lbJets","h_dR_lbJets",50,3,4);
+	TH1D* h_dR_mbJets = new TH1D("h_dR_mbJets","h_dR_mbJets",50,3,4);
+
+	TH1D* h_Apl_allJets = new TH1D("h_Apl_allJets","h_Apl_allJets",50,-1,1);
+	TH1D* h_Apl_lbJets = new TH1D("h_Apl_lbJets","h_Apl_lbJets",50,-1,1);
+	TH1D* h_Apl_mbJets = new TH1D("h_Apl_mbJets","h_Apl_mbJets",50,-1,1);
+
+	TH1D* h_Phi_allJets = new TH1D("h_Phi_allJets","h_Phi_allJets",32,0,3.2);
+	TH1D* h_Phi_lbJets = new TH1D("h_Phi_lbJets","h_dR_lbJets",32,0,3.2);
+	TH1D* h_Phi_mbJets = new TH1D("h_Phi_mbJets","h_dR_mbJets",32,0,3.2);
+
+	TH1D * h_acopla_emu =new TH1D("h_Acopla_emu","h_Acopla_emu",50,0, 2*M_PI);
+
+
 #endif // Histodef_cpp

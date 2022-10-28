@@ -33,16 +33,15 @@ bool isFromW(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 	return false;
 }
 
-void printMCTree(int size, Int_t *GenId, Int_t *GenParent, Int_t initialID)
+bool isFromTau(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 {
 	if (initialID < 0)
 	{
-		return;
+		return false;
 	}
 	// retrieve first PDG ID number
-	Int_t startPdg = GenId[initialID];
-	Int_t newPdg = startPdg;
-	Int_t newID = initialID;
+	int startPdg = GenId[initialID];
+	int newID = initialID, newPdg = startPdg;
 	// look for the parent; if the parent is of same PDGID of starting particle, iterate until parent is different particle
 	while (newPdg == startPdg)
 	{
@@ -52,8 +51,10 @@ void printMCTree(int size, Int_t *GenId, Int_t *GenParent, Int_t initialID)
 		}
 		newID = GenParent[newID];
 		newPdg = GenId[newID];
-		std::cout << "ID: " << newID << " PDG: " << newPdg << std::endl;
+		if (abs(newPdg) == 15)
+			return true;
 	}
+	return false;
 }
 
 double InvertPhi(double phi){
