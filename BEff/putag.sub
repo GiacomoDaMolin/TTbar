@@ -1,0 +1,12 @@
+basedir=/afs/cern.ch/user/g/gdamolin/Johan/TTbar
+executable=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/BEff/pueff.sh
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+output                = $(basedir)/../output/hello.$(ClusterId).$(ProcId).out
+error                 = $(basedir)/../error/hello.$(ClusterId).$(ProcId).err
+log                   = $(basedir)/../log/hello.$(ClusterId).log
+
++JobFlavour = "longlunch"
+queue arguments from $(basedir)/TXT/lfilesbtag.txt
