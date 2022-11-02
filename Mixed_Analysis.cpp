@@ -380,37 +380,34 @@ cout<<"Call completed!"<<endl;
             	}
 		
             if(!(Jet_pt[j]>50 || Jet_puId[j]==7))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); }
-            if((Jet_pt[j]>50 || Jet_puId[j]==7))
-            { 
+            if((Jet_pt[j]>50 || Jet_puId[j]==7)) { 
              if(Jet_pt[j]<=50) t_weight*=tempSF; //else you are in pT>50 case: apply no sf
-             //correction for b-tag
-             njet_in_collection.push_back(j);
-             flavor.push_back(abs(Jet_hadronFlavour[j]));
-             tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
+              //correction for b-tag
+              njet_in_collection.push_back(j);
+              flavor.push_back(abs(Jet_hadronFlavour[j]));
+              tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
+
+	      if (Jet_btagDeepFlavB[j] > 0.0490)
+                   Nloose++;
+              if (Jet_btagDeepFlavB[j] > 0.2783)
+                   Nmedium++;
+              if (Jet_btagDeepFlavB[j] > 0.71)
+                   Ntight++;
             
-              if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp)  
-              {
-                 if (!one_Bjet)
-                 {
+              if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp){
+                 if (!one_Bjet){
                       MainBjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
                       OppositeBjet_p4->SetPtEtaPhiM(Jet_pt[j], -1 * Jet_eta[j], InvertPhi(Jet_phi[j]), Jet_mass[j]);
 
-                      if (MainBjet_p4->DeltaR(*Muon_p4) < 0.4 || MainBjet_p4->DeltaR(*Electron_p4) < 0.4)
-                              continue;
-                      one_Bjet = true;
-                      id_m_jet = j;
-                  }
+                      if (MainBjet_p4->DeltaR(*Muon_p4) > 0.4 && MainBjet_p4->DeltaR(*Electron_p4) > 0.4){
+                      	one_Bjet = true;
+                      	id_m_jet = j;
+			 }
+                      }
                }
-                
-               if (Jet_btagDeepFlavB[j] > 0.0490)
-                   Nloose++;
-               if (Jet_btagDeepFlavB[j] > 0.2783)
-                   Nmedium++;
-               if (Jet_btagDeepFlavB[j] > 0.71)
-                   Ntight++;
-            }
-            }
-        }
+            }//end if(jetpt>50 !!puid==7)
+          }//end kinematic if
+        }//end for
           //corrections of jets already applied 
         Weight*=t_weight; 
             
@@ -451,7 +448,7 @@ cout<<"Call completed!"<<endl;
         h_LooseJets->Fill(Nloose, Weight);
         h_MediumJets->Fill(Nmedium, Weight);
         h_TightJets->Fill(Ntight, Weight);
-        Acopl_emu=M_PI-(Electron_p4.DeltaPhi(*Muon_p4));
+        Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
         h_acopla_emu->Fill(Acopl_emu,Weight);
 
 
@@ -696,6 +693,48 @@ int main(int argc, char **argv)
     double IntLuminosity = atof(argv[4]);
     string boolstr = argv[5];
     bool Signal = (boolstr == "true");
+
+    h_Muon_pt->Sumw2();
+    h_Muon_eta->Sumw2();
+    h_Electron_pt->Sumw2();
+    h_Electron_eta->Sumw2();
+    h_Muon_pt_weighted->Sumw2();
+    h_Muon_eta_weighted->Sumw2();
+    h_Electron_pt_weighted->Sumw2();
+    h_Electron_eta_weighted->Sumw2();
+    h_Muon_pt_from_W->Sumw2();
+    h_Muon_eta_from_W->Sumw2();
+    h_Electron_pt_from_W->Sumw2();
+    h_Electron_eta_from_W->Sumw2();
+    h_Muon_pt_weighted_from_W->Sumw2();
+    h_Muon_eta_weighted_from_W->Sumw2();
+    h_Electron_pt_weighted_from_W->Sumw2();
+    h_Electron_eta_weighted_from_W->Sumw2();
+    h_Muon_pt_trigger->Sumw2();
+    h_Muon_eta_trigger->Sumw2();
+    h_Electron_pt_trigger->Sumw2();
+    h_Electron_eta_trigger->Sumw2();
+    h_Muon_Electron_invariant_mass->Sumw2();
+    h_Muon_Muon_invariant_mass->Sumw2();
+    h_Electron_Electron_invariant_mass->Sumw2();
+    h_Muon_Electron_invariant_mass_weighted->Sumw2();
+    h_Muon_Muon_invariant_mass_weighted->Sumw2();
+    h_Electron_Electron_invariant_mass_weighted->Sumw2();
+    h_leading_lepton_pt->Sumw2();
+    h_leading_lepton_pt_weighted->Sumw2();
+    h_LooseJets->Sumw2();
+    h_MediumJets->Sumw2();
+    h_TightJets->Sumw2();
+	h_dR_allJets->Sumw2();
+	h_dR_lbJets->Sumw2();
+	h_dR_mbJets ->Sumw2();
+      h_Apl_allJets->Sumw2();
+	h_Apl_lbJets->Sumw2();
+	h_Apl_mbJets->Sumw2();
+	h_Phi_allJets->Sumw2();
+	h_Phi_lbJets->Sumw2();
+	h_Phi_mbJets->Sumw2();
+	h_acopla_emu->Sumw2();
 
     Mixed_Analysis(inputFile, outputFile, crossSection, IntLuminosity, Signal);
 
