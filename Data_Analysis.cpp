@@ -64,8 +64,6 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tin->SetBranchAddress("Jet_mass", &Jet_mass);
 
     // collect the trigger information
-    // triggers were 27 and 35 before
-    // Triggers now changed to looser cuts due to Michele's request
     Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf;
     tin->SetBranchStatus("HLT_IsoMu24", 1);
     tin->SetBranchStatus("HLT_Ele32_WPTight_Gsf", 1);
@@ -128,7 +126,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tout->Branch("muon_pt", &muon_pt);
 
     int Nloose=0, Nmedium=0, Ntight=0;
-    float dR_muE,dR_mujet,dR_ejet,dR_allJets,dR_lbJets,dR_mbJets,Apl_allJets,Apl_lbJets,Apl_mbJets,Phi_allJets,Phi_lbJets,Phi_mbJets, PTbjet;
+    float dR_muE,dR_mujet,dR_ejet,dR_allJets,dR_lbJets,dR_mbJets,Apl_allJets,Apl_lbJets,Apl_mbJets,Phi_allJets,Phi_lbJets,Phi_mbJets, PTbjet,Acopl_emu;
 
     tout->Branch("dR_mue", &dR_muE);
     tout->Branch("dR_mujet", &dR_mujet);
@@ -146,10 +144,11 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tout->Branch("Nloose", &Nloose);
     tout->Branch("Nmedium", &Nmedium);
     tout->Branch("Ntight", &Ntight);
+    tout->Branch("Acopl_emu", &Acopl_emu);
 
     RoccoR rc;
     rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
-    
+    #pragma omp parallel for
     for (UInt_t i = 0; i < nEv; i++)
     {
         tin->GetEntry(i);
@@ -179,7 +178,10 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
                 break;
             }
         }
-        if (muon_idx==-1) continue;
+        if (muon_idx==-1) {
+            n_dropped++;
+            continue;
+        }
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++){
             if ((Electron_pt[j]>35 && abs(Electron_eta[j])<2.4 && Electron_mvaFall17V2Iso_WP90[j])){
@@ -188,7 +190,10 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
                 else {electron_idx = j; break;}
             }
         }
-        if (electron_idx==-1) continue;
+        if (electron_idx==-1) {
+            n_dropped++;
+            continue;
+        }
         bool selection = ((muon_idx > -1) && (electron_idx > -1));
         // check the seleected objects for opposite charge
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
@@ -220,6 +225,8 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         h_LooseJets->Fill(Nloose);
         h_MediumJets->Fill(Nmedium);
         h_TightJets->Fill(Ntight);
+        Acopl_emu=M_PI-(Electron_p4.DeltaPhi(*Muon_p4));
+        h_acopla_emu->Fill(Acopl_emu);
 
         if (!selection)
         {
@@ -264,34 +271,37 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	bool ok1=false,ok2=false ,ok3=false;
 	for (size_t j = 0; j < nJet; j++){
 		if (j==id_m_jet) continue;
-		TLorentzVector *tempJet = new TLorentzVector();
-		tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
-		double temp=OppositeBjet_p4->DeltaR(*tempJet);
+                if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
+		 TLorentzVector *tempJet = new TLorentzVector();
+		 tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
+		 double temp=OppositeBjet_p4->DeltaR(*tempJet);
 
-		TVector3 A(tempJet->X(),tempJet->Y(),tempJet->Z());	
-		TVector3 B(MainBjet_p4->X(),MainBjet_p4->Y(),MainBjet_p4->Z());
+		 TVector3 A(tempJet->X(),tempJet->Y(),tempJet->Z());	
+		 TVector3 B(MainBjet_p4->X(),MainBjet_p4->Y(),MainBjet_p4->Z());
 
-		double tempApl=A.Dot(B)/(A.Mag()*B.Mag());
+		 double tempApl=A.Dot(B)/(A.Mag()*B.Mag());
 
-		if(temp<dR_allJets) {dR_allJets=temp; ok1=true;}
-		if(tempApl<Apl_allJets) {Apl_allJets=tempApl;}
-		if(Jet_btagDeepFlavB[j] > 0.0490){ ok2=true;
+		 if(temp<dR_allJets) {dR_allJets=temp; ok1=true;}
+		 if(tempApl<Apl_allJets) {Apl_allJets=tempApl;}
+		 if(Jet_btagDeepFlavB[j] > 0.0490){ ok2=true;
 			if (temp<dR_lbJets){dR_lbJets=temp;}
 			if (tempApl<Apl_lbJets) {Apl_lbJets=tempApl;}
 			}
-		if(Jet_btagDeepFlavB[j] > 0.2783){ ok3=true;
+		 if(Jet_btagDeepFlavB[j] > 0.2783){ ok3=true;
 			if (temp<dR_mbJets){dR_mbJets=temp;}
 			if (tempApl<Apl_mbJets) {Apl_mbJets=tempApl;}
 			}
   
 			
-		delete tempJet;	
-        	}
+		 delete tempJet;	
+		 }//end if
+        	}//end for
 
 //dphi
 	Phi_allJets=999, Phi_lbJets=999, Phi_mbJets=999;
 	for (size_t j = 0; j < nJet; j++){
 			if(j==id_m_jet) continue;
+			if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
 			double temp=Jet_phi[j]-OppositeBjet_p4->Phi();
 			if (temp<-1*M_PI) temp+=2*M_PI;
 			if (temp>M_PI) temp-=2*M_PI;
@@ -300,13 +310,13 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 			if(temp<Phi_allJets) {Phi_allJets=temp;}
 			if((Jet_btagDeepFlavB[j] > 0.0490) && (temp<Phi_lbJets)) {Phi_lbJets=temp;}
 			if((Jet_btagDeepFlavB[j] > 0.2783) && (temp<Phi_mbJets)) {Phi_mbJets=temp;}
-        		}
+        		 }//end if
+        	}//end for
+
 
         if (muon_idx > -1 && electron_idx > -1)
         {
-           // calculate the invariant mass of the two muons
             invMass = (*(Muon_p4) + *(Electron_p4)).M();
-            // fill the invariant mass histogram
             h_Muon_Electron_invariant_mass->Fill(invMass);
         }
 	tout->Fill();
@@ -331,6 +341,10 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 
     h_Muon_Electron_invariant_mass->Write();
     h_leading_lepton_pt->Write();
+    h_LooseJets->Write();
+    h_MediumJets->Write();
+    h_TightJets->Write();
+    h_acopla_emu->Write();
 
     fout->Write();
     fout->Close();

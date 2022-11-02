@@ -55,12 +55,12 @@ void EffComputer(std::string infile){
             std::cout << "Processing entry " << i << " of " << tin->GetEntries() << std::endl;
   for (int j=0; j<nJet;j++){
     if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]<50 )){
-    if(Jet_genJetIdx[j]<0) h2_PU_Denom->Fill(Jet_pt[j],abs(Jet_eta[j]));
-    if(Jet_genJetIdx[j]>=0) h2_PV_Denom->Fill(Jet_pt[j],abs(Jet_eta[j]));
+    if(Jet_genJetIdx[j]<0) h2_PU_Denom->Fill(Jet_pt[j],Jet_eta[j]);
+    if(Jet_genJetIdx[j]>=0) h2_PV_Denom->Fill(Jet_pt[j],Jet_eta[j]);
 
     if(Jet_puId[j]==7){
-    if(Jet_genJetIdx[j]<0) h2_PU_Num->Fill(Jet_pt[j],abs(Jet_eta[j]));
-    if(Jet_genJetIdx[j]>=0) h2_PV_Num->Fill(Jet_pt[j],abs(Jet_eta[j]));
+    if(Jet_genJetIdx[j]<0) h2_PU_Num->Fill(Jet_pt[j],Jet_eta[j]);
+    if(Jet_genJetIdx[j]>=0) h2_PV_Num->Fill(Jet_pt[j],Jet_eta[j]);
 
     }
    } 

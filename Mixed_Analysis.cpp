@@ -246,7 +246,7 @@ cout<<"Call completed!"<<endl;
     tout->Branch("Weight", &Weight);
 
     int Nloose = 0, Nmedium = 0, Ntight = 0;
-    float dR_muE, dR_mujet, dR_ejet, dR_allJets, dR_lbJets, dR_mbJets, Apl_allJets, Apl_lbJets, Apl_mbJets, Phi_allJets, Phi_lbJets, Phi_mbJets, PTbjet;
+    float dR_muE, dR_mujet, dR_ejet, dR_allJets, dR_lbJets, dR_mbJets, Apl_allJets, Apl_lbJets, Apl_mbJets, Phi_allJets, Phi_lbJets, Phi_mbJets, PTbjet,Acopl_emu;
 
     tout->Branch("dR_mue", &dR_muE);
     tout->Branch("dR_mujet", &dR_mujet);
@@ -264,6 +264,7 @@ cout<<"Call completed!"<<endl;
     tout->Branch("Nloose", &Nloose);
     tout->Branch("Nmedium", &Nmedium);
     tout->Branch("Ntight", &Ntight);
+    tout->Branch("Acopl_emu", &Acopl_emu);
 
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
@@ -272,6 +273,7 @@ cout<<"Call completed!"<<endl;
 
     trun_out->Fill(); // we already called trun->GetEntry(0);
 
+    #pragma omp parallel for
     for (UInt_t i = 0; i <nEv; i++)
     {
         tin->GetEntry(i);
@@ -295,7 +297,10 @@ cout<<"Call completed!"<<endl;
                 break;
             }
         }
-        if (muon_idx==-1) continue;
+        if (muon_idx==-1)  {
+            n_dropped++;
+            continue;
+        }
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"}); 
 
@@ -324,7 +329,10 @@ cout<<"Call completed!"<<endl;
                 }
             }
         }
-        if (electron_idx==-1) continue;
+        if (electron_idx==-1) {
+            n_dropped++;
+            continue;
+        }
 
         Weight *= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
         Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
@@ -439,10 +447,14 @@ cout<<"Call completed!"<<endl;
 			}
 		
 		}
-      
+        //filling before jet selections
         h_LooseJets->Fill(Nloose, Weight);
         h_MediumJets->Fill(Nmedium, Weight);
         h_TightJets->Fill(Ntight, Weight);
+        Acopl_emu=M_PI-(Electron_p4.DeltaPhi(*Muon_p4));
+        h_acopla_emu->Fill(Acopl_emu,Weight);
+
+
         selection = selection && (one_Bjet);
         if (!selection)
         {
@@ -530,9 +542,10 @@ cout<<"Call completed!"<<endl;
         Apl_allJets = 1.1, Apl_lbJets = 1.1, Apl_mbJets = 1.1;
         bool ok1 = false, ok2 = false, ok3 = false;
         for (size_t j = 0; j < nJet; j++)
-        {
-            if (j == id_m_jet)
+        {  
+          if (j == id_m_jet)
                 continue;
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
             TLorentzVector *tempJet = new TLorentzVector();
             tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
             double temp = OppositeBjet_p4->DeltaR(*tempJet);
@@ -577,14 +590,16 @@ cout<<"Call completed!"<<endl;
             }
 
             delete tempJet;
-        }
+         }//end if
+        } //end for
 
         // dphi
         Phi_allJets = 999, Phi_lbJets = 999, Phi_mbJets = 999;
         for (size_t j = 0; j < nJet; j++)
-        {
+        { 
             if (j == id_m_jet)
                 continue;
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
             double temp = Jet_phi[j] - OppositeBjet_p4->Phi();
             if (temp < -1 * M_PI)
                 temp += 2 * M_PI;
@@ -605,6 +620,7 @@ cout<<"Call completed!"<<endl;
             {
                 Phi_mbJets = temp;
             }
+         }
         }
 
         if (muon_idx > -1 && electron_idx > -1)
@@ -660,6 +676,12 @@ cout<<"Call completed!"<<endl;
     h_Muon_Electron_invariant_mass_weighted->Write();
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
+
+    h_LooseJets->Write();
+    h_MediumJets->Write();
+    h_TightJets->Write();
+    h_acopla_emu->Write();
+
 
     fout->Write();
     fout->Close();
