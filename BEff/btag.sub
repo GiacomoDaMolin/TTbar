@@ -1,5 +1,5 @@
 basedir=/afs/cern.ch/user/g/gdamolin/Johan/TTbar
-executable=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/eff.sh
+executable=/afs/cern.ch/user/g/gdamolin/Johan/TTbar/BEff/eff.sh
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT

@@ -12,4 +12,4 @@ echo "CMSSW_BASE is now set to $CMSSW_BASE"
 echo "PROXY is now set to $X509_USER_PROXY"
 echo "executing script as"
 echo "EffBtag.exe $1"
-/afs/cern.ch/user/g/gdamolin/Johan/TTbar/EffBtag.exe $1
+/afs/cern.ch/user/g/gdamolin/Johan/TTbar/BEff/EffBtag.exe $1
