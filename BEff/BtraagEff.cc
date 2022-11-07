@@ -55,7 +55,7 @@ void EffComputer(std::string infile){
  h2_BTaggingEff_Num_udsg->Sumw2();
  
 
- //#pragma omp parallel for
+ #pragma omp parallel for
  for(int i=0; i<tin->GetEntries(); i++){
   tin->GetEntry(i);
   if (i % 100000 == 0)
@@ -78,7 +78,7 @@ void EffComputer(std::string infile){
  }
  auto const pos = infile.find_last_of('/');
  std::string inname=infile.substr(pos + 1);
- std::string outfile="/afs/cern.ch/user/g/gdamolin/public/tempB/Out_"+inname; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
+ std::string outfile="/afs/cern.ch/user/g/gdamolin/public/tempB/BE/Out_"+inname; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
  std::cout<<outfile<<std::endl;
  TFile *a=TFile::Open(outfile.c_str(),"recreate");
  h2_BTaggingEff_Denom_b->Write();

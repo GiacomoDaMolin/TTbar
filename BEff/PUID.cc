@@ -68,7 +68,7 @@ void EffComputer(std::string infile){
  }
  auto const pos = infile.find_last_of('/');
  std::string inname=infile.substr(pos + 1);
- std::string outfile="/afs/cern.ch/user/g/gdamolin/public/tempB/Out_"+inname; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
+ std::string outfile="/afs/cern.ch/user/g/gdamolin/public/tempB/PU/Out_"+inname; //DO NOT DO HERE THE RATIO, YOU CANNOT HADD FILES IF YOU DO
  std::cout<<outfile<<std::endl;
  TFile *a=TFile::Open(outfile.c_str(),"recreate");
  h2_PV_Denom->Write();

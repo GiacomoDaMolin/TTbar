@@ -187,7 +187,7 @@ cout<<"Call completed!"<<endl;
     
     string muon_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/muon_Z.json.gz";
     string electron_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/electron.json.gz";
-    string jets_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/jet_jerc.json.gz";
+    string jets_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/jet_jmar.json";
     string b_tag_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/btagging.json.gz";
     string pileup_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/puWeights.json.gz";
 
@@ -202,13 +202,14 @@ cout<<"Call completed!"<<endl;
     auto muon_id = muon_c_set->at("NUM_TightID_DEN_genTracks");
     auto muon_iso = muon_c_set->at("NUM_TightRelIso_DEN_TightIDandIPCut");
     auto electron_id = ele_c_set->at("UL-Electron-ID-SF");
+    auto jet_pu = jet_c_set->at("PUJetID_eff");
     auto b_tag = btag_c_set->at("deepJet_mujets");
     auto b_mistag= btag_c_set->at("deepJet_incl"); //only for light jets
     auto pu_correction = pu_c_set->at("Collisions18_UltraLegacy_goldenJSON");
     
     TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
     TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
-
+/*
     TFile *fpuId_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/effcyPUID_81Xtraining.root");
     TH2F * puId_eff= static_cast<TH2F *>(fpuId_eff->Get("h2_eff_mc2018_T")); //for jet matching PV jets
     TH2F * puId_mis= static_cast<TH2F *>(fpuId_eff->Get("h2_mistag_mc2018_T")); //for jets coming from PileUP
@@ -216,8 +217,8 @@ cout<<"Call completed!"<<endl;
     TFile *fpuId_scf = new TFile("/afs/cern.ch/user/g/gdamolin/public/scalefactorsPUID_81Xtraining.root");
     TH2F * puId_SFeff= static_cast<TH2F *>(fpuId_scf->Get("h2_eff_sf2018_T")); //for jet matching PV jets
     TH2F * puId_SFmis= static_cast<TH2F *>(fpuId_scf->Get("h2_mistag_sf2018_T")); //for jets coming from PileUP
-
-    TFile *fb_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/Beff.root");
+*/
+    TFile *fb_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/Beff_new.root");
     TH2D * l_eff= static_cast<TH2D *>(fb_eff->Get("l_jets_tagged")); 
     TH2D * c_eff= static_cast<TH2D *>(fb_eff->Get("c_jets_tagged")); 
     TH2D * b_eff= static_cast<TH2D *>(fb_eff->Get("b_jets_tagged")); 
