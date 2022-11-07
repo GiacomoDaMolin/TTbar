@@ -209,15 +209,7 @@ cout<<"Call completed!"<<endl;
     
     TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
     TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
-/*
-    TFile *fpuId_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/effcyPUID_81Xtraining.root");
-    TH2F * puId_eff= static_cast<TH2F *>(fpuId_eff->Get("h2_eff_mc2018_T")); //for jet matching PV jets
-    TH2F * puId_mis= static_cast<TH2F *>(fpuId_eff->Get("h2_mistag_mc2018_T")); //for jets coming from PileUP
 
-    TFile *fpuId_scf = new TFile("/afs/cern.ch/user/g/gdamolin/public/scalefactorsPUID_81Xtraining.root");
-    TH2F * puId_SFeff= static_cast<TH2F *>(fpuId_scf->Get("h2_eff_sf2018_T")); //for jet matching PV jets
-    TH2F * puId_SFmis= static_cast<TH2F *>(fpuId_scf->Get("h2_mistag_sf2018_T")); //for jets coming from PileUP
-*/
     TFile *fb_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/Beff_new.root");
     TH2D * l_eff= static_cast<TH2D *>(fb_eff->Get("l_jets_tagged")); 
     TH2D * c_eff= static_cast<TH2D *>(fb_eff->Get("c_jets_tagged")); 
@@ -349,7 +341,6 @@ cout<<"Call completed!"<<endl;
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
         Float_t jet_btag_deepFlav_wp = 0.2783;
-        // cycle through btags and check if one passes the tagging WP
         bool one_Bjet = false;
         int id_m_jet = -1;
         Nloose = 0, Nmedium = 0, Ntight = 0;
@@ -363,25 +354,22 @@ cout<<"Call completed!"<<endl;
             if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6)){
             //correction for pileupID
             int MC_pu = Jet_genJetIdx[j];
-            int binSF,binEff;
-            float tempSF,tempEff;
+            float tempSF=1.,tempEff;
             //if is pileUpjet
-            if (MC_pu<0) {
-            	binSF = puId_SFmis->FindBin(Jet_pt[j],Jet_eta[j]);
-            	tempSF= puId_SFmis->GetBinContent(binSF);
-            	binEff= puId_mis->FindBin(Jet_pt[j],Jet_eta[j]);
-            	tempEff= puId_mis->GetBinContent(binEff);
+            if (MC_pu<0 ) {
+		tempSF=1.;
+            	tempEff= 0;
             	}
             //if is truly a jet
-            else {
-            	binSF = puId_SFeff->FindBin(Jet_pt[j],Jet_eta[j]);
-            	tempSF= puId_SFeff->GetBinContent(binSF);
-            	binEff= puId_eff->FindBin(Jet_pt[j],Jet_eta[j]);
-            	tempEff= puId_eff->GetBinContent(binEff);
+            else { if (Jet_pt[j]=<50){
+            	     tempSF= jet_pu->evaluate({Jet_eta[j],Jet_pt[j],"nom", "L"});
+            	     tempEff= jet_pu->evaluate({Jet_eta[j],Jet_pt[j],"nom", "MCEff"});
+		    }
             	}
+            bool passesPUID=(Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7);
 		
-            if(!(Jet_pt[j]>50 || Jet_puId[j]==7))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); }
-            if((Jet_pt[j]>50 || Jet_puId[j]==7)) { 
+            if(!(Jet_pt[j]>50 || passesPUID ))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); } //TODO:possibly inverted
+            if((Jet_pt[j]>50 || passesPUID)) { 
              if(Jet_pt[j]<=50) t_weight*=tempSF; //else you are in pT>50 case: apply no sf
               //correction for b-tag
               njet_in_collection.push_back(j);
@@ -543,7 +531,7 @@ cout<<"Call completed!"<<endl;
         {  
           if (j == id_m_jet)
                 continue;
-          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
             TLorentzVector *tempJet = new TLorentzVector();
             tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
             double temp = OppositeBjet_p4->DeltaR(*tempJet);
@@ -597,7 +585,7 @@ cout<<"Call completed!"<<endl;
         { 
             if (j == id_m_jet)
                 continue;
-          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
             double temp = Jet_phi[j] - OppositeBjet_p4->Phi();
             if (temp < -1 * M_PI)
                 temp += 2 * M_PI;

@@ -199,12 +199,11 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
         // the tight working point is 0.71, medium 0.2783, loose 0.0490
         Float_t jet_btag_deepFlav_wp = 0.2783;
-        // cycle through btags and check if one passes the tagging WP
         bool one_Bjet = false;
         int id_m_jet=-1;
 	Nloose=0, Nmedium=0, Ntight=0;
         for (size_t j = 0; j < nJet; j++){
-          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7))
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7)))
             {
 	    if (Jet_btagDeepFlavB[j] > 0.0490)	Nloose++;
 	    if (Jet_btagDeepFlavB[j] > 0.2783)	Nmedium++;
@@ -272,7 +271,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	bool ok1=false,ok2=false ,ok3=false;
 	for (size_t j = 0; j < nJet; j++){
 		if (j==id_m_jet) continue;
-                if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
+                if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
 		 TLorentzVector *tempJet = new TLorentzVector();
 		 tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
 		 double temp=OppositeBjet_p4->DeltaR(*tempJet);
@@ -302,7 +301,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	Phi_allJets=999, Phi_lbJets=999, Phi_mbJets=999;
 	for (size_t j = 0; j < nJet; j++){
 			if(j==id_m_jet) continue;
-			if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
+			if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
 			double temp=Jet_phi[j]-OppositeBjet_p4->Phi();
 			if (temp<-1*M_PI) temp+=2*M_PI;
 			if (temp>M_PI) temp-=2*M_PI;
