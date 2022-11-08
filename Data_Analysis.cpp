@@ -125,7 +125,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
 
-    int Nloose=0, Nmedium=0, Ntight=0;
+    int Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
     float dR_muE,dR_mujet,dR_ejet,dR_allJets,dR_lbJets,dR_mbJets,Apl_allJets,Apl_lbJets,Apl_mbJets,Phi_allJets,Phi_lbJets,Phi_mbJets, PTbjet,Acopl_emu;
 
     tout->Branch("dR_mue", &dR_muE);
@@ -144,6 +144,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     tout->Branch("Nloose", &Nloose);
     tout->Branch("Nmedium", &Nmedium);
     tout->Branch("Ntight", &Ntight);
+    tout->Branch("JetNotB", &JetsNotB);
     tout->Branch("Acopl_emu", &Acopl_emu);
 
     RoccoR rc;
@@ -201,10 +202,11 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         Float_t jet_btag_deepFlav_wp = 0.2783;
         bool one_Bjet = false;
         int id_m_jet=-1;
-	Nloose=0, Nmedium=0, Ntight=0;
+	Nloose=0, Nmedium=0, Ntight=0,JetsNotB=0;
         for (size_t j = 0; j < nJet; j++){
           if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7)))
             {
+	    if (Jet_btagDeepFlavB[j] < 0.0490) JetsNotB++;
 	    if (Jet_btagDeepFlavB[j] > 0.0490)	Nloose++;
 	    if (Jet_btagDeepFlavB[j] > 0.2783)	Nmedium++;
 	    if (Jet_btagDeepFlavB[j] > 0.71)	Ntight++;

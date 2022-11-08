@@ -210,13 +210,11 @@ cout<<"Call completed!"<<endl;
     TFile *fecorr_trig = new TFile("/afs/cern.ch/user/g/gdamolin/public/Riccardo_egammaTriggerEfficiency_2018_20200422.root");
     TH2F * EleTrigHisto= static_cast<TH2F *>(fecorr_trig->Get("EGamma_SF2D"));
 
-    TFile *fb_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/Beff_new.root");
+    TFile *fb_eff = new TFile("/afs/cern.ch/user/g/gdamolin/public/Beff_puLoose.root");
     TH2D * l_eff= static_cast<TH2D *>(fb_eff->Get("l_jets_tagged")); 
     TH2D * c_eff= static_cast<TH2D *>(fb_eff->Get("c_jets_tagged")); 
     TH2D * b_eff= static_cast<TH2D *>(fb_eff->Get("b_jets_tagged")); 
    
-
-
 
     RoccoR rc;
     rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
@@ -238,7 +236,7 @@ cout<<"Call completed!"<<endl;
     tout->Branch("muon_pt", &muon_pt);
     tout->Branch("Weight", &Weight);
 
-    int Nloose = 0, Nmedium = 0, Ntight = 0;
+    int Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
     float dR_muE, dR_mujet, dR_ejet, dR_allJets, dR_lbJets, dR_mbJets, Apl_allJets, Apl_lbJets, Apl_mbJets, Phi_allJets, Phi_lbJets, Phi_mbJets, PTbjet,Acopl_emu;
 
     tout->Branch("dR_mue", &dR_muE);
@@ -257,6 +255,7 @@ cout<<"Call completed!"<<endl;
     tout->Branch("Nloose", &Nloose);
     tout->Branch("Nmedium", &Nmedium);
     tout->Branch("Ntight", &Ntight);
+    tout->Branch("JetNotB", &JetsNotB);
     tout->Branch("Acopl_emu", &Acopl_emu);
 
     trun_out->Branch("genEventSumw", &genEventSumw);
@@ -267,7 +266,7 @@ cout<<"Call completed!"<<endl;
     trun_out->Fill(); // we already called trun->GetEntry(0);
 
     #pragma omp parallel for
-    for (UInt_t i = 0; i <nEv; i++)
+    for (UInt_t i = 0; i <10000;i++)//nEv; i++)
     {
         tin->GetEntry(i);
         if (i % 100000 == 0)
@@ -343,7 +342,7 @@ cout<<"Call completed!"<<endl;
         Float_t jet_btag_deepFlav_wp = 0.2783;
         bool one_Bjet = false;
         int id_m_jet = -1;
-        Nloose = 0, Nmedium = 0, Ntight = 0;
+        Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
 	//vectors for applying b-tag corrections
 	vector<int> njet_in_collection;
 	vector<int> flavor;
@@ -361,21 +360,22 @@ cout<<"Call completed!"<<endl;
             	tempEff= 0;
             	}
             //if is truly a jet
-            else { if (Jet_pt[j]=<50){
+            else { if (Jet_pt[j]<=50){
             	     tempSF= jet_pu->evaluate({Jet_eta[j],Jet_pt[j],"nom", "L"});
-            	     tempEff= jet_pu->evaluate({Jet_eta[j],Jet_pt[j],"nom", "MCEff"});
+            	     tempEff= jet_pu->evaluate({Jet_eta[j],Jet_pt[j],"MCEff", "L"});
 		    }
             	}
             bool passesPUID=(Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7);
 		
-            if(!(Jet_pt[j]>50 || passesPUID ))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); } //TODO:possibly inverted
+            if(!(Jet_pt[j]>50 || passesPUID ))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); } //TODO:assuming is the correct form
             if((Jet_pt[j]>50 || passesPUID)) { 
              if(Jet_pt[j]<=50) t_weight*=tempSF; //else you are in pT>50 case: apply no sf
               //correction for b-tag
               njet_in_collection.push_back(j);
               flavor.push_back(abs(Jet_hadronFlavour[j]));
               tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
-
+        
+	      if (Jet_btagDeepFlavB[j] < 0.0490) JetsNotB++;
 	      if (Jet_btagDeepFlavB[j] > 0.0490)
                    Nloose++;
               if (Jet_btagDeepFlavB[j] > 0.2783)
@@ -667,7 +667,6 @@ cout<<"Call completed!"<<endl;
     h_MediumJets->Write();
     h_TightJets->Write();
     h_acopla_emu->Write();
-
 
     fout->Write();
     fout->Close();
