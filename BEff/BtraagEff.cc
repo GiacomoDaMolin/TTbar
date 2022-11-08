@@ -61,7 +61,7 @@ void EffComputer(std::string infile){
   if (i % 100000 == 0)
             std::cout << "Processing entry " << i << " of " << tin->GetEntries() << std::endl;
   for (int j=0; j<nJet;j++){
-    if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || Jet_puId[j]==7)){
+    if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
     int flav=Jet_hadronFlavour[j];
     /*if((abs(abs(Jet_eta[j])-1.5)<0.3)) {std::cout<<Jet_eta[j]<<std::endl;
 	std::cout<<abs(abs(Jet_eta[j])-1.5)<<std::endl;}*/
