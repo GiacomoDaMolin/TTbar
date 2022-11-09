@@ -266,7 +266,7 @@ cout<<"Call completed!"<<endl;
     trun_out->Fill(); // we already called trun->GetEntry(0);
 
     #pragma omp parallel for
-    for (UInt_t i = 0; i <10000;i++)//nEv; i++)
+    for (UInt_t i = 0; i <nEv; i++)
     {
         tin->GetEntry(i);
         if (i % 100000 == 0)
