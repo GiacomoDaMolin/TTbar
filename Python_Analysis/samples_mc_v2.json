@@ -9,7 +9,7 @@
     "TTSemileptonic": {
         "xs": 365340,
         "signal": false,
-        "dataset": "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
+        "dataset": "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
         "Sum_w": 146472193017.08405,
         "N_events": 486770000
     },
@@ -51,7 +51,7 @@
     "W2j": {
         "xs": 3338000,
         "signal": false,
-        "dataset": "WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
+        "dataset": "/WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
         "Sum_w": 2407273656615.9043,
         "N_events": 98380466
     },

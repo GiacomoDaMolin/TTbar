@@ -47,7 +47,7 @@ output                = {base_dir}/out/$(ClusterId).$(ProcId).out\n\
 error                 = {base_dir}/err/$(ClusterId).$(ProcId).err\n\
 log                   = {base_dir}/log/$(ClusterId).$(ProcId).log\n\
 \n\
-+JobFlavour = \"tomorrow\"\n\
++JobFlavour = \"workday\"\n\
 {arguments}\n\
 queue"
     return file_str
