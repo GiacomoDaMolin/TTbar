@@ -7,6 +7,7 @@
 #include "TH2F.h"
 #include "TCanvas.h"
 #include "TLorentzVector.h"
+#include "TRandom3.h"
 
 // include user defined histograms and auxiliary macros
 #include "Auxiliary.cpp"
@@ -100,6 +101,7 @@ cout<<"Call completed!"<<endl;
     Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE], Jet_genJetIdx[MAX_ARRAY_SIZE];
     UChar_t Muon_genPartFlav[MAX_ARRAY_SIZE], Electron_genPartFlav[MAX_ARRAY_SIZE];
     UInt_t nGenPart;
+    Float_t GenPart_pt[GEN_MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Electron_genPartIdx", 1);
     tin->SetBranchStatus("Electron_genPartFlav", 1);
     tin->SetBranchStatus("Muon_genPartIdx", 1);
@@ -108,6 +110,7 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchStatus("GenPart_genPartIdxMother", 1);
     tin->SetBranchStatus("nGenPart", 1);
     tin->SetBranchStatus("Jet_genJetIdx",1);
+    tin->SetBranchStatus("GenPart_pt",1);
     tin->SetBranchAddress("nGenPart", &nGenPart);
     tin->SetBranchAddress("Electron_genPartIdx", &Electron_genPartIdx);
     tin->SetBranchAddress("Electron_genPartFlav", &Electron_genPartFlav);
@@ -116,7 +119,7 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchAddress("GenPart_pdgId", &GenPart_pdgId);
     tin->SetBranchAddress("GenPart_genPartIdxMother", &GenPart_genPartIdxMother);
     tin->SetBranchAddress("Jet_genJetIdx",&Jet_genJetIdx);
-
+    tin->SetBranchAddress("GenPart_pt",&GenPart_pt);
     // collect the trigger information
     Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf;
     tin->SetBranchStatus("HLT_IsoMu24", 1);
@@ -125,7 +128,7 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchAddress("HLT_Ele32_WPTight_Gsf", &HLT_Ele32_WPTight_Gsf);
 
     // collect the triggger Ids
-    Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
+    Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE],Muon_nTrackerLayers[MAX_ARRAY_SIZE];
     Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE], Muon_triggerIdLoose[MAX_ARRAY_SIZE], Muon_tightId[MAX_ARRAY_SIZE];
     Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Muon_tightId", 1);
@@ -134,12 +137,14 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchStatus("Muon_pfRelIso04_all", 1);
     tin->SetBranchStatus("Electron_charge", 1);
     tin->SetBranchStatus("Electron_mvaFall17V2Iso_WP90", 1);
+    tin->SetBranchStatus("Muon_nTrackerLayers", 1);
     tin->SetBranchAddress("Electron_mvaFall17V2Iso_WP90", &Electron_mvaFall17V2Iso_WP90);
     tin->SetBranchAddress("Muon_tightId", &Muon_tightId);
     tin->SetBranchAddress("Muon_charge", &Muon_charge);
     tin->SetBranchAddress("Muon_triggerIdLoose", &Muon_triggerIdLoose);
     tin->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all);
     tin->SetBranchAddress("Electron_charge", &Electron_charge);
+    tin->SetBranchAddress("Muon_nTrackerLayers", &Muon_nTrackerLayers);
 
     // Jet tagging and ID, FlavB is the recomended one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
@@ -215,6 +220,7 @@ cout<<"Call completed!"<<endl;
     TH2D * c_eff= static_cast<TH2D *>(fb_eff->Get("c_jets_tagged")); 
     TH2D * b_eff= static_cast<TH2D *>(fb_eff->Get("b_jets_tagged")); 
    
+    TRandom3 * RndGen=new TRandom3();
 
     RoccoR rc;
     rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
@@ -296,7 +302,16 @@ cout<<"Call completed!"<<endl;
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"}); 
 
-        double scmMC=rc.kScaleMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
+	int NMCparticle=Muon_genPartIdx[muon_idx];
+	double scmMC;
+	if(NMCparticle>=0) {
+		scmMC=rc.kSpreadMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],GenPart_pt[NMCparticle]);
+		}
+	else {
+		scmMC=rc.kSmearMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],Muon_nTrackerLayers[muon_idx],RndGen->Rndm());
+		}
+	
+  
         Muon_pt[muon_idx]*= scmMC;
         Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
 
@@ -342,6 +357,7 @@ cout<<"Call completed!"<<endl;
         Float_t jet_btag_deepFlav_wp = 0.2783;
         bool one_Bjet = false;
         int id_m_jet = -1;
+	int njets=0;
         Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
 	//vectors for applying b-tag corrections
 	vector<int> njet_in_collection;
@@ -367,13 +383,14 @@ cout<<"Call completed!"<<endl;
             	}
             bool passesPUID=(Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7);
 		
-            if(!(Jet_pt[j]>50 || passesPUID ))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); } //TODO:assuming is the correct form
+            if(!(Jet_pt[j]>50 || passesPUID ))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); }
             if((Jet_pt[j]>50 || passesPUID)) { 
              if(Jet_pt[j]<=50) t_weight*=tempSF; //else you are in pT>50 case: apply no sf
               //correction for b-tag
               njet_in_collection.push_back(j);
               flavor.push_back(abs(Jet_hadronFlavour[j]));
               tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
+	      njets++;
         
 	      if (Jet_btagDeepFlavB[j] < 0.0490) JetsNotB++;
 	      if (Jet_btagDeepFlavB[j] > 0.0490)
@@ -485,6 +502,8 @@ cout<<"Call completed!"<<endl;
         h_Muon_eta_weighted->Fill(muon_eta, Weight);
         h_Electron_pt_weighted->Fill(electron_pt, Weight);
         h_Electron_eta_weighted->Fill(electron_eta, Weight);
+
+	h_NJets->Fill(njets,Weight);
         // only for signal
         if (Signal)
         {
@@ -667,6 +686,7 @@ cout<<"Call completed!"<<endl;
     h_MediumJets->Write();
     h_TightJets->Write();
     h_acopla_emu->Write();
+    h_NJets->Write();
 
     fout->Write();
     fout->Close();
@@ -723,6 +743,7 @@ int main(int argc, char **argv)
 	h_Phi_lbJets->Sumw2();
 	h_Phi_mbJets->Sumw2();
 	h_acopla_emu->Sumw2();
+	h_NJets->Sumw2();
 
     Mixed_Analysis(inputFile, outputFile, crossSection, IntLuminosity, Signal);
 

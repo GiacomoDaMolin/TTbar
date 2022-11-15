@@ -202,10 +202,12 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         Float_t jet_btag_deepFlav_wp = 0.2783;
         bool one_Bjet = false;
         int id_m_jet=-1;
+	int njets=0;
 	Nloose=0, Nmedium=0, Ntight=0,JetsNotB=0;
         for (size_t j = 0; j < nJet; j++){
           if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7)))
             {
+	    njets++;
 	    if (Jet_btagDeepFlavB[j] < 0.0490) JetsNotB++;
 	    if (Jet_btagDeepFlavB[j] > 0.0490)	Nloose++;
 	    if (Jet_btagDeepFlavB[j] > 0.2783)	Nmedium++;
@@ -267,6 +269,13 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         h_Electron_pt->Fill(electron_pt);
         h_Electron_eta->Fill(electron_eta);
 
+	h_Muon_pt_weighted->Fill(muon_pt);
+        h_Muon_eta_weighted->Fill(muon_eta);
+
+        h_Electron_pt_weighted->Fill(electron_pt);
+        h_Electron_eta_weighted->Fill(electron_eta);
+	h_NJets->Fill(njets);
+
         
 	dR_allJets=999, dR_lbJets=999, dR_mbJets=999;
 	Apl_allJets=1.1,Apl_lbJets=1.1,Apl_mbJets=1.1;
@@ -320,6 +329,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         {
             invMass = (*(Muon_p4) + *(Electron_p4)).M();
             h_Muon_Electron_invariant_mass->Fill(invMass);
+	    h_Muon_Electron_invariant_mass_weighted->Fill(invMass);
         }
 	tout->Fill();
     }
@@ -335,18 +345,19 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
     std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
     // Write the histograms to the file
-    h_Muon_eta->Write();
-    h_Muon_pt->Write();
+    h_Muon_eta_weighted->Write();
+    h_Muon_pt_weighted->Write();
 
-    h_Electron_eta->Write();
-    h_Electron_pt->Write();
+    h_Electron_eta_weighted->Write();
+    h_Electron_pt_weighted->Write();
 
-    h_Muon_Electron_invariant_mass->Write();
-    h_leading_lepton_pt->Write();
+    h_Muon_Electron_invariant_mass_weighted->Write();
+    h_leading_lepton_pt_weighted->Write();
     h_LooseJets->Write();
     h_MediumJets->Write();
     h_TightJets->Write();
     h_acopla_emu->Write();
+    h_NJets->Write();
 
     fout->Write();
     fout->Close();
@@ -402,6 +413,7 @@ int main(int argc, char **argv)
 	h_Phi_lbJets->Sumw2();
 	h_Phi_mbJets->Sumw2();
 	h_acopla_emu->Sumw2();
+	h_NJets->Sumw2();
 
     DataAnalysis(inputFile, outputFile, IsFirstDataset);
 }

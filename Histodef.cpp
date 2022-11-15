@@ -39,6 +39,7 @@
     TH1D* h_leading_lepton_pt = new TH1D("leading_lepton_pt", "leading_lepton_pt", 45, 20, 200);
     TH1D* h_leading_lepton_pt_weighted = new TH1D("leading_lepton_pt_weighted", "leading_lepton_pt_weighted", 45, 20, 200);
     // other histos (weighted only)
+    TH1D *h_NJets = new TH1D("NJets","NJets",15,0,15);
     TH1D *h_LooseJets = new TH1D("N_looseJets","N_looseJets",12,0,12);
     TH1D *h_MediumJets = new TH1D("N_mediumJets","N_mediumJets",8,0,8);
     TH1D *h_TightJets = new TH1D("N_tightJets","N_tightJets",6,0,6);
