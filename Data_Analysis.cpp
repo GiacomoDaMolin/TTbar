@@ -186,6 +186,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++){
             if ((Electron_pt[j]>35 && abs(Electron_eta[j])<2.4 && Electron_mvaFall17V2Iso_WP90[j])){
+		if((abs(Electron_eta[j])>1.44) && (abs(Electron_eta[j])<1.57)) {continue;} //remove electrons in the acceptance break
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
 		if(Electron_p4->DeltaR(*Muon_p4)<0.4) {continue;}
                 else {electron_idx = j; break;}
@@ -205,7 +206,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	int njets=0;
 	Nloose=0, Nmedium=0, Ntight=0,JetsNotB=0;
         for (size_t j = 0; j < nJet; j++){
-          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7)))
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4)))
             {
 	    njets++;
 	    if (Jet_btagDeepFlavB[j] < 0.0490) JetsNotB++;
@@ -282,7 +283,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	bool ok1=false,ok2=false ,ok3=false;
 	for (size_t j = 0; j < nJet; j++){
 		if (j==id_m_jet) continue;
-                if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
+                if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
 		 TLorentzVector *tempJet = new TLorentzVector();
 		 tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
 		 double temp=OppositeBjet_p4->DeltaR(*tempJet);
@@ -312,7 +313,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	Phi_allJets=999, Phi_lbJets=999, Phi_mbJets=999;
 	for (size_t j = 0; j < nJet; j++){
 			if(j==id_m_jet) continue;
-			if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
+			if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
 			double temp=Jet_phi[j]-OppositeBjet_p4->Phi();
 			if (temp<-1*M_PI) temp+=2*M_PI;
 			if (temp>M_PI) temp-=2*M_PI;

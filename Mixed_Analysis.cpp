@@ -272,7 +272,7 @@ cout<<"Call completed!"<<endl;
     trun_out->Fill(); // we already called trun->GetEntry(0);
 
     #pragma omp parallel for
-    for (UInt_t i = 0; i <nEv; i++)
+    for (UInt_t i = 0; i <100;i++)//<nEv; i++)
     {
         tin->GetEntry(i);
         if (i % 100000 == 0)
@@ -300,7 +300,8 @@ cout<<"Call completed!"<<endl;
             continue;
         }
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
-        Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"}); 
+        Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"});
+			cout<<"PU corrections "<< pu_correction->evaluate({N_pu_vertices, "nominal"}) <<endl;
 
 	int NMCparticle=Muon_genPartIdx[muon_idx];
 	double scmMC;
@@ -313,17 +314,21 @@ cout<<"Call completed!"<<endl;
 	
   
         Muon_pt[muon_idx]*= scmMC;
+		cout<<"Rochester corrections "<<  scmMC <<endl;
         Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
 
         if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
-        Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
+        Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
+
+		cout<<" Muons id: "<< muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"})<<" Iso " <<muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}) << " Trig "<<muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}) <<endl; 
         
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++)
         {
             if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j]))
             {
+		if((abs(Electron_eta[j])>1.44) && (abs(Electron_eta[j])<1.57)) {continue;} //remove electrons in the acceptance break
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 if (Electron_p4->DeltaR(*Muon_p4) < 0.4)
                 {
@@ -343,10 +348,12 @@ cout<<"Call completed!"<<endl;
 
         Weight *= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
         Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
+		cout<< "Ele Reco "<< electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}) <<" Ele iso "<<electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}) <<endl;
         if(HLT_Ele32_WPTight_Gsf) {
             //retrieve Histo
             int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
             float temp= EleTrigHisto->GetBinContent(bin);
+		cout<<"ELe trigger "<<temp<<endl;
             Weight*=temp;
             }
 
@@ -381,7 +388,7 @@ cout<<"Call completed!"<<endl;
             	     tempEff= jet_pu->evaluate({Jet_eta[j],Jet_pt[j],"MCEff", "L"});
 		    }
             	}
-            bool passesPUID=(Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7);
+            bool passesPUID=(Jet_puId[j]>=4);
 		
             if(!(Jet_pt[j]>50 || passesPUID ))	{t_weight*=(1-tempSF*tempEff)/(1-tempEff); }
             if((Jet_pt[j]>50 || passesPUID)) { 
@@ -415,6 +422,7 @@ cout<<"Call completed!"<<endl;
           }//end kinematic if
         }//end for
           //corrections of jets already applied 
+	cout<<"pu tag weighting "<<t_weight<<endl;
         Weight*=t_weight; 
             
 	for(int jj=0;jj<flavor.size();jj++){
@@ -422,8 +430,8 @@ cout<<"Call completed!"<<endl;
 		if (flavor[jj]<4) convflav==0;
 		if (!(convflav==0 || convflav==4 || convflav==5)) {cout<<"Something weird in the flavor of jet"<<endl;}
 		if(tagged[jj]){
-			if (convflav!=0) Weight *= b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
-			else  Weight *= b_mistag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]});
+			if (convflav!=0) {Weight *= b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]}); cout<<"Btag succesful "<<b_tag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]})<<endl;}
+			else  {Weight *= b_mistag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]}); cout<<"Btag succesful "<<b_mistag->evaluate({"central", "M", convflav, abs(Jet_eta[njet_in_collection[jj]]), Jet_pt[njet_in_collection[jj]]})<<endl;}
 			continue;}
 
 		//if not tagged
@@ -446,6 +454,7 @@ cout<<"Call completed!"<<endl;
 				int bin =b_eff->FindBin(Jet_pt[njet_in_collection[jj]],abs(Jet_eta[njet_in_collection[jj]]));
 				Eff=b_eff->GetBinContent(bin);
 				}
+			cout<<"Btag failed "<<(1-SF*Eff)/(1-Eff)<<endl;
 			Weight*=(1-SF*Eff)/(1-Eff);
 			}
 		
@@ -550,7 +559,7 @@ cout<<"Call completed!"<<endl;
         {  
           if (j == id_m_jet)
                 continue;
-          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
             TLorentzVector *tempJet = new TLorentzVector();
             tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
             double temp = OppositeBjet_p4->DeltaR(*tempJet);
@@ -604,7 +613,7 @@ cout<<"Call completed!"<<endl;
         { 
             if (j == id_m_jet)
                 continue;
-          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]==4 || Jet_puId[j]==6 ||Jet_puId[j]==7))){
+          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
             double temp = Jet_phi[j] - OppositeBjet_p4->Phi();
             if (temp < -1 * M_PI)
                 temp += 2 * M_PI;
