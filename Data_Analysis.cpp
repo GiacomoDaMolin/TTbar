@@ -175,8 +175,12 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         for (UInt_t j = 0; j < nMuon; j++){
             if ((Muon_pt[j]>27. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
                 muon_idx = j;
-                Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-                break;
+		double scmDT=rc.kScaleDT(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
+       		Muon_pt[muon_idx]*= scmDT;
+		Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
+		if(Muon_p4->Pt()<26) { muon_idx = -1; continue;}//if after rochester below pT threshold of trigger SF, reject muon
+                else break;
+                
             }
         }
         if (muon_idx==-1) {
@@ -225,25 +229,20 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
             } //end tag
 	  }//end kinematic if
         }
-        selection = selection && (one_Bjet);
-
-        h_LooseJets->Fill(Nloose);
-        h_MediumJets->Fill(Nmedium);
-        h_TightJets->Fill(Ntight);
-        Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
-        h_acopla_emu->Fill(Acopl_emu);
+        selection = selection && (one_Bjet);       
 
         if (!selection)
         {
             n_dropped++;
             continue;
         }
-        PTbjet=MainBjet_p4->Pt();
-
-	double scmDT=rc.kScaleDT(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
-        Muon_pt[muon_idx]*= scmDT;
-	Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
-        
+	
+        h_LooseJets->Fill(Nloose);
+        h_MediumJets->Fill(Nmedium);
+        h_TightJets->Fill(Ntight);
+	Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
+        h_acopla_emu->Fill(Acopl_emu);
+        PTbjet=MainBjet_p4->Pt();        
 
         dR_mujet=Muon_p4->DeltaR(*MainBjet_p4);
 	dR_ejet=Electron_p4->DeltaR(*MainBjet_p4);

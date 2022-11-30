@@ -291,8 +291,18 @@ cout<<"Call completed!"<<endl;
             if ((Muon_pt[j] > 27. && abs(Muon_eta[j]) < 2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15))
             {
                 muon_idx = j;
+		int NMCparticle=Muon_genPartIdx[muon_idx];
+		double scmMC;
+		if(NMCparticle>=0) {
+			scmMC=rc.kSpreadMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],GenPart_pt[NMCparticle]);
+			}
+		else {
+			scmMC=rc.kSmearMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],Muon_nTrackerLayers[muon_idx],RndGen->Rndm());
+			}
+		Muon_pt[muon_idx]*= scmMC;
                 Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-                break;
+		if(Muon_p4->Pt()<26) { muon_idx = -1; continue;}//if after rochester below pT threshold of trigger SF, reject muon
+                else break;
             }
         }
         if (muon_idx==-1)  {
@@ -300,23 +310,9 @@ cout<<"Call completed!"<<endl;
             continue;
         }
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
+	double Weight2=Weight;
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"});
 			
-
-	int NMCparticle=Muon_genPartIdx[muon_idx];
-	double scmMC;
-	if(NMCparticle>=0) {
-		scmMC=rc.kSpreadMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],GenPart_pt[NMCparticle]);
-		}
-	else {
-		scmMC=rc.kSmearMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],Muon_nTrackerLayers[muon_idx],RndGen->Rndm());
-		}
-	
-  
-        Muon_pt[muon_idx]*= scmMC;
-		
-        Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
-
         if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
         Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
@@ -458,13 +454,6 @@ cout<<"Call completed!"<<endl;
 			}
 		
 		}
-        //filling before jet selections
-        h_LooseJets->Fill(Nloose, Weight);
-        h_MediumJets->Fill(Nmedium, Weight);
-        h_TightJets->Fill(Ntight, Weight);
-        Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
-        h_acopla_emu->Fill(Acopl_emu,Weight);
-
 
         selection = selection && (one_Bjet);
         if (!selection)
@@ -472,6 +461,13 @@ cout<<"Call completed!"<<endl;
             n_dropped++;
             continue;
         }
+	 //filling before jet selections
+        h_LooseJets->Fill(Nloose, Weight);
+        h_MediumJets->Fill(Nmedium, Weight);
+        h_TightJets->Fill(Ntight, Weight);
+        Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
+        h_acopla_emu->Fill(Acopl_emu,Weight);
+
         PTbjet = MainBjet_p4->Pt();
 
         dR_mujet = Muon_p4->DeltaR(*MainBjet_p4);
@@ -484,13 +480,13 @@ cout<<"Call completed!"<<endl;
         {
             // fill the hist
             leading_lepton_pt = Muon_p4->Pt();
-            h_leading_lepton_pt->Fill(leading_lepton_pt);
+            h_leading_lepton_pt->Fill(leading_lepton_pt,Weight2);
             h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
         }
         else
         {
             leading_lepton_pt = Electron_p4->Pt();
-            h_leading_lepton_pt->Fill(leading_lepton_pt);
+            h_leading_lepton_pt->Fill(leading_lepton_pt,Weight2);
             h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
         }
 
@@ -500,11 +496,11 @@ cout<<"Call completed!"<<endl;
         electron_pt = Electron_pt[electron_idx];
         electron_eta = Electron_eta[electron_idx];
 
-        h_Muon_pt->Fill(muon_pt);
-        h_Muon_eta->Fill(muon_eta);
+        h_Muon_pt->Fill(muon_pt, Weight2);
+        h_Muon_eta->Fill(muon_eta, Weight2);
 
-        h_Electron_pt->Fill(electron_pt);
-        h_Electron_eta->Fill(electron_eta);
+        h_Electron_pt->Fill(electron_pt,Weight2);
+        h_Electron_eta->Fill(electron_eta, Weight2);
         // fill the weighted histograms
         h_Muon_pt_weighted->Fill(muon_pt, Weight);
         h_Muon_eta_weighted->Fill(muon_eta, Weight);
@@ -523,10 +519,10 @@ cout<<"Call completed!"<<endl;
                 // printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
                 if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Muon_genPartIdx[j]))
                 {
-                    muon_pt_from_W = Muon_p4->Pt();;
+                    muon_pt_from_W = Muon_p4->Pt();
                     muon_eta_from_W = Muon_eta[j];
-                    h_Muon_pt_from_W->Fill(muon_pt_from_W);
-                    h_Muon_eta_from_W->Fill(muon_eta_from_W);
+                    h_Muon_pt_from_W->Fill(muon_pt_from_W,Weight2);
+                    h_Muon_eta_from_W->Fill(muon_eta_from_W,Weight2);
                     h_Muon_pt_weighted_from_W->Fill(muon_pt_from_W, Weight);
                     h_Muon_eta_weighted_from_W->Fill(muon_eta_from_W, Weight);
                     if (muon_idx != j)
@@ -540,8 +536,8 @@ cout<<"Call completed!"<<endl;
                 {
                     electron_pt_from_W = Electron_pt[j];
                     electron_eta_from_W = Electron_eta[j];
-                    h_Electron_pt_from_W->Fill(electron_pt_from_W);
-                    h_Electron_eta_from_W->Fill(electron_eta_from_W);
+                    h_Electron_pt_from_W->Fill(electron_pt_from_W,Weight2);
+                    h_Electron_eta_from_W->Fill(electron_eta_from_W,Weight2);
                     h_Electron_pt_weighted_from_W->Fill(electron_pt_from_W, Weight);
                     h_Electron_eta_weighted_from_W->Fill(electron_eta_from_W, Weight);
                     if (electron_idx != j)
@@ -641,7 +637,7 @@ cout<<"Call completed!"<<endl;
             // calculate the invariant mass of the two muons
             invMass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
-            h_Muon_Electron_invariant_mass->Fill(invMass);
+            h_Muon_Electron_invariant_mass->Fill(invMass, Weight2);
             h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
         }
         // fill the tree
