@@ -62,4 +62,51 @@ double InvertPhi(double phi){
  if (invphi>M_PI){invphi=invphi-2*M_PI;}
  return invphi;
 }
+
+void HistIniz(){
+
+ h_Muon_pt->Sumw2();
+    h_Muon_eta->Sumw2();
+    h_Electron_pt->Sumw2();
+    h_Electron_eta->Sumw2();
+    h_Muon_pt_weighted->Sumw2();
+    h_Muon_eta_weighted->Sumw2();
+    h_Electron_pt_weighted->Sumw2();
+    h_Electron_eta_weighted->Sumw2();
+    h_Muon_pt_from_W->Sumw2();
+    h_Muon_eta_from_W->Sumw2();
+    h_Electron_pt_from_W->Sumw2();
+    h_Electron_eta_from_W->Sumw2();
+    h_Muon_pt_weighted_from_W->Sumw2();
+    h_Muon_eta_weighted_from_W->Sumw2();
+    h_Electron_pt_weighted_from_W->Sumw2();
+    h_Electron_eta_weighted_from_W->Sumw2();
+    h_Muon_pt_trigger->Sumw2();
+    h_Muon_eta_trigger->Sumw2();
+    h_Electron_pt_trigger->Sumw2();
+    h_Electron_eta_trigger->Sumw2();
+    h_Muon_Electron_invariant_mass->Sumw2();
+    h_Muon_Muon_invariant_mass->Sumw2();
+    h_Electron_Electron_invariant_mass->Sumw2();
+    h_Muon_Electron_invariant_mass_weighted->Sumw2();
+    h_Muon_Muon_invariant_mass_weighted->Sumw2();
+    h_Electron_Electron_invariant_mass_weighted->Sumw2();
+    h_leading_lepton_pt->Sumw2();
+    h_leading_lepton_pt_weighted->Sumw2();
+    h_LooseJets->Sumw2();
+    h_MediumJets->Sumw2();
+    h_TightJets->Sumw2();
+	h_dR_allJets->Sumw2();
+	h_dR_lbJets->Sumw2();
+	h_dR_mbJets ->Sumw2();
+      h_Apl_allJets->Sumw2();
+	h_Apl_lbJets->Sumw2();
+	h_Apl_mbJets->Sumw2();
+	h_Phi_allJets->Sumw2();
+	h_Phi_lbJets->Sumw2();
+	h_Phi_mbJets->Sumw2();
+	h_acopla_emu->Sumw2();
+	h_NJets->Sumw2();
+
+}
 #endif // Auxiliary_cpp

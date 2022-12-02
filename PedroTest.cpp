@@ -243,26 +243,6 @@ cout<<"Call completed!"<<endl;
     tout->Branch("Weight", &Weight);
 
     int Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
-    float dR_muE, dR_mujet, dR_ejet, dR_allJets, dR_lbJets, dR_mbJets, Apl_allJets, Apl_lbJets, Apl_mbJets, Phi_allJets, Phi_lbJets, Phi_mbJets, PTbjet,Acopl_emu;
-
-    tout->Branch("dR_mue", &dR_muE);
-    tout->Branch("dR_mujet", &dR_mujet);
-    tout->Branch("dR_ejet", &dR_ejet);
-    tout->Branch("dR_allJets", &dR_allJets);
-    tout->Branch("dR_lbJets", &dR_lbJets);
-    tout->Branch("dR_mbJets", &dR_mbJets);
-    tout->Branch("Apl_lbJets", &Apl_lbJets);
-    tout->Branch("Apl_allJets", &Apl_allJets);
-    tout->Branch("Apl_mbJets", &Apl_mbJets);
-    tout->Branch("Phi_allJets", &Phi_allJets);
-    tout->Branch("Phi_lbJets", &Phi_lbJets);
-    tout->Branch("Phi_mbJets", &Phi_mbJets);
-    tout->Branch("PTbjet", &PTbjet);
-    tout->Branch("Nloose", &Nloose);
-    tout->Branch("Nmedium", &Nmedium);
-    tout->Branch("Ntight", &Ntight);
-    tout->Branch("JetNotB", &JetsNotB);
-    tout->Branch("Acopl_emu", &Acopl_emu);
 
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
@@ -284,25 +264,6 @@ cout<<"Call completed!"<<endl;
     	toutT->Branch("Weight", &Weight);
 	toutT->Branch("FromTau", &FromTau);
 	toutT->Branch("From2Taus", &From2Taus);
-	toutT->Branch("dR_mue", &dR_muE);
-	toutT->Branch("dR_mujet", &dR_mujet);
-	toutT->Branch("dR_ejet", &dR_ejet);
-	    toutT->Branch("dR_allJets", &dR_allJets);
-	    toutT->Branch("dR_lbJets", &dR_lbJets);
-	    toutT->Branch("dR_mbJets", &dR_mbJets);
-	    toutT->Branch("Apl_lbJets", &Apl_lbJets);
-	    toutT->Branch("Apl_allJets", &Apl_allJets);
-	    toutT->Branch("Apl_mbJets", &Apl_mbJets);
-	    toutT->Branch("Phi_allJets", &Phi_allJets);
-	    toutT->Branch("Phi_lbJets", &Phi_lbJets);
-	    toutT->Branch("Phi_mbJets", &Phi_mbJets);
-	    toutT->Branch("PTbjet", &PTbjet);
-	    toutT->Branch("Nloose", &Nloose);
-	    toutT->Branch("Nmedium", &Nmedium);
-	    toutT->Branch("Ntight", &Ntight);
-	    toutT->Branch("JetNotB", &JetsNotB);
-	    toutT->Branch("Acopl_emu", &Acopl_emu);
-
 
 	trun_outT->Branch("genEventSumw", &genEventSumw);
         trun_outT->Branch("IntLumi", &IntLuminosity);
@@ -319,7 +280,7 @@ cout<<"Call completed!"<<endl;
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
         
 	// apply triggers
-        if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf)){
+        if (!(HLT_IsoMu24)){
             trigger_dropped++;
             continue;
         };
@@ -382,18 +343,10 @@ cout<<"Call completed!"<<endl;
 
         Weight *= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
         Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
-		
-        if(HLT_Ele32_WPTight_Gsf) {
-            //retrieve Histo
-            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
-            float temp= EleTrigHisto->GetBinContent(bin);
-            Weight*=temp;
-            }
 
         bool selection = ((muon_idx > -1) && (electron_idx > -1));
-        // check the seleected objects for opposite charge
+       
         selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
-        // the tight working point is 0.71, medium 0.2783, loose 0.0490
         Float_t jet_btag_deepFlav_wp = 0.2783;
         bool one_Bjet = false;
         int id_m_jet = -1;
@@ -411,7 +364,6 @@ cout<<"Call completed!"<<endl;
 	    Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
 	    if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {delete Tjet_p4; continue;}
 	    else {delete Tjet_p4;}
-	
             //correction for pileupID
             int MC_pu = Jet_genJetIdx[j];
             float tempSF=1.,tempEff;
@@ -435,13 +387,7 @@ cout<<"Call completed!"<<endl;
               njet_in_collection.push_back(j);
               flavor.push_back(abs(Jet_hadronFlavour[j]));
               tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
-	      njets++;
-        
-	      if (Jet_btagDeepFlavB[j] < 0.0490) JetsNotB++;
-	      if (Jet_btagDeepFlavB[j] > 0.0490) Nloose++;
-              if (Jet_btagDeepFlavB[j] > 0.2783) Nmedium++;
-              if (Jet_btagDeepFlavB[j] > 0.71) Ntight++;
-            
+	      
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp){
                  if (!one_Bjet){
                       MainBjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
@@ -496,20 +442,18 @@ cout<<"Call completed!"<<endl;
 
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
-        h_LooseJets->Fill(Nloose, Weight);
-        h_MediumJets->Fill(Nmedium, Weight);
-        h_TightJets->Fill(Ntight, Weight);
-        Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
-        h_acopla_emu->Fill(Acopl_emu,Weight);
+		
+	//TODO:fill before trigger 
+	
+	if(HLT_Ele32_WPTight_Gsf) {
+            //retrieve Histo
+            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
+            float temp= EleTrigHisto->GetBinContent(bin);
+            Weight*=temp;
+	    //TODO:fill after trigger
+            }
 
-        PTbjet = MainBjet_p4->Pt();
-
-        dR_mujet = Muon_p4->DeltaR(*MainBjet_p4);
-        dR_ejet = Electron_p4->DeltaR(*MainBjet_p4);
-        dR_muE = Muon_p4->DeltaR(*Electron_p4);
-
-
-        if (Muon_p4->Pt() > Electron_p4->Pt()){
+        /*if (Muon_p4->Pt() > Electron_p4->Pt()){
             leading_lepton_pt = Muon_p4->Pt();
             h_leading_lepton_pt->Fill(leading_lepton_pt,Weight2);
             h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
@@ -538,105 +482,13 @@ cout<<"Call completed!"<<endl;
         h_Electron_eta_weighted->Fill(electron_eta, Weight);
 
 	h_NJets->Fill(njets,Weight);
-        // only for signal
-        if (Signal)
-        {
-            // cross check which index the objects have that actually originate from the W
-            size_t nMuon_p4 = 0, nElectron_p4 = 0;
-            for (UInt_t j = 0; j < nMuon; j++)
-            {
-                // match the muon to the PID of the W boson (PID=24)
-                // printMCTree(nGenPart, GenPart_pdgId,GenPart_genPartIdxMother, Muon_genPartIdx[j]);
-                if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Muon_genPartIdx[j]))
-                {
-                    muon_pt_from_W = Muon_p4->Pt();
-                    muon_eta_from_W = Muon_eta[j];
-                    h_Muon_pt_from_W->Fill(muon_pt_from_W,Weight2);
-                    h_Muon_eta_from_W->Fill(muon_eta_from_W,Weight2);
-                    h_Muon_pt_weighted_from_W->Fill(muon_pt_from_W, Weight);
-                    h_Muon_eta_weighted_from_W->Fill(muon_eta_from_W, Weight);
-                    if (muon_idx != j)
-                        non_matching_muon++;
-                }
-            }
-
-            for (UInt_t j = 0; j < nElectron; j++)
-            {
-                if (isFromW(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Electron_genPartIdx[j]))
-                {
-                    electron_pt_from_W = Electron_pt[j];
-                    electron_eta_from_W = Electron_eta[j];
-                    h_Electron_pt_from_W->Fill(electron_pt_from_W,Weight2);
-                    h_Electron_eta_from_W->Fill(electron_eta_from_W,Weight2);
-                    h_Electron_pt_weighted_from_W->Fill(electron_pt_from_W, Weight);
-                    h_Electron_eta_weighted_from_W->Fill(electron_eta_from_W, Weight);
-                    if (electron_idx != j)
-                        non_matching_electron++;
-                }
-            }
-        }
-        // END only for signal
-
-        dR_allJets = 999, dR_lbJets = 999, dR_mbJets = 999;
-        Apl_allJets = 1.1, Apl_lbJets = 1.1, Apl_mbJets = 1.1;
-        for (size_t j = 0; j < nJet; j++)
-        {  
-          if (j == id_m_jet)
-                continue;
-	  TLorentzVector *Tjet_p4 = new TLorentzVector();
-	  Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
-	  if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {delete Tjet_p4; continue;}
-	  else {delete Tjet_p4;}
-          if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
-            TLorentzVector *tempJet = Tjet_p4;
-            double temp = OppositeBjet_p4->DeltaR(*tempJet);
-
-            TVector3 A(tempJet->X(), tempJet->Y(), tempJet->Z());
-            TVector3 B(MainBjet_p4->X(), MainBjet_p4->Y(), MainBjet_p4->Z());
-
-            double tempApl = A.Dot(B) / (A.Mag() * B.Mag());
-
-            if (temp < dR_allJets){dR_allJets = temp;}
-            if (tempApl < Apl_allJets){Apl_allJets = tempApl;}
-            if (Jet_btagDeepFlavB[j] > 0.0490){
-                if (temp < dR_lbJets){dR_lbJets = temp;}
-                if (tempApl < Apl_lbJets){Apl_lbJets = tempApl;}
-            }
-            if (Jet_btagDeepFlavB[j] > 0.2783){
-                if (temp < dR_mbJets){dR_mbJets = temp;}
-                if (tempApl < Apl_mbJets){Apl_mbJets = tempApl;}
-            }
-            delete tempJet;
-         }//end if
-        } //end for
-
-        // dphi
-        Phi_allJets = 999, Phi_lbJets = 999, Phi_mbJets = 999;
-        for (size_t j = 0; j < nJet; j++){ 
-	    if (j == id_m_jet) continue;
-	    TLorentzVector *Tjet_p4 = new TLorentzVector();
-	    Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
-	    if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {delete Tjet_p4; continue;}
-	    else {delete Tjet_p4;}
-
-	    if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
-		    double temp = Jet_phi[j] - OppositeBjet_p4->Phi();
-		    if (temp < -1 * M_PI) temp += 2 * M_PI;
-		    if (temp > M_PI) temp -= 2 * M_PI;
-		    if (temp < 0) temp *= (-1);
-
-		    if (temp < Phi_allJets){Phi_allJets = temp;}
-		    if ((Jet_btagDeepFlavB[j] > 0.0490) && (temp < Phi_lbJets)){Phi_lbJets = temp;}
-		    if ((Jet_btagDeepFlavB[j] > 0.2783) && (temp < Phi_mbJets)){Phi_mbJets = temp;}
-	    }
-        }
-
+       
         if (muon_idx > -1 && electron_idx > -1){
             invMass = (*(Muon_p4) + *(Electron_p4)).M();
             // fill the invariant mass histogram
             h_Muon_Electron_invariant_mass->Fill(invMass, Weight2);
             h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
-        }
+        }*/
         // fill the tree
         if(Signal && FromTau) {toutT->Fill();}
 	else {tout->Fill();}
@@ -658,16 +510,7 @@ cout<<"Call completed!"<<endl;
 
     tout->Write();
     trun_out->Write();
-    // Write the histograms to the file
-    h_Muon_eta->Write();
-    h_Muon_pt->Write();
-    h_Muon_pt_from_W->Write();
-    h_Muon_eta_from_W->Write();
-    // weighted histograms
-    h_Muon_eta_weighted->Write();
-    h_Muon_pt_weighted->Write();
-    h_Muon_pt_weighted_from_W->Write();
-    h_Muon_eta_weighted_from_W->Write();
+
 
     h_Electron_eta->Write();
     h_Electron_pt->Write();
@@ -684,11 +527,6 @@ cout<<"Call completed!"<<endl;
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
 
-    h_LooseJets->Write();
-    h_MediumJets->Write();
-    h_TightJets->Write();
-    h_acopla_emu->Write();
-    h_NJets->Write();
 
     fout->Close();
     if (Signal) {

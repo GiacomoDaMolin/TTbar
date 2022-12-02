@@ -212,7 +212,10 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         for (size_t j = 0; j < nJet; j++){
           if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4)))
             {
-	    njets++;
+	    TLorentzVector *Tjet_p4 = new TLorentzVector();
+	    Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
+	    if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {delete Tjet_p4; continue;}
+	    else {delete Tjet_p4; njets++;};
 	    if (Jet_btagDeepFlavB[j] < 0.0490) JetsNotB++;
 	    if (Jet_btagDeepFlavB[j] > 0.0490)	Nloose++;
 	    if (Jet_btagDeepFlavB[j] > 0.2783)	Nmedium++;
@@ -231,8 +234,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         }
         selection = selection && (one_Bjet);       
 
-        if (!selection)
-        {
+        if (!selection){
             n_dropped++;
             continue;
         }
@@ -279,12 +281,16 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         
 	dR_allJets=999, dR_lbJets=999, dR_mbJets=999;
 	Apl_allJets=1.1,Apl_lbJets=1.1,Apl_mbJets=1.1;
-	bool ok1=false,ok2=false ,ok3=false;
 	for (size_t j = 0; j < nJet; j++){
 		if (j==id_m_jet) continue;
+
+		TLorentzVector *Tjet_p4 = new TLorentzVector();
+	    	Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
+	    	if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {delete Tjet_p4; continue;}
+		
+
                 if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
-		 TLorentzVector *tempJet = new TLorentzVector();
-		 tempJet->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
+		 TLorentzVector *tempJet = Tjet_p4;
 		 double temp=OppositeBjet_p4->DeltaR(*tempJet);
 
 		 TVector3 A(tempJet->X(),tempJet->Y(),tempJet->Z());	
@@ -292,19 +298,19 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 
 		 double tempApl=A.Dot(B)/(A.Mag()*B.Mag());
 
-		 if(temp<dR_allJets) {dR_allJets=temp; ok1=true;}
+		 if(temp<dR_allJets) {dR_allJets=temp;}
 		 if(tempApl<Apl_allJets) {Apl_allJets=tempApl;}
-		 if(Jet_btagDeepFlavB[j] > 0.0490){ ok2=true;
+		 if(Jet_btagDeepFlavB[j] > 0.0490){
 			if (temp<dR_lbJets){dR_lbJets=temp;}
 			if (tempApl<Apl_lbJets) {Apl_lbJets=tempApl;}
 			}
-		 if(Jet_btagDeepFlavB[j] > 0.2783){ ok3=true;
+		 if(Jet_btagDeepFlavB[j] > 0.2783){
 			if (temp<dR_mbJets){dR_mbJets=temp;}
 			if (tempApl<Apl_mbJets) {Apl_mbJets=tempApl;}
 			}
   
 			
-		 delete tempJet;	
+		 delete tempJet, Tjet_p4;	
 		 }//end if
         	}//end for
 
@@ -312,6 +318,11 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	Phi_allJets=999, Phi_lbJets=999, Phi_mbJets=999;
 	for (size_t j = 0; j < nJet; j++){
 			if(j==id_m_jet) continue;
+			TLorentzVector *Tjet_p4 = new TLorentzVector();
+	    		Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
+	    		if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {continue;}
+			delete Tjet_p4;
+
 			if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
 			double temp=Jet_phi[j]-OppositeBjet_p4->Phi();
 			if (temp<-1*M_PI) temp+=2*M_PI;
@@ -372,48 +383,7 @@ int main(int argc, char **argv)
     if (IsFirstDataset) {std::cout<<"############## It is first dataset! ##################"<<std::endl;}
     if (!IsFirstDataset) {std::cout<<"@@@@@@@@@@@@@@ NOT first dataset! @@@@@@@@@@@@@@@@@@"<<std::endl;}
 
-    h_Muon_pt->Sumw2();
-    h_Muon_eta->Sumw2();
-    h_Electron_pt->Sumw2();
-    h_Electron_eta->Sumw2();
-    h_Muon_pt_weighted->Sumw2();
-    h_Muon_eta_weighted->Sumw2();
-    h_Electron_pt_weighted->Sumw2();
-    h_Electron_eta_weighted->Sumw2();
-    h_Muon_pt_from_W->Sumw2();
-    h_Muon_eta_from_W->Sumw2();
-    h_Electron_pt_from_W->Sumw2();
-    h_Electron_eta_from_W->Sumw2();
-    h_Muon_pt_weighted_from_W->Sumw2();
-    h_Muon_eta_weighted_from_W->Sumw2();
-    h_Electron_pt_weighted_from_W->Sumw2();
-    h_Electron_eta_weighted_from_W->Sumw2();
-    h_Muon_pt_trigger->Sumw2();
-    h_Muon_eta_trigger->Sumw2();
-    h_Electron_pt_trigger->Sumw2();
-    h_Electron_eta_trigger->Sumw2();
-    h_Muon_Electron_invariant_mass->Sumw2();
-    h_Muon_Muon_invariant_mass->Sumw2();
-    h_Electron_Electron_invariant_mass->Sumw2();
-    h_Muon_Electron_invariant_mass_weighted->Sumw2();
-    h_Muon_Muon_invariant_mass_weighted->Sumw2();
-    h_Electron_Electron_invariant_mass_weighted->Sumw2();
-    h_leading_lepton_pt->Sumw2();
-    h_leading_lepton_pt_weighted->Sumw2();
-    h_LooseJets->Sumw2();
-    h_MediumJets->Sumw2();
-    h_TightJets->Sumw2();
-	h_dR_allJets->Sumw2();
-	h_dR_lbJets->Sumw2();
-	h_dR_mbJets ->Sumw2();
-      h_Apl_allJets->Sumw2();
-	h_Apl_lbJets->Sumw2();
-	h_Apl_mbJets->Sumw2();
-	h_Phi_allJets->Sumw2();
-	h_Phi_lbJets->Sumw2();
-	h_Phi_mbJets->Sumw2();
-	h_acopla_emu->Sumw2();
-	h_NJets->Sumw2();
+    HistIniz();
 
     DataAnalysis(inputFile, outputFile, IsFirstDataset);
 }
