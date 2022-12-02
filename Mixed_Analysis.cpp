@@ -586,7 +586,7 @@ cout<<"Call completed!"<<endl;
 	  TLorentzVector *Tjet_p4 = new TLorentzVector();
 	  Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
 	  if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {delete Tjet_p4; continue;}
-	  else {delete Tjet_p4;}
+	  
           if((abs(Jet_eta[j]) < 2.4) && Jet_pt[j]>25 && (Jet_jetId[j]==2 || Jet_jetId[j]==6) && (Jet_pt[j]>50 || (Jet_puId[j]>=4))){
             TLorentzVector *tempJet = Tjet_p4;
             double temp = OppositeBjet_p4->DeltaR(*tempJet);
@@ -606,7 +606,7 @@ cout<<"Call completed!"<<endl;
                 if (temp < dR_mbJets){dR_mbJets = temp;}
                 if (tempApl < Apl_mbJets){Apl_mbJets = tempApl;}
             }
-            delete tempJet;
+            delete Tjet_p4;
          }//end if
         } //end for
 
