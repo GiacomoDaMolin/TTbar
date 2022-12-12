@@ -271,7 +271,13 @@ cout<<"Call completed!"<<endl;
 
     trun_out->Fill(); // we already called trun->GetEntry(0);
     bool From2Taus=false, FromTau=false;
-    TFile *foutT = new TFile(("Tau"+ofile).c_str(), "RECREATE");
+
+
+    size_t found = ofile.find_last_of("/");
+    string oname=ofile.substr(found+1);
+    string path=ofile.substr(0,found);
+    string Tauname=path+"/Tau_"+oname;
+    TFile *foutT = new TFile(Tauname.c_str(), "RECREATE");
     TTree *toutT = new TTree("toutT", "toutT");
     TTree *trun_outT = new TTree("Run_outT", "Run_outT");
     if (Signal) {
@@ -695,6 +701,7 @@ cout<<"Call completed!"<<endl;
 	foutT->cd();
 	toutT->Write();
 	trun_outT->Write();
+	foutT->Write();
 	foutT->Close();
 	}
 }

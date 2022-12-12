@@ -33,26 +33,17 @@ bool isFromW(int size, Int_t *GenId, Int_t *GenParent, int initialID)
 	return false;
 }
 
-bool isFromTau(int size, Int_t *GenId, Int_t *GenParent, int initialID)
-{
-	if (initialID < 0)
-	{
-		return false;
-	}
+bool isFromTau(int size, Int_t *GenId, Int_t *GenParent, int initialID){
+	if (initialID < 0){return false;}
 	// retrieve first PDG ID number
 	int startPdg = GenId[initialID];
 	int newID = initialID, newPdg = startPdg;
 	// look for the parent; if the parent is of same PDGID of starting particle, iterate until parent is different particle
-	while (newPdg == startPdg)
-	{
-		if (newID > size)
-		{
-			std::cout << "WARNING: index " << newID << " exceeding max size " << size << std::endl;
-		}
+	while (newPdg == startPdg)	{
+		if (newID > size)  {std::cout << "WARNING: index " << newID << " exceeding max size " << size << std::endl;}
 		newID = GenParent[newID];
 		newPdg = GenId[newID];
-		if (abs(newPdg) == 15)
-			return true;
+		if (abs(newPdg) == 15)	return true;
 	}
 	return false;
 }

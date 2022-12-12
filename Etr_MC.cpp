@@ -30,7 +30,7 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
     return (luminosity * crossSection * genWeight); // / SumWeights;
 }
 
-void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Signal = false)
+void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Signal = true)
 {
 
     if (crossSection < 0. || IntLuminosity < 0.)
@@ -443,52 +443,41 @@ cout<<"Call completed!"<<endl;
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
 		
-	//TODO:fill before trigger 
 	
+	if (Muon_p4->Pt() > Electron_p4->Pt()){
+            leading_lepton_pt = Muon_p4->Pt();
+	    }
+	else{leading_lepton_pt = Electron_p4->Pt();}
+	muon_pt = Muon_p4->Pt();
+        muon_eta = Muon_eta[muon_idx];
+	electron_pt = Electron_pt[electron_idx];
+        electron_eta = Electron_eta[electron_idx];
+	if (muon_idx > -1 && electron_idx > -1){invMass = (*(Muon_p4) + *(Electron_p4)).M();}
+
+	//TODO:fill before trigger convention: not weighted
+	h_leading_lepton_pt->Fill(leading_lepton_pt,Weight);
+	h_Muon_pt->Fill(muon_pt, Weight);
+        h_Muon_eta->Fill(muon_eta, Weight);
+        h_Electron_pt->Fill(electron_pt,Weight);
+        h_Electron_eta->Fill(electron_eta, Weight);
+	h_Muon_Electron_invariant_mass->Fill(invMass, Weight2);
+
 	if(HLT_Ele32_WPTight_Gsf) {
             //retrieve Histo
             int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
             float temp= EleTrigHisto->GetBinContent(bin);
             Weight*=temp;
-	    //TODO:fill after trigger
+	    //TODO:fill after trigger convention weighted
+	    h_Muon_pt_weighted->Fill(muon_pt, Weight);
+            h_Muon_eta_weighted->Fill(muon_eta, Weight);
+            h_Electron_pt_weighted->Fill(electron_pt, Weight);
+            h_Electron_eta_weighted->Fill(electron_eta, Weight);
+	    h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
+	    h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
             }
-
-        /*if (Muon_p4->Pt() > Electron_p4->Pt()){
-            leading_lepton_pt = Muon_p4->Pt();
-            h_leading_lepton_pt->Fill(leading_lepton_pt,Weight2);
-            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
-        }
-        else{
-            leading_lepton_pt = Electron_p4->Pt();
-            h_leading_lepton_pt->Fill(leading_lepton_pt,Weight2);
-            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
-        }
-
-        // fill the histograms
-        muon_pt = Muon_p4->Pt();
-        muon_eta = Muon_eta[muon_idx];
-        electron_pt = Electron_pt[electron_idx];
-        electron_eta = Electron_eta[electron_idx];
-
-        h_Muon_pt->Fill(muon_pt, Weight2);
-        h_Muon_eta->Fill(muon_eta, Weight2);
-
-        h_Electron_pt->Fill(electron_pt,Weight2);
-        h_Electron_eta->Fill(electron_eta, Weight2);
-        // fill the weighted histograms
-        h_Muon_pt_weighted->Fill(muon_pt, Weight);
-        h_Muon_eta_weighted->Fill(muon_eta, Weight);
-        h_Electron_pt_weighted->Fill(electron_pt, Weight);
-        h_Electron_eta_weighted->Fill(electron_eta, Weight);
 
 	h_NJets->Fill(njets,Weight);
        
-        if (muon_idx > -1 && electron_idx > -1){
-            invMass = (*(Muon_p4) + *(Electron_p4)).M();
-            // fill the invariant mass histogram
-            h_Muon_Electron_invariant_mass->Fill(invMass, Weight2);
-            h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
-        }*/
         // fill the tree
         if(Signal && FromTau) {toutT->Fill();}
 	else {tout->Fill();}
@@ -511,7 +500,10 @@ cout<<"Call completed!"<<endl;
     tout->Write();
     trun_out->Write();
 
-
+    h_Muon_pt->Write();
+    h_Muon_eta->Write();
+    h_Muon_pt_weighted->Write();
+    h_Muon_eta_weighted->Write();
     h_Electron_eta->Write();
     h_Electron_pt->Write();
     h_Electron_pt_from_W->Write();
@@ -546,6 +538,7 @@ int main(int argc, char **argv)
     double IntLuminosity = atof(argv[4]);
     string boolstr = argv[5];
     bool Signal = (boolstr == "true");
+
 
     HistIniz();
 

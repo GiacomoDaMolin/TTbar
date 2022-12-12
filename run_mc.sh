@@ -20,11 +20,17 @@ while getopts "i:o:x:l:s:" opt; do
         ;;
     esac
 done
+
+echo "Signal is $SIGNAL"
+
 EXE="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Mixed_Analysis"
 outdir="/afs/cern.ch/user/g/gdamolin/Johan/MC"
 filename=$INFILE
 filestring=$(echo $filename | sed 's|\(^.*/\)\([a-z,A-Z,0-9,-]*\).root$|\2|')
-ofilename=${outdir}/$filestring"_MA".root
+ofilename=${outdir}/$filestring"_MA.root"
+echo "ofilename $ofilename"
+#if Signal is true
+ofilename2=${outdir}/"Tau_"$filestring"_MA.root"
 
 cd $CMSSW
 eval `scram r -sh`
@@ -42,4 +48,13 @@ ${EXE} $filename $ofilename ${XSEC} ${LUMI} ${SIGNAL} || {
     fi
     exit 1
 }
-mv $ofilename ${OUTPATH}/${filestring}_MA.root
+
+echo "$ofilename in ${OUTPATH}/${filestring}_MA.root "
+mv $ofilename ${OUTPATH}/${filestring}"_MA.root"
+
+
+case $SIGNAL in
+  (true)     mv $ofilename2 ${OUTPATH}/"Tau_"$filestring".root";;
+  (false)   echo "is false";;
+esac
+
