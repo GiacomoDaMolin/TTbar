@@ -188,6 +188,8 @@ cout<<"Call completed!"<<endl;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
     float Weight;
 
+    bool From2Taus=false, FromTau=false;
+
     // open correctionfiles
     
     string muon_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/muon_Z.json.gz";
@@ -241,8 +243,8 @@ cout<<"Call completed!"<<endl;
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
     tout->Branch("Weight", &Weight);
-
-    int Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
+    tout->Branch("FromTau", &FromTau);
+    tout->Branch("From2Taus", &From2Taus);
 
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
@@ -250,8 +252,12 @@ cout<<"Call completed!"<<endl;
     trun_out->Branch("nEv", &n_events);
 
     trun_out->Fill(); // we already called trun->GetEntry(0);
-    bool From2Taus=false, FromTau=false;
-    TFile *foutT = new TFile(("Tau"+ofile).c_str(), "RECREATE");
+    
+    size_t found = ofile.find_last_of("/");
+    string oname=ofile.substr(found+1);
+    string path=ofile.substr(0,found);
+    string Tauname=path+"/Tau_"+oname;
+    TFile *foutT = new TFile(Tauname.c_str(), "RECREATE");
     TTree *toutT = new TTree("toutT", "toutT");
     TTree *trun_outT = new TTree("Run_outT", "Run_outT");
     if (Signal) {
@@ -351,7 +357,6 @@ cout<<"Call completed!"<<endl;
         bool one_Bjet = false;
         int id_m_jet = -1;
 	int njets=0;
-        Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
 	//vectors for applying b-tag corrections
 	vector<int> njet_in_collection;
 	vector<int> flavor;
@@ -497,6 +502,7 @@ cout<<"Call completed!"<<endl;
     std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
     std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
 
+    fout->cd();
     tout->Write();
     trun_out->Write();
 
@@ -506,13 +512,13 @@ cout<<"Call completed!"<<endl;
     h_Muon_eta_weighted->Write();
     h_Electron_eta->Write();
     h_Electron_pt->Write();
-    h_Electron_pt_from_W->Write();
-    h_Electron_eta_from_W->Write();
+    /*h_Electron_pt_from_W->Write();
+    h_Electron_eta_from_W->Write();*/
     // weighted histograms
     h_Electron_eta_weighted->Write();
     h_Electron_pt_weighted->Write();
-    h_Electron_pt_weighted_from_W->Write();
-    h_Electron_eta_weighted_from_W->Write();
+    /*h_Electron_pt_weighted_from_W->Write();
+    h_Electron_eta_weighted_from_W->Write();*/
 
     h_Muon_Electron_invariant_mass->Write();
     h_Muon_Electron_invariant_mass_weighted->Write();
@@ -524,7 +530,8 @@ cout<<"Call completed!"<<endl;
     if (Signal) {
 	foutT->cd();
 	toutT->Write();
-	trun_outT->Write();
+	trun_outT->Write();	
+	foutT->Write();
 	foutT->Close();
 	}
 }
@@ -537,7 +544,7 @@ int main(int argc, char **argv)
     double crossSection = atof(argv[3]);
     double IntLuminosity = atof(argv[4]);
     string boolstr = argv[5];
-    bool Signal = (boolstr == "true");
+    bool Signal = (boolstr == "true" || boolstr == "True");
 
 
     HistIniz();

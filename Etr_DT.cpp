@@ -12,11 +12,10 @@
 // include user defined histograms and auxiliary macros
 #include "Histodef.cpp"
 #include "Auxiliary.cpp"
+#include "Python_Analysis/corrections/roccor/RoccoR.cc"
 
 // correctionlib
-#include "correction.h"
 using namespace std;
-using correction::CorrectionSet;
 
 #define MAX_ARRAY_SIZE 128
 #define GEN_MAX_ARRAY_SIZE 1024
@@ -249,10 +248,10 @@ cout<<"Call completed!"<<endl;
 	    else {delete Tjet_p4;}
             //correction for pileupID
             
+	    bool passesPUID=(Jet_puId[j]>=4);
             if((Jet_pt[j]>50 || passesPUID)) { 
              
               //correction for b-tag
-             
 	      
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp){
                  if (!one_Bjet){
@@ -285,7 +284,7 @@ cout<<"Call completed!"<<endl;
 
 	if (muon_idx > -1 && electron_idx > -1){invMass = (*(Muon_p4) + *(Electron_p4)).M();}
 
-	//TODO:fill before trigger convention: not weighted
+	//fill before trigger convention called not weighted
 	h_leading_lepton_pt->Fill(leading_lepton_pt);
 	h_Muon_pt->Fill(muon_pt);
         h_Muon_eta->Fill(muon_eta);
@@ -294,11 +293,7 @@ cout<<"Call completed!"<<endl;
 	h_Muon_Electron_invariant_mass->Fill(invMass);
 
 	if(HLT_Ele32_WPTight_Gsf) {
-            //retrieve Histo
-            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
-            float temp= EleTrigHisto->GetBinContent(bin);
-            Weight*=temp;
-	    //TODO:fill after trigger convention weighted
+            //fill before trigger convention called weighted
 	    h_Muon_pt_weighted->Fill(muon_pt);
             h_Muon_eta_weighted->Fill(muon_eta);
             h_Electron_pt_weighted->Fill(electron_pt);
@@ -309,7 +304,7 @@ cout<<"Call completed!"<<endl;
 
 	h_NJets->Fill(njets);
        
-	else {tout->Fill();}
+	tout->Fill();
     }
 
 
@@ -333,13 +328,13 @@ cout<<"Call completed!"<<endl;
     h_Muon_eta_weighted->Write();
     h_Electron_eta->Write();
     h_Electron_pt->Write();
-    h_Electron_pt_from_W->Write();
-    h_Electron_eta_from_W->Write();
+    /*h_Electron_pt_from_W->Write();
+    h_Electron_eta_from_W->Write();*/
     // weighted histograms
     h_Electron_eta_weighted->Write();
     h_Electron_pt_weighted->Write();
-    h_Electron_pt_weighted_from_W->Write();
-    h_Electron_eta_weighted_from_W->Write();
+    /*h_Electron_pt_weighted_from_W->Write();
+    h_Electron_eta_weighted_from_W->Write();*/
 
     h_Muon_Electron_invariant_mass->Write();
     h_Muon_Electron_invariant_mass_weighted->Write();

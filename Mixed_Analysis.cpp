@@ -245,6 +245,8 @@ cout<<"Call completed!"<<endl;
     int Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
     float dR_muE, dR_mujet, dR_ejet, dR_allJets, dR_lbJets, dR_mbJets, Apl_allJets, Apl_lbJets, Apl_mbJets, Phi_allJets, Phi_lbJets, Phi_mbJets, PTbjet,Acopl_emu;
 
+    bool From2Taus=false, FromTau=false;
+
     tout->Branch("dR_mue", &dR_muE);
     tout->Branch("dR_mujet", &dR_mujet);
     tout->Branch("dR_ejet", &dR_ejet);
@@ -263,6 +265,8 @@ cout<<"Call completed!"<<endl;
     tout->Branch("Ntight", &Ntight);
     tout->Branch("JetNotB", &JetsNotB);
     tout->Branch("Acopl_emu", &Acopl_emu);
+    tout->Branch("FromTau", &FromTau);
+    tout->Branch("From2Taus", &From2Taus);
 
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
@@ -270,8 +274,6 @@ cout<<"Call completed!"<<endl;
     trun_out->Branch("nEv", &n_events);
 
     trun_out->Fill(); // we already called trun->GetEntry(0);
-    bool From2Taus=false, FromTau=false;
-
 
     size_t found = ofile.find_last_of("/");
     string oname=ofile.substr(found+1);
@@ -649,7 +651,9 @@ cout<<"Call completed!"<<endl;
     }
 
     delete fecorr_trig;
-
+    cout<<" Is this signal?"<<endl;
+    if (Signal) cout<<"Yes"<<endl;
+    else cout<<"No"<<endl;
     std::cout << "non_matching_muon = " << non_matching_muon << endl;
     std::cout << "non_matching_electron = " << non_matching_electron << endl;
 
@@ -698,12 +702,14 @@ cout<<"Call completed!"<<endl;
 
     fout->Close();
     if (Signal) {
+	cout<<"Saving Tau File!"<<endl;
 	foutT->cd();
 	toutT->Write();
 	trun_outT->Write();
 	foutT->Write();
 	foutT->Close();
 	}
+   else cout<<"Not writing tree in Tau File"<<endl;
 }
 
 int main(int argc, char **argv)
@@ -714,7 +720,7 @@ int main(int argc, char **argv)
     double crossSection = atof(argv[3]);
     double IntLuminosity = atof(argv[4]);
     string boolstr = argv[5];
-    bool Signal = (boolstr == "true");
+    bool Signal = (boolstr == "true" || boolstr == "True");
 
     HistIniz();
 
