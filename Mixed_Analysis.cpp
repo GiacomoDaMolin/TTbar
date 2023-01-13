@@ -334,23 +334,19 @@ cout<<"Call completed!"<<endl;
 
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++)
-        {
-            if ((Muon_pt[j] > 27. && abs(Muon_eta[j]) < 2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15))
-            {
-                muon_idx = j;
-		int NMCparticle=Muon_genPartIdx[muon_idx];
-		double scmMC;
-		if(NMCparticle>=0) {
-			scmMC=rc.kSpreadMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],GenPart_pt[NMCparticle]);
-			}
-		else {
-			scmMC=rc.kSmearMC(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx],Muon_nTrackerLayers[muon_idx],RndGen->Rndm());
-			}
-		Muon_pt[muon_idx]*= scmMC;
-                Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
-		if(Muon_p4->Pt()<26) { muon_idx = -1; continue;}//if after rochester below pT threshold of trigger SF, reject muon
-                else break;
-            }
+        { if ((abs(Muon_eta[j]) < 2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
+		  int NMCparticle=Muon_genPartIdx[j];
+		  double scmMC;
+		  if(NMCparticle>=0) {scmMC=rc.kSpreadMC(Muon_charge[j],Muon_pt[j],Muon_eta[j],Muon_phi[j],GenPart_pt[NMCparticle]);}
+		  else {scmMC=rc.kSmearMC(Muon_charge[j],Muon_pt[j],Muon_eta[j],Muon_phi[j],Muon_nTrackerLayers[j],RndGen->Rndm());}
+
+		  Muon_pt[j]*= scmMC;
+		  if ( Muon_pt[j] > 27.){
+		        muon_idx = j;
+		        Muon_p4->SetPtEtaPhiM(Muon_pt[j], Muon_eta[j], Muon_phi[j], Muon_mass[j]);
+			break;
+		    }
+          }
         }
         if (muon_idx==-1)  {
             n_dropped++;

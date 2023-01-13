@@ -173,14 +173,14 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
-            if ((Muon_pt[j]>27. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
-                muon_idx = j;
-		double scmDT=rc.kScaleDT(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
-       		Muon_pt[muon_idx]*= scmDT;
-		Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
-		if(Muon_p4->Pt()<26) { muon_idx = -1; continue;}//if after rochester below pT threshold of trigger SF, reject muon
-                else break;
-                
+            if ((abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
+		double scmDT=rc.kScaleDT(Muon_charge[j],Muon_pt[j],Muon_eta[j],Muon_phi[j]);
+       		Muon_pt[j]*= scmDT;
+		if (Muon_pt[j]>27.){
+		        muon_idx = j;
+			Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
+			break;
+                }
             }
         }
         if (muon_idx==-1) {

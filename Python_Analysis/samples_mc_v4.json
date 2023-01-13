@@ -97,6 +97,13 @@
         "Sum_w": 376234621.7050001,
         "N_events": 11573849
     },
+   "St_s": {
+        "xs": 11240,
+        "signal": false,
+        "dataset": "/ST_s-channel_4f_leptonDecays_TuneCP5CR1_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM",
+        "Sum_w": 7,
+        "N_events": 7
+    },
     "WW": {
         "xs": 75800,
         "signal": false,

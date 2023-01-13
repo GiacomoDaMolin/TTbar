@@ -3,24 +3,24 @@
 #include "TH1.h"
 
     // Define the histogram objects
-    TH1D* h_Muon_pt = new TH1D("h_Muon_pt","h_Muon_pt",100,0,200);
+    TH1D* h_Muon_pt = new TH1D("h_Muon_pt","h_Muon_pt",67,0,201);
     TH1D* h_Muon_eta = new TH1D("h_Muon_eta","h_Muon_eta",100,-5,5);
-    TH1D* h_Electron_pt = new TH1D("h_Electron_pt", "Electron_pt", 100, 0, 200);
+    TH1D* h_Electron_pt = new TH1D("h_Electron_pt", "Electron_pt", 40, 0, 200);
     TH1D* h_Electron_eta = new TH1D("h_Electron_eta", "Electron_eta", 100, -5, 5);
     // define the weighted histograms
-    TH1D* h_Muon_pt_weighted = new TH1D("h_Muon_pt_weighted","h_Muon_pt_weighted",100,0,200);
+    TH1D* h_Muon_pt_weighted = new TH1D("h_Muon_pt_weighted","h_Muon_pt_weighted",67,0,201); //to start bin at 27
     TH1D* h_Muon_eta_weighted = new TH1D("h_Muon_eta_weighted","h_Muon_eta_weighted",100,-5,5);
-    TH1D* h_Electron_pt_weighted = new TH1D("h_Electron_pt_weighted", "Electron_pt_weighted", 100, 0, 200);
+    TH1D* h_Electron_pt_weighted = new TH1D("h_Electron_pt_weighted", "Electron_pt_weighted", 40, 0, 200);
     TH1D* h_Electron_eta_weighted = new TH1D("h_Electron_eta_weighted", "Electron_eta_weighted", 100, -5, 5);
 
-    TH1D* h_Muon_pt_from_W = new TH1D("Muon_pt", "Muon_pt_from_W", 100, 0, 200);
+    TH1D* h_Muon_pt_from_W = new TH1D("Muon_pt", "Muon_pt_from_W", 67, 0, 201);
     TH1D* h_Muon_eta_from_W = new TH1D("Muon_eta", "Muon_eta_from_W", 100, -5, 5);
-    TH1D* h_Electron_pt_from_W = new TH1D("Electron_pt", "Electron_pt_from_W", 100, 0, 200);
+    TH1D* h_Electron_pt_from_W = new TH1D("Electron_pt", "Electron_pt_from_W", 40, 0, 200);
     TH1D* h_Electron_eta_from_W = new TH1D("Electron_eta", "Electron_eta_from_W", 100, -5, 5);
     // add weighted histograms
-    TH1D* h_Muon_pt_weighted_from_W = new TH1D("Muon_pt_weighted", "Muon_pt_weighted_from_W", 100, 0, 200);
+    TH1D* h_Muon_pt_weighted_from_W = new TH1D("Muon_pt_weighted", "Muon_pt_weighted_from_W", 67, 0, 201);
     TH1D* h_Muon_eta_weighted_from_W = new TH1D("Muon_eta_weighted", "Muon_eta_weighted_from_W", 100, -5, 5);
-    TH1D* h_Electron_pt_weighted_from_W = new TH1D("Electron_pt_weighted", "Electron_pt_weighted_from_W", 100, 0, 200);
+    TH1D* h_Electron_pt_weighted_from_W = new TH1D("Electron_pt_weighted", "Electron_pt_weighted_from_W", 40, 0, 200);
     TH1D* h_Electron_eta_weighted_from_W = new TH1D("Electron_eta_weighted", "Electron_eta_weighted_from_W", 100, -5, 5);
 
     TH1D* h_Muon_pt_trigger = new TH1D("Muon_pt_trigger", "Muon_pt_trigger", 100, 0, 200);

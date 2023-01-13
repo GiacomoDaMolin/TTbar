@@ -71,30 +71,7 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchStatus("Jet_mass", 1);
     tin->SetBranchAddress("Jet_mass", &Jet_mass);
 
-    // get gen quantities
-    Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE];
-    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE], Jet_genJetIdx[MAX_ARRAY_SIZE];
-    UChar_t Muon_genPartFlav[MAX_ARRAY_SIZE], Electron_genPartFlav[MAX_ARRAY_SIZE];
-    UInt_t nGenPart;
-    Float_t GenPart_pt[GEN_MAX_ARRAY_SIZE];
-    tin->SetBranchStatus("Electron_genPartIdx", 1);
-    tin->SetBranchStatus("Electron_genPartFlav", 1);
-    tin->SetBranchStatus("Muon_genPartIdx", 1);
-    tin->SetBranchStatus("Muon_genPartFlav", 1);
-    tin->SetBranchStatus("GenPart_pdgId", 1);
-    tin->SetBranchStatus("GenPart_genPartIdxMother", 1);
-    tin->SetBranchStatus("nGenPart", 1);
-    tin->SetBranchStatus("Jet_genJetIdx",1);
-    tin->SetBranchStatus("GenPart_pt",1);
-    tin->SetBranchAddress("nGenPart", &nGenPart);
-    tin->SetBranchAddress("Electron_genPartIdx", &Electron_genPartIdx);
-    tin->SetBranchAddress("Electron_genPartFlav", &Electron_genPartFlav);
-    tin->SetBranchAddress("Muon_genPartIdx", &Muon_genPartIdx);
-    tin->SetBranchAddress("Muon_genPartFlav", &Muon_genPartFlav);
-    tin->SetBranchAddress("GenPart_pdgId", &GenPart_pdgId);
-    tin->SetBranchAddress("GenPart_genPartIdxMother", &GenPart_genPartIdxMother);
-    tin->SetBranchAddress("Jet_genJetIdx",&Jet_genJetIdx);
-    tin->SetBranchAddress("GenPart_pt",&GenPart_pt);
+    
     // collect the trigger information
     Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf;
     tin->SetBranchStatus("HLT_IsoMu24", 1);
@@ -199,14 +176,14 @@ cout<<"Call completed!"<<endl;
 
         Int_t muon_idx = -1;
         for (UInt_t j = 0; j < nMuon; j++){
-            if ((Muon_pt[j]>27. && abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
-                muon_idx = j;
-		double scmDT=rc.kScaleDT(Muon_charge[muon_idx],Muon_pt[muon_idx],Muon_eta[muon_idx],Muon_phi[muon_idx]);
-       		Muon_pt[muon_idx]*= scmDT;
-		Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
-		if(Muon_p4->Pt()<26) { muon_idx = -1; continue;}//if after rochester below pT threshold of trigger SF, reject muon
-                else break;
-                
+            if ((abs(Muon_eta[j])<2.4 && Muon_tightId[j] && Muon_pfRelIso04_all[j] < 0.15)){
+		double scmDT=rc.kScaleDT(Muon_charge[j],Muon_pt[j],Muon_eta[j],Muon_phi[j]);
+       		Muon_pt[j]*= scmDT;
+		if (Muon_pt[j]>27.){
+		        muon_idx = j;
+			Muon_p4->SetPtEtaPhiM(Muon_pt[muon_idx], Muon_eta[muon_idx], Muon_phi[muon_idx], Muon_mass[muon_idx]);
+			break;
+                }
             }
         }
         if (muon_idx==-1)  {
