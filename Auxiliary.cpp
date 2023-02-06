@@ -98,6 +98,17 @@ void HistIniz(){
 	h_Phi_mbJets->Sumw2();
 	h_acopla_emu->Sumw2();
 	h_NJets->Sumw2();
+  h_vsPTandEta_onlye->Sumw2();
+  h_vsPTandEta_onlymu->Sumw2();
+  h_vsPTandEta_muande->Sumw2();
+
+h_Trigger->Sumw2();
+h_mu_3dsig->Sumw2();
+h_mu_3d ->Sumw2();
+h_mu_dxy->Sumw2();
+h_e_3dsig->Sumw2();
+h_e_3d->Sumw2();
+h_e_dxy->Sumw2();
 
 }
 #endif // Auxiliary_cpp

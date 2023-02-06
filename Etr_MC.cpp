@@ -462,6 +462,7 @@ cout<<"Call completed!"<<endl;
         h_Electron_pt->Fill(electron_pt,Weight);
         h_Electron_eta->Fill(electron_eta, Weight);
 	h_Muon_Electron_invariant_mass->Fill(invMass, Weight);
+	h_vsPTandEta_onlymu->Fill(electron_pt,electron_eta, Weight);
 
 	if(HLT_Ele32_WPTight_Gsf) {
             //retrieve Histo
@@ -475,6 +476,7 @@ cout<<"Call completed!"<<endl;
             h_Electron_eta_weighted->Fill(electron_eta, Weight);
 	    h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
 	    h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
+	    h_vsPTandEta_muande->Fill(electron_pt,electron_eta, Weight);
             }
 
 	h_NJets->Fill(njets,Weight);
@@ -520,6 +522,9 @@ cout<<"Call completed!"<<endl;
     h_Muon_Electron_invariant_mass_weighted->Write();
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
+
+    h_vsPTandEta_onlymu->Write();
+    h_vsPTandEta_muande->Write();
 
 
     fout->Close();
