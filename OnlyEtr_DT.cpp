@@ -74,19 +74,24 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE];
     Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE], Muon_triggerIdLoose[MAX_ARRAY_SIZE], Muon_tightId[MAX_ARRAY_SIZE];
-    Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE];
+    Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE], Electron_dxy[MAX_ARRAY_SIZE], Electron_dz[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Muon_tightId", 1);
     tin->SetBranchStatus("Muon_charge", 1);
     tin->SetBranchStatus("Muon_triggerIdLoose", 1);
     tin->SetBranchStatus("Muon_pfRelIso04_all", 1);
     tin->SetBranchStatus("Electron_charge", 1);
     tin->SetBranchStatus("Electron_mvaFall17V2Iso_WP90", 1);
+    tin->SetBranchStatus("Electron_dxy", 1);
+    tin->SetBranchStatus("Electron_dz", 1);
     tin->SetBranchAddress("Electron_mvaFall17V2Iso_WP90", &Electron_mvaFall17V2Iso_WP90);
     tin->SetBranchAddress("Muon_tightId", &Muon_tightId);
     tin->SetBranchAddress("Muon_charge", &Muon_charge);
     tin->SetBranchAddress("Muon_triggerIdLoose", &Muon_triggerIdLoose);
     tin->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all);
-    tin->SetBranchAddress("Electron_charge", &Electron_charge);
+    tin->SetBranchAddress("Electron_charge", &Electron_charge); 
+    tin->SetBranchAddress("Electron_dxy", &Electron_dxy);    
+    tin->SetBranchAddress("Electron_dz", &Electron_dz);
+
 
     // Jet tagging , FlavB is the recomennded one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
@@ -160,7 +165,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
         }
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++){
-            if ((Electron_pt[j]>35 && abs(Electron_eta[j])<2.4 && Electron_mvaFall17V2Iso_WP90[j])){
+            if ((Electron_pt[j]>35 && abs(Electron_eta[j])<2.4 && Electron_mvaFall17V2Iso_WP90[j]&& abs(Electron_dxy[j])<0.2 && abs(Electron_dz[j])<0.5)){
 		if((abs(Electron_eta[j])>1.44) && (abs(Electron_eta[j])<1.57)) {continue;} //remove electrons in the acceptance break
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
 		if(Electron_p4->DeltaR(*Muon_p4)<0.4) {continue;}
@@ -216,7 +221,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
             
         }
         h_leading_lepton_pt->Fill(leading_lepton_pt);
-        // fill the histograms
+        // fill the histograms: not weighted only e trigger
         muon_pt = Muon_pt[muon_idx];
         muon_eta = Muon_eta[muon_idx];
         electron_pt = Electron_pt[electron_idx];
@@ -224,21 +229,28 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 
         h_Muon_pt->Fill(muon_pt);
         h_Muon_eta->Fill(muon_eta);
-
         h_Electron_pt->Fill(electron_pt);
         h_Electron_eta->Fill(electron_eta);
-	h_Muon_pt_weighted->Fill(muon_pt);
-        h_Muon_eta_weighted->Fill(muon_eta);
-        h_Electron_pt_weighted->Fill(electron_pt);
-        h_Electron_eta_weighted->Fill(electron_eta);
+
+	
 	h_vsPTandEta_onlye->Fill(electron_pt,electron_eta);
 
 
         if (muon_idx > -1 && electron_idx > -1){
             invMass = (*(Muon_p4) + *(Electron_p4)).M();
             h_Muon_Electron_invariant_mass->Fill(invMass);
-	    h_Muon_Electron_invariant_mass_weighted->Fill(invMass);
+	   
         }
+	//weighted= AND of triggers
+	if(HLT_IsoMu24){
+		h_Muon_pt_weighted->Fill(muon_pt);
+        	h_Muon_eta_weighted->Fill(muon_eta);
+        	h_Electron_pt_weighted->Fill(electron_pt);
+        	h_Electron_eta_weighted->Fill(electron_eta);
+		h_Muon_Electron_invariant_mass_weighted->Fill(invMass);
+	
+	}
+
 	tout->Fill();
     }
     std::cout << "Total number of events: " << nEv << std::endl;
@@ -253,12 +265,17 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
     std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
     // Write the histograms to the file
+    h_Muon_pt->Write();
+    h_Muon_eta->Write();
+    h_Electron_eta->Write();
+    h_Electron_pt->Write();
+    h_Muon_Electron_invariant_mass->Write();
+    h_leading_lepton_pt->Write();
+
     h_Muon_eta_weighted->Write();
     h_Muon_pt_weighted->Write();
-
     h_Electron_eta_weighted->Write();
     h_Electron_pt_weighted->Write();
-
     h_Muon_Electron_invariant_mass_weighted->Write();
     h_leading_lepton_pt_weighted->Write();
     h_vsPTandEta_onlye->Write();

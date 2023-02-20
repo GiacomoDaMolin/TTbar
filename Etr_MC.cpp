@@ -130,7 +130,7 @@ cout<<"Call completed!"<<endl;
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE],Muon_nTrackerLayers[MAX_ARRAY_SIZE];
     Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE], Muon_triggerIdLoose[MAX_ARRAY_SIZE], Muon_tightId[MAX_ARRAY_SIZE];
-    Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE];
+    Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE], Electron_dxy[MAX_ARRAY_SIZE], Electron_dz[MAX_ARRAY_SIZE];
     tin->SetBranchStatus("Muon_tightId", 1);
     tin->SetBranchStatus("Muon_charge", 1);
     tin->SetBranchStatus("Muon_triggerIdLoose", 1);
@@ -138,6 +138,8 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchStatus("Electron_charge", 1);
     tin->SetBranchStatus("Electron_mvaFall17V2Iso_WP90", 1);
     tin->SetBranchStatus("Muon_nTrackerLayers", 1);
+    tin->SetBranchStatus("Electron_dz", 1);
+    tin->SetBranchStatus("Electron_dxy", 1);
     tin->SetBranchAddress("Electron_mvaFall17V2Iso_WP90", &Electron_mvaFall17V2Iso_WP90);
     tin->SetBranchAddress("Muon_tightId", &Muon_tightId);
     tin->SetBranchAddress("Muon_charge", &Muon_charge);
@@ -145,6 +147,8 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all);
     tin->SetBranchAddress("Electron_charge", &Electron_charge);
     tin->SetBranchAddress("Muon_nTrackerLayers", &Muon_nTrackerLayers);
+    tin->SetBranchAddress("Electron_dz", &Electron_dz);
+    tin->SetBranchAddress("Electron_dxy", &Electron_dxy);
 
     // Jet tagging and ID, FlavB is the recomended one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
@@ -172,6 +176,11 @@ cout<<"Call completed!"<<endl;
     Float_t genWeight;
     tin->SetBranchStatus("genWeight", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
+
+//L1
+    Float_t L1PreFiringWeight_Nom;
+    tin->SetBranchStatus("L1PreFiringWeight_Nom", 1);
+    tin->SetBranchAddress("L1PreFiringWeight_Nom", &L1PreFiringWeight_Nom);
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
@@ -314,6 +323,7 @@ cout<<"Call completed!"<<endl;
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
 	double Weight2=Weight;
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"});
+	Weight *= L1PreFiringWeight_Nom;
 			
         if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
@@ -322,7 +332,7 @@ cout<<"Call completed!"<<endl;
 	 
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++){
-            if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j])){
+            if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j] && abs(Electron_dxy[j])<0.2 && abs(Electron_dz[j])<0.5)){
 		if((abs(Electron_eta[j])>1.44) && (abs(Electron_eta[j])<1.57)) {continue;} //remove electrons in the acceptance break
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 if (Electron_p4->DeltaR(*Muon_p4) < 0.4) {continue;}
@@ -348,7 +358,7 @@ cout<<"Call completed!"<<endl;
 
         bool selection = ((muon_idx > -1) && (electron_idx > -1));
        
-        selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
+        selection = selection && ((Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0);
         Float_t jet_btag_deepFlav_wp = 0.2783;
         bool one_Bjet = false;
         int id_m_jet = -1;
@@ -388,6 +398,7 @@ cout<<"Call completed!"<<endl;
               njet_in_collection.push_back(j);
               flavor.push_back(abs(Jet_hadronFlavour[j]));
               tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
+		njets++;
 	      
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp){
                  if (!one_Bjet){
@@ -443,7 +454,6 @@ cout<<"Call completed!"<<endl;
 
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
-		
 	
 	if (Muon_p4->Pt() > Electron_p4->Pt()){
             leading_lepton_pt = Muon_p4->Pt();
@@ -517,6 +527,8 @@ cout<<"Call completed!"<<endl;
     h_Electron_pt_weighted->Write();
     /*h_Electron_pt_weighted_from_W->Write();
     h_Electron_eta_weighted_from_W->Write();*/
+
+    h_NJets->Write();
 
     h_Muon_Electron_invariant_mass->Write();
     h_Muon_Electron_invariant_mass_weighted->Write();
