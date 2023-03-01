@@ -59,4 +59,23 @@
 	TH1D * h_acopla_emu =new TH1D("h_Acopla_emu","h_Acopla_emu",50,0, 2*M_PI);
 
 
+     TH2D *h_vsPTandEta_onlye= new TH2D("ETriggervsePtEta","ETriggervsePtEta",40,0,200,20,-3,3);
+     TH2D *h_vsPTandEta_onlymu= new TH2D("MuTriggervsePtEta","MuTriggervsePtEta",40, 0, 200,20,-3,3);
+     TH2D *h_vsPTandEta_muande= new TH2D("BothTriggervsePtEta","BothTriggervsePtEta",40, 0, 200,20,-3,3);
+
+   TH1D* h_Trigger = new TH1D("Trigger","h_Phi_allJets",4,0,4);
+   TH1D* h_mu_3dsig = new TH1D("h_mu_3dsig","h_mu_3dsig",30,0,30);
+   TH1D* h_mu_3d = new TH1D("h_mu_3d","h_mu_3d",30,0,0.06);
+   TH1D * h_mu_dxy =new TH1D("h_mu_dxy","h_mu_dxy",30,0, 0.03);
+   TH1D* h_e_3dsig = new TH1D("h_e_3dsig","h_e_3dsig",30,0,30);
+   TH1D* h_e_3d = new TH1D("h_e_3d","h_e_3d",30,0,0.06);
+   TH1D * h_e_dxy =new TH1D("h_e_dxy","h_e_dxy",30,0, 0.03);
+
+   TH1D *b_pt=new TH1D("bJet_pt","bJet_pt",40,25,425);
+   TH2D *jethole=new TH2D("jethole","jethole;eta; phi",24,-2.4,2.4,63,-3.14,3.14);
+   TH2D *ehole=new TH2D("ehole","ehole;eta; phi",24,-2.4,2.4,63,-3.14,3.14);
+
+
+   
+
 #endif // Histodef_cpp

@@ -50,7 +50,6 @@ cout<<"Call completed!"<<endl;
     trun->SetBranchAddress("genEventSumw", &genEventSumw);
     trun->SetBranchAddress("genEventCount", &genEventCount);
 
-
     trun->GetEntry(0);
 
     TTree *tin = static_cast<TTree *>(fin->Get("Events"));
@@ -98,7 +97,7 @@ cout<<"Call completed!"<<endl;
 
     // get gen quantities
     Int_t Muon_genPartIdx[MAX_ARRAY_SIZE], Electron_genPartIdx[MAX_ARRAY_SIZE];
-    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE], Jet_genJetIdx[MAX_ARRAY_SIZE];
+    Int_t GenPart_pdgId[GEN_MAX_ARRAY_SIZE], GenPart_genPartIdxMother[GEN_MAX_ARRAY_SIZE], GenPart_statusFlags[GEN_MAX_ARRAY_SIZE], Jet_genJetIdx[MAX_ARRAY_SIZE];
     UChar_t Muon_genPartFlav[MAX_ARRAY_SIZE], Electron_genPartFlav[MAX_ARRAY_SIZE];
     UInt_t nGenPart;
     Float_t GenPart_pt[GEN_MAX_ARRAY_SIZE];
@@ -111,6 +110,7 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchStatus("nGenPart", 1);
     tin->SetBranchStatus("Jet_genJetIdx",1);
     tin->SetBranchStatus("GenPart_pt",1);
+    tin->SetBranchStatus("GenPart_statusFlags",1);
     tin->SetBranchAddress("nGenPart", &nGenPart);
     tin->SetBranchAddress("Electron_genPartIdx", &Electron_genPartIdx);
     tin->SetBranchAddress("Electron_genPartFlav", &Electron_genPartFlav);
@@ -120,6 +120,8 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchAddress("GenPart_genPartIdxMother", &GenPart_genPartIdxMother);
     tin->SetBranchAddress("Jet_genJetIdx",&Jet_genJetIdx);
     tin->SetBranchAddress("GenPart_pt",&GenPart_pt);
+    tin->SetBranchAddress("GenPart_statusFlags",&GenPart_statusFlags);
+
     // collect the trigger information
     Bool_t HLT_IsoMu24, HLT_Ele32_WPTight_Gsf;
     tin->SetBranchStatus("HLT_IsoMu24", 1);
@@ -130,7 +132,8 @@ cout<<"Call completed!"<<endl;
     // collect the triggger Ids
     Int_t Muon_charge[MAX_ARRAY_SIZE], Electron_charge[MAX_ARRAY_SIZE],Muon_nTrackerLayers[MAX_ARRAY_SIZE];
     Bool_t Electron_mvaFall17V2Iso_WP90[MAX_ARRAY_SIZE], Muon_triggerIdLoose[MAX_ARRAY_SIZE], Muon_tightId[MAX_ARRAY_SIZE];
-    Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE];
+    Float_t Muon_pfRelIso04_all[MAX_ARRAY_SIZE], Electron_ip3d[MAX_ARRAY_SIZE], Electron_sip3d[MAX_ARRAY_SIZE], Electron_dxy[MAX_ARRAY_SIZE], Electron_dz[MAX_ARRAY_SIZE], Muon_dxy[MAX_ARRAY_SIZE], Muon_dz[MAX_ARRAY_SIZE], Muon_ip3d[MAX_ARRAY_SIZE], Muon_sip3d[MAX_ARRAY_SIZE];
+
     tin->SetBranchStatus("Muon_tightId", 1);
     tin->SetBranchStatus("Muon_charge", 1);
     tin->SetBranchStatus("Muon_triggerIdLoose", 1);
@@ -145,6 +148,23 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all);
     tin->SetBranchAddress("Electron_charge", &Electron_charge);
     tin->SetBranchAddress("Muon_nTrackerLayers", &Muon_nTrackerLayers);
+
+    tin->SetBranchStatus("Electron_ip3d", 1);
+    tin->SetBranchStatus("Electron_sip3d", 1);
+    tin->SetBranchStatus("Electron_dxy", 1);
+    tin->SetBranchStatus("Electron_dz", 1);
+    tin->SetBranchStatus("Muon_dxy", 1);
+    tin->SetBranchStatus("Muon_dz", 1);
+    tin->SetBranchStatus("Muon_ip3d", 1);
+    tin->SetBranchStatus("Muon_sip3d", 1);
+    tin->SetBranchAddress("Electron_dz", &Electron_dz);
+    tin->SetBranchAddress("Electron_ip3d", &Electron_ip3d);
+    tin->SetBranchAddress("Electron_sip3d", &Electron_sip3d);
+    tin->SetBranchAddress("Electron_dxy", &Electron_dxy);
+    tin->SetBranchAddress("Muon_dxy", &Muon_dxy);
+    tin->SetBranchAddress("Muon_dz", &Muon_dz);
+    tin->SetBranchAddress("Muon_ip3d", &Muon_ip3d);
+    tin->SetBranchAddress("Muon_sip3d", &Muon_sip3d);
 
     // Jet tagging and ID, FlavB is the recomended one, DeepB was used by Anup
     Float_t Jet_btagDeepFlavB[MAX_ARRAY_SIZE], Jet_btagDeepB[MAX_ARRAY_SIZE];
@@ -172,6 +192,23 @@ cout<<"Call completed!"<<endl;
     Float_t genWeight;
     tin->SetBranchStatus("genWeight", 1);
     tin->SetBranchAddress("genWeight", &genWeight);
+
+
+    //L1
+    Float_t L1PreFiringWeight_Nom;
+    tin->SetBranchStatus("L1PreFiringWeight_Nom", 1);
+    tin->SetBranchAddress("L1PreFiringWeight_Nom", &L1PreFiringWeight_Nom);
+    Int_t TrigObj_id[MAX_ARRAY_SIZE]; UInt_t nTrigObj;
+    Float_t TrigObj_eta[MAX_ARRAY_SIZE], TrigObj_phi[MAX_ARRAY_SIZE];
+    tin->SetBranchStatus("TrigObj_id", 1);
+    tin->SetBranchStatus("TrigObj_eta", 1);
+    tin->SetBranchStatus("TrigObj_phi", 1);
+    tin->SetBranchStatus("nTrigObj", 1);
+    tin->SetBranchAddress("TrigObj_id", &TrigObj_id);
+    tin->SetBranchAddress("TrigObj_eta", &TrigObj_eta);
+    tin->SetBranchAddress("TrigObj_phi", &TrigObj_phi); 
+    tin->SetBranchAddress("nTrigObj", &nTrigObj);
+    int evenottrigMatch=0;
 
     int non_matching_muon = 0, non_matching_electron = 0;
     int n_dropped = 0;
@@ -221,11 +258,9 @@ cout<<"Call completed!"<<endl;
     TH2D * b_eff= static_cast<TH2D *>(fb_eff->Get("b_jets_tagged")); 
    
     TRandom3 * RndGen=new TRandom3();
-
     RoccoR rc;
     rc.init("/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/roccor/RoccoR2018UL.txt");
-    
-    
+     
     // save the histograms in a new File
 
     TFile *fout = new TFile(ofile.c_str(), "RECREATE");
@@ -267,6 +302,8 @@ cout<<"Call completed!"<<endl;
     tout->Branch("Acopl_emu", &Acopl_emu);
     tout->Branch("FromTau", &FromTau);
     tout->Branch("From2Taus", &From2Taus);
+    tout->Branch("MuTrigger", &HLT_IsoMu24);
+    tout->Branch("ETrigger", &HLT_Ele32_WPTight_Gsf);
 
     trun_out->Branch("genEventSumw", &genEventSumw);
     trun_out->Branch("IntLumi", &IntLuminosity);
@@ -310,6 +347,8 @@ cout<<"Call completed!"<<endl;
 	    toutT->Branch("Ntight", &Ntight);
 	    toutT->Branch("JetNotB", &JetsNotB);
 	    toutT->Branch("Acopl_emu", &Acopl_emu);
+            toutT->Branch("MuTrigger", &HLT_IsoMu24);
+    toutT->Branch("ETrigger", &HLT_Ele32_WPTight_Gsf);
 
 
 	trun_outT->Branch("genEventSumw", &genEventSumw);
@@ -327,7 +366,7 @@ cout<<"Call completed!"<<endl;
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
         
 	// apply triggers
-        if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf)){
+        if (!(HLT_Ele32_WPTight_Gsf)){
             trigger_dropped++;
             continue;
         };
@@ -353,17 +392,19 @@ cout<<"Call completed!"<<endl;
             continue;
         }
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
+	Weight *=  getTopPtWeight(GenPart_pdgId,GenPart_statusFlags,GenPart_pt,nGenPart);
 	double Weight2=Weight;
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"});
+	Weight*= L1PreFiringWeight_Nom;
 			
-        if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
+        //if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
         Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
 
 	 
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++){
-            if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j])){
+            if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j] && abs(Electron_dxy[j])<0.2 && abs(Electron_dz[j])<0.5)){
 		if((abs(Electron_eta[j])>1.44) && (abs(Electron_eta[j])<1.57)) {continue;} //remove electrons in the acceptance break
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 if (Electron_p4->DeltaR(*Muon_p4) < 0.4) {continue;}
@@ -374,6 +415,26 @@ cout<<"Call completed!"<<endl;
             n_dropped++;
             continue;
         }
+/*
+	bool saved=false;
+	for(int j=0; j<nTrigObj;j++){
+		if(TrigObj_id[j]==11){
+		 TLorentzVector *T_p4 = new TLorentzVector();
+	         T_p4->SetPtEtaPhiM(10, TrigObj_eta[j], TrigObj_phi[j], 10);
+		 if(T_p4->DeltaR(*Electron_p4)<0.1)	{saved=true; delete T_p4;
+					 break;}
+		 delete T_p4;
+		}
+		if(TrigObj_id[j]==13){
+			 TLorentzVector *T_p4 = new TLorentzVector();
+			 T_p4->SetPtEtaPhiM(10, TrigObj_eta[j], TrigObj_phi[j], 10);
+			 if(T_p4->DeltaR(*Muon_p4)<0.1)	{saved=true; delete T_p4;
+					 break;}
+			 delete T_p4; 
+			}
+	}
+
+	if (saved==false) {evenottrigMatch++; n_dropped++; continue;}	*/
 	
 	if(Signal){
 		bool firstistau=isFromTau(nGenPart, GenPart_pdgId, GenPart_genPartIdxMother, Muon_genPartIdx[muon_idx]);
@@ -641,6 +702,19 @@ cout<<"Call completed!"<<endl;
             h_Muon_Electron_invariant_mass->Fill(invMass, Weight2);
             h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
         }
+	h_Trigger->Fill(HLT_IsoMu24+2*HLT_Ele32_WPTight_Gsf,Weight); 
+	h_mu_3dsig->Fill(Muon_sip3d[muon_idx],Weight);
+	h_mu_3d->Fill(Muon_ip3d[muon_idx],Weight);
+	h_mu_dxy->Fill(abs(Muon_dxy[muon_idx]),Weight);
+	h_e_3dsig->Fill(Electron_sip3d[electron_idx],Weight);
+	h_e_3d->Fill(Electron_ip3d[electron_idx],Weight);
+	h_e_dxy->Fill(abs(Electron_dxy[electron_idx]),Weight);
+
+	b_pt->Fill(MainBjet_p4->Pt(),Weight);
+	jethole->Fill(MainBjet_p4->Eta(),MainBjet_p4->Phi(),Weight);
+	ehole->Fill(Electron_p4->Eta(),Electron_p4->Phi(),Weight);
+
+
         // fill the tree
         if(Signal && FromTau) {toutT->Fill();}
 	else {tout->Fill();}
@@ -653,6 +727,8 @@ cout<<"Call completed!"<<endl;
     std::cout << "non_matching_muon = " << non_matching_muon << endl;
     std::cout << "non_matching_electron = " << non_matching_electron << endl;
 
+    cout<<"L1 requirement removes "<< evenottrigMatch << " events"<<endl;
+
     std::cout << "NeV = " << nEv << endl;
     std::cout << "trigger dropped = " << trigger_dropped << endl;
     std::cout << "selections dropped = " << n_dropped << endl; //remember the cross trigger in Data
@@ -664,37 +740,10 @@ cout<<"Call completed!"<<endl;
 
     tout->Write();
     trun_out->Write();
+	
     // Write the histograms to the file
-    h_Muon_eta->Write();
-    h_Muon_pt->Write();
-    h_Muon_pt_from_W->Write();
-    h_Muon_eta_from_W->Write();
-    // weighted histograms
-    h_Muon_eta_weighted->Write();
-    h_Muon_pt_weighted->Write();
-    h_Muon_pt_weighted_from_W->Write();
-    h_Muon_eta_weighted_from_W->Write();
 
-    h_Electron_eta->Write();
-    h_Electron_pt->Write();
-    h_Electron_pt_from_W->Write();
-    h_Electron_eta_from_W->Write();
-    // weighted histograms
-    h_Electron_eta_weighted->Write();
-    h_Electron_pt_weighted->Write();
-    h_Electron_pt_weighted_from_W->Write();
-    h_Electron_eta_weighted_from_W->Write();
-
-    h_Muon_Electron_invariant_mass->Write();
-    h_Muon_Electron_invariant_mass_weighted->Write();
-    h_leading_lepton_pt->Write();
-    h_leading_lepton_pt_weighted->Write();
-
-    h_LooseJets->Write();
-    h_MediumJets->Write();
-    h_TightJets->Write();
-    h_acopla_emu->Write();
-    h_NJets->Write();
+    HistWrite();
 
     fout->Close();
     if (Signal) {

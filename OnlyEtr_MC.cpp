@@ -30,7 +30,7 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
     return (luminosity * crossSection * genWeight); // / SumWeights;
 }
 
-void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Signal = true)
+void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Signal = false)
 {
 
     if (crossSection < 0. || IntLuminosity < 0.)
@@ -138,8 +138,8 @@ cout<<"Call completed!"<<endl;
     tin->SetBranchStatus("Electron_charge", 1);
     tin->SetBranchStatus("Electron_mvaFall17V2Iso_WP90", 1);
     tin->SetBranchStatus("Muon_nTrackerLayers", 1);
-    tin->SetBranchStatus("Electron_dz", 1);
     tin->SetBranchStatus("Electron_dxy", 1);
+    tin->SetBranchStatus("Electron_dz", 1);
     tin->SetBranchAddress("Electron_mvaFall17V2Iso_WP90", &Electron_mvaFall17V2Iso_WP90);
     tin->SetBranchAddress("Muon_tightId", &Muon_tightId);
     tin->SetBranchAddress("Muon_charge", &Muon_charge);
@@ -197,8 +197,6 @@ cout<<"Call completed!"<<endl;
     Float_t muon_eta_from_W, muon_pt_from_W, electron_eta_from_W, electron_pt_from_W;
     float Weight;
 
-    bool From2Taus=false, FromTau=false;
-
     // open correctionfiles
     
     string muon_json = "/afs/cern.ch/user/g/gdamolin/Johan/TTbar/Python_Analysis/corrections/muon_Z.json.gz";
@@ -252,6 +250,9 @@ cout<<"Call completed!"<<endl;
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
     tout->Branch("Weight", &Weight);
+
+    bool From2Taus=false, FromTau=false;
+
     tout->Branch("FromTau", &FromTau);
     tout->Branch("From2Taus", &From2Taus);
 
@@ -261,7 +262,7 @@ cout<<"Call completed!"<<endl;
     trun_out->Branch("nEv", &n_events);
 
     trun_out->Fill(); // we already called trun->GetEntry(0);
-    
+
     size_t found = ofile.find_last_of("/");
     string oname=ofile.substr(found+1);
     string path=ofile.substr(0,found);
@@ -280,6 +281,7 @@ cout<<"Call completed!"<<endl;
 	toutT->Branch("FromTau", &FromTau);
 	toutT->Branch("From2Taus", &From2Taus);
 
+
 	trun_outT->Branch("genEventSumw", &genEventSumw);
         trun_outT->Branch("IntLumi", &IntLuminosity);
         trun_outT->Branch("xs", &crossSection);
@@ -295,7 +297,7 @@ cout<<"Call completed!"<<endl;
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
         
 	// apply triggers
-        if (!(HLT_IsoMu24)){
+        if (!HLT_Ele32_WPTight_Gsf){
             trigger_dropped++;
             continue;
         };
@@ -323,16 +325,15 @@ cout<<"Call completed!"<<endl;
         Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
 	double Weight2=Weight;
         Weight *= pu_correction->evaluate({N_pu_vertices, "nominal"});
-	Weight *= L1PreFiringWeight_Nom;
+	Weight*= L1PreFiringWeight_Nom;
 			
-        if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});} 
         Weight *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"}); 
         Weight *= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
 
 	 
         Int_t electron_idx = -1;
         for (UInt_t j = 0; j < nElectron; j++){
-            if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j] && abs(Electron_dxy[j])<0.2 && abs(Electron_dz[j])<0.5)){
+            if ((Electron_pt[j] > 35 && abs(Electron_eta[j]) < 2.4 && Electron_mvaFall17V2Iso_WP90[j]&& abs(Electron_dxy[j])<0.2 && abs(Electron_dz[j])<0.5)){
 		if((abs(Electron_eta[j])>1.44) && (abs(Electron_eta[j])<1.57)) {continue;} //remove electrons in the acceptance break
                 Electron_p4->SetPtEtaPhiM(Electron_pt[j], Electron_eta[j], Electron_phi[j], Electron_mass[j]);
                 if (Electron_p4->DeltaR(*Muon_p4) < 0.4) {continue;}
@@ -355,10 +356,18 @@ cout<<"Call completed!"<<endl;
 
         Weight *= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); 
         Weight *= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
+		
+        if(HLT_Ele32_WPTight_Gsf) {
+            //retrieve Histo
+            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
+            float temp= EleTrigHisto->GetBinContent(bin);
+            Weight*=temp;
+            }
 
         bool selection = ((muon_idx > -1) && (electron_idx > -1));
-       
-        selection = selection && ((Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0);
+        // check the seleected objects for opposite charge
+        selection = selection && (Muon_charge[muon_idx] * Electron_charge[electron_idx]) < 0;
+        // the tight working point is 0.71, medium 0.2783, loose 0.0490
         Float_t jet_btag_deepFlav_wp = 0.2783;
         bool one_Bjet = false;
         int id_m_jet = -1;
@@ -375,6 +384,7 @@ cout<<"Call completed!"<<endl;
 	    Tjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
 	    if((Tjet_p4->DeltaR(*Muon_p4)<0.4) || (Tjet_p4->DeltaR(*Electron_p4)<0.4)) {delete Tjet_p4; continue;}
 	    else {delete Tjet_p4;}
+	
             //correction for pileupID
             int MC_pu = Jet_genJetIdx[j];
             float tempSF=1.,tempEff;
@@ -397,9 +407,8 @@ cout<<"Call completed!"<<endl;
               //correction for b-tag
               njet_in_collection.push_back(j);
               flavor.push_back(abs(Jet_hadronFlavour[j]));
-              tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));
-		njets++;
-	      
+              tagged.push_back((Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp));      
+            
               if (Jet_btagDeepFlavB[j] > jet_btag_deepFlav_wp){
                  if (!one_Bjet){
                       MainBjet_p4->SetPtEtaPhiM(Jet_pt[j], Jet_eta[j], Jet_phi[j], Jet_mass[j]);
@@ -454,50 +463,54 @@ cout<<"Call completed!"<<endl;
 
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
-	
-	if (Muon_p4->Pt() > Electron_p4->Pt()){
+       
+        if (Muon_p4->Pt() > Electron_p4->Pt()){
             leading_lepton_pt = Muon_p4->Pt();
-	    }
-	else{leading_lepton_pt = Electron_p4->Pt();}
-	muon_pt = Muon_p4->Pt();
-        muon_eta = Muon_eta[muon_idx];
-	electron_pt = Electron_pt[electron_idx];
-        electron_eta = Electron_eta[electron_idx];
-	if (muon_idx > -1 && electron_idx > -1){invMass = (*(Muon_p4) + *(Electron_p4)).M();}
+        }
+        else{
+            leading_lepton_pt = Electron_p4->Pt();
+        }
 
-	//TODO:fill before trigger convention: not weighted
-	h_leading_lepton_pt->Fill(leading_lepton_pt,Weight);
-	h_Muon_pt->Fill(muon_pt, Weight);
+        // fill the histograms
+        muon_pt = Muon_p4->Pt();
+        muon_eta = Muon_eta[muon_idx];
+        electron_pt = Electron_pt[electron_idx];
+        electron_eta = Electron_eta[electron_idx];
+
+        h_Muon_pt->Fill(muon_pt, Weight);
         h_Muon_eta->Fill(muon_eta, Weight);
         h_Electron_pt->Fill(electron_pt,Weight);
         h_Electron_eta->Fill(electron_eta, Weight);
-	h_Muon_Electron_invariant_mass->Fill(invMass, Weight);
-	h_vsPTandEta_onlymu->Fill(electron_pt,electron_eta, Weight);
-
-	if(HLT_Ele32_WPTight_Gsf) {
-            //retrieve Histo
-            int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
-            float temp= EleTrigHisto->GetBinContent(bin);
-            Weight*=temp;
-	    //TODO:fill after trigger convention weighted
-	    h_Muon_pt_weighted->Fill(muon_pt, Weight);
-            h_Muon_eta_weighted->Fill(muon_eta, Weight);
-            h_Electron_pt_weighted->Fill(electron_pt, Weight);
-            h_Electron_eta_weighted->Fill(electron_eta, Weight);
-	    h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
-	    h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
-	    h_vsPTandEta_muande->Fill(electron_pt,electron_eta, Weight);
-            }
-
-	h_NJets->Fill(njets,Weight);
+	h_leading_lepton_pt->Fill(leading_lepton_pt,Weight);
+        // fill the weighted histograms
+        
+	h_vsPTandEta_onlye->Fill(electron_pt,electron_eta,Weight);
        
+        if (muon_idx > -1 && electron_idx > -1){
+            invMass = (*(Muon_p4) + *(Electron_p4)).M();
+            h_Muon_Electron_invariant_mass->Fill(invMass, Weight);
+        }
+
+	if(HLT_IsoMu24){
+		Weight*= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
+		h_Muon_pt_weighted->Fill(muon_pt, Weight);
+		h_Muon_eta_weighted->Fill(muon_eta, Weight);
+		h_Electron_pt_weighted->Fill(electron_pt, Weight);
+		h_Electron_eta_weighted->Fill(electron_eta, Weight);
+            	h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
+		h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
+	
+	}
+
         // fill the tree
         if(Signal && FromTau) {toutT->Fill();}
 	else {tout->Fill();}
     }
 
     delete fecorr_trig;
-
+    cout<<" Is this signal?"<<endl;
+    if (Signal) cout<<"Yes"<<endl;
+    else cout<<"No"<<endl;
     std::cout << "non_matching_muon = " << non_matching_muon << endl;
     std::cout << "non_matching_electron = " << non_matching_electron << endl;
 
@@ -510,43 +523,38 @@ cout<<"Call completed!"<<endl;
     std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
     std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
 
-    fout->cd();
     tout->Write();
     trun_out->Write();
-
-    h_Muon_pt->Write();
+    // Write the histograms to the file
     h_Muon_eta->Write();
-    h_Muon_pt_weighted->Write();
+    h_Muon_pt->Write();
+    // weighted histograms
     h_Muon_eta_weighted->Write();
+    h_Muon_pt_weighted->Write();
+
     h_Electron_eta->Write();
     h_Electron_pt->Write();
-    /*h_Electron_pt_from_W->Write();
-    h_Electron_eta_from_W->Write();*/
     // weighted histograms
     h_Electron_eta_weighted->Write();
     h_Electron_pt_weighted->Write();
-    /*h_Electron_pt_weighted_from_W->Write();
-    h_Electron_eta_weighted_from_W->Write();*/
-
-    h_NJets->Write();
 
     h_Muon_Electron_invariant_mass->Write();
     h_Muon_Electron_invariant_mass_weighted->Write();
     h_leading_lepton_pt->Write();
     h_leading_lepton_pt_weighted->Write();
 
-    h_vsPTandEta_onlymu->Write();
-    h_vsPTandEta_muande->Write();
-
+    h_vsPTandEta_onlye->Write();
 
     fout->Close();
     if (Signal) {
+	cout<<"Saving Tau File!"<<endl;
 	foutT->cd();
 	toutT->Write();
-	trun_outT->Write();	
+	trun_outT->Write();
 	foutT->Write();
 	foutT->Close();
 	}
+   else cout<<"Not writing tree in Tau File"<<endl;
 }
 
 int main(int argc, char **argv)
@@ -558,7 +566,6 @@ int main(int argc, char **argv)
     double IntLuminosity = atof(argv[4]);
     string boolstr = argv[5];
     bool Signal = (boolstr == "true" || boolstr == "True");
-
 
     HistIniz();
 
