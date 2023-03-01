@@ -18,6 +18,8 @@ I use createdagROOT.py (see the ReadMe of DY->MUMU) that creates a submit direct
 From there I just run condor_submit_dag for each directory (created from the .json).
 If some jobs fail, one can resubmit with Python_Analysis/rescue.py, which will send in condor only the jobs that failed. (see DY->MUMU readME).
 
+The scratch version of the code for the systematcis is in the directory Experimental_systematics
+
 
 
 # Data 
