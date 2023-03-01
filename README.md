@@ -1,54 +1,20 @@
-#TO DO LIST:
-##SFs in the region 1.44 < |η| < 1.57, corresponding to the transition between the barrel and endcaps of ECAL, are not provided by the EGM POG since this region is excluded by most physics analyses. 
+# Workflow
+Selections & preliminar histograms are done in:
+Mixed_Analysis.cpp for MC
+Data_Analysis.cpp for Data.
 
-1) find a way to plot from TTree, basically remake normalizer but better
-2) after (1), store in the trees all observables AFTER the selections and in Histos the ones before
+These .cpp file have their histograms defined globally in Histodef.cpp and call some (long but pretty easy) functions of Auxiliary.cpp
+The logical structure is the foolowing: the histograms are created globally, the main is called and ->sumw2() is applied to all histograms and then I set the input tree from the NanoAOD ready to be red, as well as preparing the corrections functions.
+Then I loop in the events, perform the selections, compute weights and corrections and finally fill them in Th1Ds.
+After the loop I just cout some numbers and Write the histo in the outfile (which will be in Eos).
 
-3)Multithreading: at some point speed might become an issue
-OR
-4) pre skimming: triggers already discard a lot of events: store nanoaod skimmed somewhere
+To continue with the analysis, one needs to hadd the files of each sample, divide their yield by the SumOfMCweights and then plot them as he/she pleases.
+I have a script for that, I can pass it to you if you want. However the names of files and directories are hard-coded.
 
-5) separate TT Tau->l from l
-
-
-
-
-# How to send jobs in Condor
-
-To create the description of the jobs needed to run over a dataset the following command can be used
-
-```
-sh RunDataset.sh -e myanalysis.py \
-    -d dataset_name \
-    -o output_dir
-    -x xsec \
-    -l integ_luminosity \
-    -s is_signal
-    -p full_path_to_proxy \
-    -c full_path_to_cmssw
-```
-NOTE: use RunDataset.sh if you want to run on MC, RunActualData.sh if you wish to run on Data.
-
-The output is a `jobdescription.txt` file which will list all the arguments to be used to process single files.
-This will be called when you launch the job on condor.
-Before submitting to condor, test locally that a single file will be processed as desired by doing
-
-```
-sh RunDataset.sh `head -n 1 jobdescription.txt`
-```
-
-If all looks good you can submit to condor by doing
-
-```
-condor_submit jobdescription.sub
-```
-
-LAWS OF CONDOR:
-1) Thou cannot put your logs/executable nor output files in eos, Condor will refuse to read it. You can however save them in afs and then move them in eos in the script.
-2) Thou cannot use mkdir while using condor.
-3) Thou need to create the c++ executable with THE SAME CMSSW CMSENV version of the one you put in full_path_to_cmssw
-4) I will share soon a file with all the commands for each dataset, possibly we can make a script from it
-5) Thou will help me make me a Postscript that "hadd"s all the output files in a single file because doing that manually is a pain
+How do I launc the Analysis?
+I use createdagROOT.py (see the ReadMe of DY->MUMU) that creates a submit directory.
+From there I just run condor_submit_dag for each directory (created from the .json).
+If some jobs fail, one can resubmit with Python_Analysis/rescue.py, which will send in condor only the jobs that failed. (see DY->MUMU readME).
 
 
 
@@ -101,67 +67,3 @@ brilcalc lumi -u /fb --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/nor
 #Sum recorded : 59.819714474  
 #Check JSON:  
 #(run,ls) in json but not in results: [(325172, 477), (325172, 478), (325172, 479), (325172, 480), (325172, 481), (325172, 482), (325172, 483), (325172, 484), (325172, 485)]  
-# MC
-
-## Signal
-### Fully Leptonic Dataset 
-GenCrossSection=72.1pb
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FTTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-
-### (unused) Semi-Leptonic Dataset 
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FTTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-
-
-## Backgrounds 
-### Drell-Yann (1Jet) Background production.
-GenCrossSection=951.5 pb (or 955.8)
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC 951.5*1000 59.83 False
-```
-
-### DY 2 Jets
-GenCrossSection=360.4 pb 
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC/ 360.4*1000 59.83 False
-```
-
-### DY Mass Range
-GenCrossSection=15810 pb
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC/ 15810*1000 59.83 False
-```
-### W 0 Jet
-GenCrossSection=53330 pb, #Events: 177728297
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC 53330*1000 59.83 False
-```
-
-### W 1 Jet
-GenCrossSection=8875.0 pb, #Events: 190471282
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /WJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC 8875.0*1000 59.83 False
-```
-### W 2 Jet
-GenCrossSection=3338.0 pb
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC 3338 59.83*1000 False
-```
-
-### SingleTop
-GenCrossSection=32.45 pb
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV_PDFWeights-powheg-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV_PDFWeights-powheg-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC 32.45*1000 59.83 False
-```
-### SingleAntiTop
-GenCrossSection=32.51 pb
-https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV_PDFWeights-powheg-pythia8%2FRunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1%2FNANOAODSIM&instance=prod/global
-```
-./run_MC.sh ./Mixed_Analysis /ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV_PDFWeights-powheg-pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM ./output/MC 32.51*1000 59.83 False
-```
