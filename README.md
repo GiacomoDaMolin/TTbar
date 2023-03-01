@@ -4,9 +4,11 @@ Mixed_Analysis.cpp for MC
 Data_Analysis.cpp for Data.
 
 These .cpp file have their histograms defined globally in Histodef.cpp and call some (long but pretty easy) functions of Auxiliary.cpp
-The logical structure is the foolowing: the histograms are created globally, the main is called and ->sumw2() is applied to all histograms and then I set the input tree from the NanoAOD ready to be red, as well as preparing the corrections functions.
-Then I loop in the events, perform the selections, compute weights and corrections and finally fill them in Th1Ds.
-After the loop I just cout some numbers and Write the histo in the outfile (which will be in Eos).
+The logical structure is the foolowing
+-the histograms are created globally, the main is called and ->sumw2() is applied to all histograms 
+-then I set the input tree from the NanoAOD ready to be red, as well as preparing the corrections functions.
+-I loop in the events, perform the selections, compute weights and corrections and finally fill them in Th1Ds.
+-After the loop I just cout some numbers and Write the histo in the outfile (which will be in Eos).
 
 To continue with the analysis, one needs to hadd the files of each sample, divide their yield by the SumOfMCweights and then plot them as he/she pleases.
 I have a script for that, I can pass it to you if you want. However the names of files and directories are hard-coded.
