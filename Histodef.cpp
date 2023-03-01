@@ -71,4 +71,11 @@
    TH1D* h_e_3d = new TH1D("h_e_3d","h_e_3d",30,0,0.06);
    TH1D * h_e_dxy =new TH1D("h_e_dxy","h_e_dxy",30,0, 0.03);
 
+   TH1D *b_pt=new TH1D("bJet_pt","bJet_pt",40,25,425);
+   TH2D *jethole=new TH2D("jethole","jethole;eta; phi",24,-2.4,2.4,63,-3.14,3.14);
+   TH2D *ehole=new TH2D("ehole","ehole;eta; phi",24,-2.4,2.4,63,-3.14,3.14);
+
+
+   
+
 #endif // Histodef_cpp

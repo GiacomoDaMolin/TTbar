@@ -190,17 +190,17 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
             std::cout << "Processing entry " << i << " of " << nEv << std::endl;
         // apply triggers
 
-        /*if (!(HLT_IsoMu24 || HLT_Ele32_WPTight_Gsf)){
+        if (!(HLT_Ele32_WPTight_Gsf)){
             trigger_dropped++;
             continue;
         };
 
         // avoid cross triggers
-        //if (!IsFirstDataSet && HLT_Ele32_WPTight_Gsf && HLT_IsoMu24){ crosstrigger++;   continue;}
+        /*if (!IsFirstDataSet && HLT_Ele32_WPTight_Gsf && HLT_IsoMu24){ crosstrigger++;   continue;}
 	if (IsFirstDataSet && HLT_Ele32_WPTight_Gsf){crosstrigger++;   continue;}
 	if (!IsFirstDataSet && HLT_IsoMu24){crosstrigger++;   continue;}*/
 
-	if (!((IsFirstDataSet && HLT_IsoMu24)||(!IsFirstDataSet && HLT_Ele32_WPTight_Gsf && !HLT_IsoMu24))){trigger_dropped++; continue;}
+	//if (!((IsFirstDataSet && HLT_IsoMu24)||(!IsFirstDataSet && HLT_Ele32_WPTight_Gsf && !HLT_IsoMu24))){trigger_dropped++; continue;}
 
         // loop over the muons and electrons and only keep the fist ones that pass the requirements
         Int_t muon_idx = -1;
@@ -393,6 +393,11 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
 	    h_Muon_Electron_invariant_mass_weighted->Fill(invMass);
         }
 
+	b_pt->Fill(MainBjet_p4->Pt());
+	jethole->Fill(MainBjet_p4->Eta(),MainBjet_p4->Phi());
+	ehole->Fill(Electron_p4->Eta(),Electron_p4->Phi());
+
+
         h_Trigger->Fill(HLT_IsoMu24+2*HLT_Ele32_WPTight_Gsf); 
 	h_mu_3dsig->Fill(Muon_sip3d[muon_idx]);
 	h_mu_3d->Fill(Muon_ip3d[muon_idx]);
@@ -417,28 +422,7 @@ void DataAnalysis(string inputFile, string ofile, bool IsFirstDataSet)
     std::cout << "Fraction of events removed by selections = " << (n_dropped * 1. / Rem_trigger) << endl;
     std::cout << "Final number of events "<< Rem_trigger - n_dropped <<endl;
     // Write the histograms to the file
-    h_Muon_eta_weighted->Write();
-    h_Muon_pt_weighted->Write();
-
-    h_Electron_eta_weighted->Write();
-    h_Electron_pt_weighted->Write();
-
-    h_Muon_Electron_invariant_mass_weighted->Write();
-    h_leading_lepton_pt_weighted->Write();
-    h_LooseJets->Write();
-    h_MediumJets->Write();
-    h_TightJets->Write();
-    h_acopla_emu->Write();
-    h_NJets->Write();
-
-    
-    h_Trigger->Write();
-    h_mu_3dsig->Write();
-    h_mu_3d->Write();
-    h_mu_dxy->Write();
-    h_e_3dsig->Write();
-    h_e_3d->Write();
-    h_e_dxy->Write();
+    HistWrite();
 
     fout->Write();
     fout->Close();
