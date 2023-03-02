@@ -10,9 +10,8 @@
 #include "TRandom3.h"
 
 // include user defined histograms and auxiliary macros
-#include "Histodef.cpp"
-#include "Auxiliary.cpp"
-#include "Python_Analysis/corrections/roccor/RoccoR.cc"
+#include "Auxiliary.cc"
+#include "../Python_Analysis/corrections/roccor/RoccoR.cc"
 
 // correctionlib
 #include "correction.h"
@@ -27,7 +26,7 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
     return (luminosity * crossSection * genWeight);
 }
 
-void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Data= false, bool systematics=false, string processname){
+void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Data= false, bool systematics=false, string processname=""){
     if (crossSection < 0. || IntLuminosity < 0.){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
     }
@@ -419,10 +418,8 @@ cout<<"Call completed!"<<endl;
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
         
-         //TODO: Fill the vecWeights so we have systematics
-         //order systs= {"Muon_Id","Muon_Iso","Ele_Reco","Ele_IdIso","Ele_trigger"}; shift={"Up","Down"};
          
-        if(!data){ 
+        if(!Data){ 
 		 
 		Weight = getWeight(IntLuminosity, crossSection, genWeight, genEventSumw);
 		Weight *=  getTopPtWeight(GenPart_pdgId,GenPart_statusFlags,GenPart_pt,nGenPart);
@@ -512,44 +509,22 @@ cout<<"Call completed!"<<endl;
         muon_eta = Muon_eta[muon_idx];
         electron_pt = Electron_pt[electron_idx];
         electron_eta = Electron_eta[electron_idx];
-	
-	//TODO: prepare the Fills and write
-	
-	for(int k=0;k<syst
-	
-	
-        h_LooseJets->Fill(Nloose, Weight);
-        h_MediumJets->Fill(Nmedium, Weight);
-        h_TightJets->Fill(Ntight, Weight);
-        Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
-        h_acopla_emu->Fill(Acopl_emu,Weight);
         PTbjet = MainBjet_p4->Pt();
-        dR_mujet = Muon_p4->DeltaR(*MainBjet_p4);
-        dR_ejet = Electron_p4->DeltaR(*MainBjet_p4);
-        dR_muE = Muon_p4->DeltaR(*Electron_p4);
-
-
-        if (Muon_p4->Pt() > Electron_p4->Pt()){
-            leading_lepton_pt = Muon_p4->Pt();
-            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
-        }
-        else{
-            leading_lepton_pt = Electron_p4->Pt();;
-            h_leading_lepton_pt_weighted->Fill(leading_lepton_pt, Weight);
-        }
-
-        h_Muon_pt_weighted->Fill(muon_pt, Weight);
-        h_Electron_pt_weighted->Fill(electron_pt, Weight);
-	h_NJets->Fill(njets,Weight);
         
         if (muon_idx > -1 && electron_idx > -1){
             invMass = (*(Muon_p4) + *(Electron_p4)).M();
-            h_Muon_Electron_invariant_mass_weighted->Fill(invMass, Weight);
         }
+        Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
+	
+	for(int k=0;k<VecWeights.size();k++){
+		Histos[k*observables.size()] ->Fill(muon_pt,VecWeights[k]);
+    		Histos[k*observables.size()+1] ->Fill(electron_pt,VecWeights[k]);
+    		Histos[k*observables.size()+2] ->Fill(MainBjet_p4->Pt(),VecWeights[k]);
+    		Histos[k*observables.size()+3] ->Fill(invMass,VecWeights[k]);
+    		Histos[k*observables.size()+4] ->Fill(Acopl_emu,VecWeights[k]);
+    		Histos[k*observables.size()+5] ->Fill(njets,VecWeights[k]);
+		}
 
-	b_pt->Fill(MainBjet_p4->Pt(),Weight);
-
-        // fill the tree
         tout->Fill();
     }
 
@@ -572,7 +547,7 @@ cout<<"Call completed!"<<endl;
     tout->Write();
     trun_out->Write();
 
-    HistWrite();
+    for(auto &k: Histos) HistWrite(k);
     fout->Close();
 }
 
