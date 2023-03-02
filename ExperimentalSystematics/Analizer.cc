@@ -287,30 +287,38 @@ cout<<"Call completed!"<<endl;
     /*Define all pointers here
     TH1D* Muon_pt, *Electron_pt,*B_pt,*Invariant_Mass,*Lepton_Acoplanarity,*Njets;
     TH1D* Muon_pt_Muon_IdUp, *Electron_pt,*B_pt,*Invariant_Mass,*Lepton_Acoplanarity,*Njets; */
+    TH1D* temp=NULL;
     vector<TH1D*>  Histos;
-    if(systematics){ Histos.reserve(observables.size()*(systs.size()*2+1)); }
-    else Histos.reserve(observables.size());
+    if(systematics){ for(int i=0;i<observables.size()*(systs.size()*2+1);i++) Histos.push_back(temp); }
+    else for(int i=0;i<observables.size();i++) Histos.push_back(temp);
     
     //get histos nominal values
-    Histos[0] = new TH1D(observables[0],observables[0],67,0,201);
-    Histos[1] = new TH1D(observables[1],observables[1],40, 0, 200);
-    Histos[2] = new TH1D(observables[2],observables[2],40,25,425);
-    Histos[3] = new TH1D(observables[3],observables[3],80, 12, 412);
-    Histos[4] = new TH1D(observables[4],observables[4],40,0, 2*M_PI);
-    Histos[5] = new TH1D(observables[5],observables[5],12,0,12);
+    temp= new TH1D(observables[0].c_str(),observables[0].c_str(),67,0,201);
+    Histos[0] = (TH1D*)temp->Clone();
+    temp = new TH1D(observables[1].c_str(),observables[1].c_str(),40, 0, 200);
+    Histos[1] = (TH1D*)temp->Clone();
+    temp = new TH1D(observables[2].c_str(),observables[2].c_str(),40,25,425);
+    Histos[2]= (TH1D*)temp->Clone(); 
+    temp= new TH1D(observables[3].c_str(),observables[3].c_str(),80, 12, 412);
+    Histos[3] = (TH1D*)temp->Clone();
+    temp = new TH1D(observables[4].c_str(),observables[4].c_str(),40,0, 2*M_PI);
+    Histos[4]= (TH1D*)temp->Clone();
+    temp = new TH1D(observables[5].c_str(),observables[5].c_str(),12,0,12);
+    Histos[5] = (TH1D*)temp->Clone();
     
     int auxindex=5;
     //here loop on systematics, clone the histo and do your things
     if(systematics){
     	for(int i=0; i<systs.size(); i++){
 	    	 for(int j=0;j<observables.size();j++){
-		    	 Histos[++auxindex]=cloneDims1d(observables[j],systs[i]+"Up");
-		    	 Histos[++auxindex]=cloneDims1d(observables[j],systs[i]+"Down");
+		    	 Histos[++auxindex]=cloneDims1d(Histos[j],(systs[i]+"Up").c_str());
+		    	 Histos[++auxindex]=cloneDims1d(Histos[j],(systs[i]+"Down").c_str());
+			
 	    	}
     	}
    }
 
-   if(auxindex!=observables.size()*(systs.size()*2+1)) cout<<"Something may go terribly wrong here!"<<endl;
+   if(auxindex!=observables.size()*(systs.size()*2+1)) cout<<"Something may go terribly wrong here!"<< auxindex<<" vs "<<observables.size()*(systs.size()*2+1) <<endl;
 
     #pragma omp parallel for
     for (UInt_t i = 0; i <nEv; i++){
@@ -548,6 +556,7 @@ cout<<"Call completed!"<<endl;
     trun_out->Write();
 
     for(auto &k: Histos) HistWrite(k);
+
     fout->Close();
 }
 

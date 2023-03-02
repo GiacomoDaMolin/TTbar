@@ -26,8 +26,8 @@ float getTopPtWeight(Int_t * pdgId,Int_t *statusFlags,Float_t * pt, Int_t Ngen) 
 
 TH1D* cloneDims1d(TH1D* hist, string newname){
   if (hist == NULL) return NULL;
-  TH1D* cloneHist = new TH1D(Form("%s_%s", hist->GetName(),newname), 
-                             Form("%s_%s", hist->GetName(),newname), 
+  TH1D* cloneHist = new TH1D(Form("%s_%s", hist->GetName(),newname.c_str()), 
+                             Form("%s_%s", hist->GetName(),newname.c_str()), 
                              hist->GetNbinsX(),
                              hist->GetXaxis()->GetXmin(),hist->GetXaxis()->GetXmax());
                              
