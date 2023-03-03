@@ -254,22 +254,16 @@ cout<<"Call completed!"<<endl;
     tout->Branch("electron_pt", &electron_pt);
     tout->Branch("muon_eta", &muon_eta);
     tout->Branch("muon_pt", &muon_pt);
-    tout->Branch("Weight", &Weight);
 
     int Nloose = 0, Nmedium = 0, Ntight = 0, JetsNotB=0;
-    float dR_muE, dR_mujet, dR_ejet, PTbjet,Acopl_emu;
+    float PTbjet,Acopl_emu;
 
-    tout->Branch("dR_mue", &dR_muE);
-    tout->Branch("dR_mujet", &dR_mujet);
-    tout->Branch("dR_ejet", &dR_ejet);
     tout->Branch("PTbjet", &PTbjet);
     tout->Branch("Nloose", &Nloose);
     tout->Branch("Nmedium", &Nmedium);
     tout->Branch("Ntight", &Ntight);
     tout->Branch("JetNotB", &JetsNotB);
     tout->Branch("Acopl_emu", &Acopl_emu);
-    tout->Branch("MuTrigger", &HLT_IsoMu24);
-    tout->Branch("ETrigger", &HLT_Ele32_WPTight_Gsf);
 
     if(!Data){
 	    trun_out = new TTree("Run_out", "Run_out");
@@ -311,14 +305,15 @@ cout<<"Call completed!"<<endl;
     if(systematics){
     	for(int i=0; i<systs.size(); i++){
 	    	 for(int j=0;j<observables.size();j++){
-		    	 Histos[++auxindex]=cloneDims1d(Histos[j],(systs[i]+"Up").c_str());
-		    	 Histos[++auxindex]=cloneDims1d(Histos[j],(systs[i]+"Down").c_str());
-			
+		    	 Histos[++auxindex]=cloneDims1d(Histos[j],(systs[i]+"Up").c_str());	
 	    	}
-    	}
+		for(int j=0;j<observables.size();j++){
+		    	 Histos[++auxindex]=cloneDims1d(Histos[j],(systs[i]+"Down").c_str());	
+	    	}
+    	} 
    }
 
-   if(auxindex!=observables.size()*(systs.size()*2+1)) cout<<"Something may go terribly wrong here!"<< auxindex<<" vs "<<observables.size()*(systs.size()*2+1) <<endl;
+   if(systematics && auxindex!=observables.size()*(systs.size()*2+1)-1) cout<<"Something may go terribly wrong here!"<< auxindex<<" vs "<<observables.size()*(systs.size()*2+1)-1 <<endl;
 
     #pragma omp parallel for
     for (UInt_t i = 0; i <nEv; i++){
@@ -425,7 +420,6 @@ cout<<"Call completed!"<<endl;
 
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
-        
          
         if(!Data){ 
 		 
@@ -438,41 +432,56 @@ cout<<"Call completed!"<<endl;
 				
 		//if(HLT_IsoMu24) {Weight *= muon_trigger->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});}
 		for(int j=0;j<VecWeights.size();j++){
-			if(j==Master_index) {VecWeights[j]*= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systup"}); continue;}
-			if(j==Master_index+1) {VecWeights[j]*= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systdown"}); continue;}
+			if(systematics){
+				if(j==Master_index) {VecWeights[j]*= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systup"}); continue;}
+				if(j==Master_index+1) {VecWeights[j]*= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systdown"}); continue;}
+				else VecWeights[j] *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
+			}
 			else VecWeights[j] *= muon_id->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
 		} 
 		Master_index+=2;
 		for(int j=0;j<VecWeights.size();j++){
-			if(j==Master_index) {VecWeights[j]*= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systup"}); continue;}
-			if(j==Master_index+1) {VecWeights[j]*= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systdown"}); continue;}
+			if(systematics){
+				if(j==Master_index) {VecWeights[j]*= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systup"}); continue;}
+				if(j==Master_index+1) {VecWeights[j]*= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "systdown"}); continue;}
+				else VecWeights[j]*= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
+			}
 			else VecWeights[j]*= muon_iso->evaluate({"2018_UL", abs(Muon_eta[muon_idx]), Muon_pt[muon_idx], "sf"});
 		} 
 		Master_index+=2;
 		
 		for(int j=0;j<VecWeights.size();j++){
-			if(j==Master_index) {VecWeights[j]*= electron_id->evaluate({"2018", "sfup", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
-			if(j==Master_index+1) {VecWeights[j]*= electron_id->evaluate({"2018", "sfdown", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
+			if(systematics){
+				if(j==Master_index) {VecWeights[j]*= electron_id->evaluate({"2018", "sfup", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
+				if(j==Master_index+1) {VecWeights[j]*= electron_id->evaluate({"2018", "sfdown", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
+				else VecWeights[j]*= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
+			}
 			else VecWeights[j]*= electron_id->evaluate({"2018", "sf", "RecoAbove20", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
 		} 
 		Master_index+=2;
 		for(int j=0;j<VecWeights.size();j++){
-			if(j==Master_index) {VecWeights[j]*= electron_id->evaluate({"2018", "sfup", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
-			if(j==Master_index+1) {VecWeights[j]*= electron_id->evaluate({"2018", "sfdown", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
+			if(systematics){
+				if(j==Master_index) {VecWeights[j]*= electron_id->evaluate({"2018", "sfup", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
+				if(j==Master_index+1) {VecWeights[j]*= electron_id->evaluate({"2018", "sfdown", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]}); continue;}
+				else VecWeights[j]*= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
+			}
 			else VecWeights[j]*= electron_id->evaluate({"2018", "sf", "wp90iso", abs(Electron_eta[electron_idx]), Electron_pt[electron_idx]});
 		} 
 		Master_index+=2;
 		
 		if(HLT_Ele32_WPTight_Gsf) {
-			    int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
-			    float temp= EleTrigHisto->GetBinContent(bin);
-			    float downErr=EleTrigHisto->GetBinErrorLow(bin);
-			    float upErr=EleTrigHisto->GetBinErrorUp(bin);
-			    for(int j=0;j<VecWeights.size();j++){
-				if(j==Master_index) {VecWeights[j]*=(temp+upErr); continue;}
-				if(j==Master_index+1) {VecWeights[j]*= (temp+downErr); continue;}
+			 int bin = EleTrigHisto->FindBin(Electron_eta[electron_idx],Electron_pt[electron_idx]);
+			 float temp= EleTrigHisto->GetBinContent(bin);
+			 float downErr=EleTrigHisto->GetBinErrorLow(bin);
+			 float upErr=EleTrigHisto->GetBinErrorUp(bin);
+			 for(int j=0;j<VecWeights.size();j++){
+				if(systematics){
+					if(j==Master_index) {VecWeights[j]*=(temp+upErr); continue;}
+					if(j==Master_index+1) {VecWeights[j]*= (temp-downErr); continue;}
+					else VecWeights[j]*= temp;
+				}
 				else VecWeights[j]*= temp;
-				} 
+			} 
 			Master_index+=2;
 		}
 		    
@@ -531,6 +540,7 @@ cout<<"Call completed!"<<endl;
     		Histos[k*observables.size()+3] ->Fill(invMass,VecWeights[k]);
     		Histos[k*observables.size()+4] ->Fill(Acopl_emu,VecWeights[k]);
     		Histos[k*observables.size()+5] ->Fill(njets,VecWeights[k]);
+		if(!systematics){break;}
 		}
 
         tout->Fill();
@@ -538,10 +548,6 @@ cout<<"Call completed!"<<endl;
 
     delete fecorr_trig;
 
-    std::cout << "non_matching_muon = " << non_matching_muon << endl;
-    std::cout << "non_matching_electron = " << non_matching_electron << endl;
-
-    cout<<"L1 requirement removes "<< evenottrigMatch << " events"<<endl;
 
     std::cout << "NeV = " << nEv << endl;
     std::cout << "trigger dropped = " << trigger_dropped << endl;
@@ -553,7 +559,7 @@ cout<<"Call completed!"<<endl;
     std::cout << "Final number of events "<< Rem_trigger - n_dropped<<endl;
 
     tout->Write();
-    trun_out->Write();
+    if(!Data) trun_out->Write();
 
     for(auto &k: Histos) HistWrite(k);
 
