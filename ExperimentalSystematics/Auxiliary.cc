@@ -3,7 +3,10 @@
 #include <iostream>
 #include<vector>
 #include<string>
+#include<TH1D.h>
+#include<string>
 using std::vector;
+using std::string;
 
 float getTopPtWeight(Int_t * pdgId,Int_t *statusFlags,Float_t * pt, Int_t Ngen) {
     float wgt=1.0;
@@ -23,8 +26,8 @@ float getTopPtWeight(Int_t * pdgId,Int_t *statusFlags,Float_t * pt, Int_t Ngen) 
 
 TH1D* cloneDims1d(TH1D* hist, string newname){
   if (hist == NULL) return NULL;
-  TH1D* cloneHist = new TH1D(Form("%s_%s", hist->GetName(),newname), 
-                             Form("%s_%s", hist->GetName(),newname), 
+  TH1D* cloneHist = new TH1D(Form("%s_%s", hist->GetName(),newname.c_str()), 
+                             Form("%s_%s", hist->GetName(),newname.c_str()), 
                              hist->GetNbinsX(),
                              hist->GetXaxis()->GetXmin(),hist->GetXaxis()->GetXmax());
                              
@@ -37,6 +40,14 @@ TH1D* cloneDims1d(TH1D* hist, string newname){
     string path=ofile.substr(0,found);
     string Tauname=path+"/Tau_"+oname;*/
 
-void HistWrite(){
+void HistWrite(TH1D *a){
+ a->SetBinContent(a->GetNbinsX(), a->GetBinContent(a->GetNbinsX()) + a->GetBinContent(a->GetNbinsX() + 1));
+ a->Write();
+}
+
+double InvertPhi(double phi){
+ double invphi=phi+M_PI;
+ if (invphi>M_PI){invphi=invphi-2*M_PI;}
+ return invphi;
 }
 #endif // Auxiliary_cpp
