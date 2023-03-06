@@ -20,13 +20,6 @@ each dag entry.")
                         help="full path to voms cms user proxy", default=None)
     parser.add_argument('-s', '--systematics', type=bool,
                         help="If true, outputs also syst variations")
-                        '''
-    parser.add_argument('-d', '--isdata', type=bool,
-                        help="If true, file is data")
-    
-    parser.add_argument('-p', '--process', type=str,
-                        help="name of process to be used for histos")
-                        '''
     return parser
 
 
@@ -34,7 +27,7 @@ def return_subfile(input_dir, base_dir, executable):
     if not executable.startswith("/"):
         executable = '/afs/cern.ch/user/g/gdamolin/Johan/\
 TTbar/ExperimentalSystematics/'+executable
-        arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
+    arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
 -x $(XS) -l $(LUMI) -d $(DATA) -s $(SYSTS) -p $(PROCESS)'
 
     file_str = f"basedir={input_dir}\n\
@@ -68,8 +61,7 @@ def run_dasgoclient(dataset: str):
 
 
 def write_dag(dagfile, subfile: str,
-              infile: str, outfile: str, process:str
-              first_data: bool = False,
+              infile: str, outfile: str, process:str,
               xs: float = None,
               lumi: int = None,
               data: bool = False,
@@ -80,7 +72,7 @@ def write_dag(dagfile, subfile: str,
     print(f"JOB {jobid} {subfile}", file=dagfile)
     print(f"VARS {jobid} INFILE=\"{infile}\" \
 OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
-data=\"{data}\" systs=\"{systs} \" process=\"{process}\" ", file=dagfile)
+DATA=\"{data}\" SYSTS=\"{systs} \" PROCESS=\"{process}\" ", file=dagfile)
 
 
 def main():
@@ -117,7 +109,7 @@ def main():
         		write_dag(dagfile=dagfile,
                               subfile=f"{basedir}/{sample}.submit",
                               infile=file, outfile=f"{output_dir}/{sample}",
-                              data=data, systs=systs, process=process
+                              data=data, systs=systs, process=process,
                               xs=xsec, lumi=lumi)
 
                  

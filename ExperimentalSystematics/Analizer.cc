@@ -26,12 +26,13 @@ double getWeight(double luminosity, double crossSection, Float_t genWeight, doub
     return (luminosity * crossSection * genWeight);
 }
 
-void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Data= false, bool systematics=false, string processname=""){
+void Mixed_Analysis(string inputFile, string ofile, double crossSection = -1, double IntLuminosity = 59.827879506, bool Data= false, bool systematics=false, string processname="A"){
     if (crossSection < 0. || IntLuminosity < 0.){
         std::cout << "WARNING: crossection " << crossSection << " and Integrated luminosity " << IntLuminosity << endl;
     }
 
 cout<<"Call completed!"<<endl;
+ if (Data) {systematics=false;}
 
     TFile *fin = TFile::Open(inputFile.c_str());
     TTree *trun;
@@ -287,13 +288,13 @@ cout<<"Call completed!"<<endl;
     else for(int i=0;i<observables.size();i++) Histos.push_back(temp);
     
     //get histos nominal values
-    temp= new TH1D(observables[0].c_str(),observables[0].c_str(),67,0,201);
+    temp= new TH1D(observables[0].c_str(),observables[0].c_str(),40,7,207);
     Histos[0] = (TH1D*)temp->Clone();
     temp = new TH1D(observables[1].c_str(),observables[1].c_str(),40, 0, 200);
     Histos[1] = (TH1D*)temp->Clone();
     temp = new TH1D(observables[2].c_str(),observables[2].c_str(),40,25,425);
     Histos[2]= (TH1D*)temp->Clone(); 
-    temp= new TH1D(observables[3].c_str(),observables[3].c_str(),80, 12, 412);
+    temp= new TH1D(observables[3].c_str(),observables[3].c_str(),40, 12, 412);
     Histos[3] = (TH1D*)temp->Clone();
     temp = new TH1D(observables[4].c_str(),observables[4].c_str(),40,0, 2*M_PI);
     Histos[4]= (TH1D*)temp->Clone();
@@ -576,6 +577,8 @@ int main(int argc, char **argv){
     string boolstr2 = argv[6];
     bool systematics = (boolstr2 == "true" || boolstr2 == "True");
     string processname = argv[7];
+
+cout<<"Process "<<processname<<endl;
 
     Mixed_Analysis(inputFile, outputFile, crossSection, IntLuminosity, Data, systematics,processname);
 
