@@ -25,7 +25,7 @@
     },
     
     "TTLLorLTAUL": {
-        "xs": 88290,
+        "xs": 89010,
         "data": false,
         "dataset": "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
         "process":"TT2LL"
@@ -116,19 +116,19 @@
         "process":"ST"
     },
     "WW": {
-        "xs": 75800,
+        "xs": 118700,
         "data": false,
         "dataset": "/WW_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
         "process":"Dibosons"
     },
     "ZW": {
-        "xs": 27600,
+        "xs": 47130,
         "data": false,
         "dataset": "/WZ_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
         "process":"Dibosons"
     },
     "ZZ": {
-        "xs": 12140,
+        "xs": 16523,
         "data": false,
         "dataset": "/ZZ_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM",
         "process":"Dibosons"

@@ -288,17 +288,17 @@ cout<<"Call completed!"<<endl;
     else for(int i=0;i<observables.size();i++) Histos.push_back(temp);
     
     //get histos nominal values
-    temp= new TH1D(observables[0].c_str(),observables[0].c_str(),20,25,205);
+    temp= new TH1D(observables[0].c_str(),observables[0].c_str(),40,7,207);
     Histos[0] = (TH1D*)temp->Clone();
-    temp = new TH1D(observables[1].c_str(),observables[1].c_str(),20, 35, 200);
+    temp = new TH1D(observables[1].c_str(),observables[1].c_str(),40, 0, 200);
     Histos[1] = (TH1D*)temp->Clone();
-    temp = new TH1D(observables[2].c_str(),observables[2].c_str(),20,30,425);
+    temp = new TH1D(observables[2].c_str(),observables[2].c_str(),40,25,425);
     Histos[2]= (TH1D*)temp->Clone(); 
-    temp= new TH1D(observables[3].c_str(),observables[3].c_str(),20, 12, 412);
+    temp= new TH1D(observables[3].c_str(),observables[3].c_str(),40, 12, 412);
     Histos[3] = (TH1D*)temp->Clone();
-    temp = new TH1D(observables[4].c_str(),observables[4].c_str(),30,0, 2*M_PI);
+    temp = new TH1D(observables[4].c_str(),observables[4].c_str(),40,0, 2*M_PI);
     Histos[4]= (TH1D*)temp->Clone();
-    temp = new TH1D(observables[5].c_str(),observables[5].c_str(),5,1,6);
+    temp = new TH1D(observables[5].c_str(),observables[5].c_str(),12,0,12);
     Histos[5] = (TH1D*)temp->Clone();
     
     int auxindex=observables.size()-1;
@@ -424,8 +424,6 @@ cout<<"Call completed!"<<endl;
 
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
-
-	//cout<<" ### Event: "<<i<<" passes the selections!"<<endl;
          
         if(!Data){ 
 		 
