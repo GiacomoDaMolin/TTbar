@@ -2,12 +2,14 @@
 echo "start"
 X509_USER_PROXY=/afs/cern.ch/user/g/gdamolin/private/x509up_u151129
 CMSSW=/afs/cern.ch/user/g/gdamolin/CMSSW_12_4_1_patch1/src
-usage() { echo "Usage: $0 [-i <input file> ] [-o <outpath>] [-x xsec] [-l <lumi>] [-d <Data bool>] [-s <Systematcis bool>] [-p <PhysicsProcess string>]" 1>&2; exit 1; }
-while getopts "i:o:x:l:d:s:p:" opt; do
+usage() { echo "Usage: $0 [-i <input file> ] [-o <outpath>] [-x xsec] [-l <lumi>] [-d <Data bool>] [-s <Systematcis bool>] [-p <PhysicsProcess string>] [-t test int]" 1>&2; exit 1; }
+while getopts "i:o:x:l:d:s:p:t:" opt; do
     case "$opt" in
         i) INFILE=$OPTARG
             ;;
         o) OUTPATH=$OPTARG
+            ;;
+        p) PRO=$OPTARG
             ;;
         x) XSEC=$OPTARG
             ;;
@@ -17,15 +19,16 @@ while getopts "i:o:x:l:d:s:p:" opt; do
             ;;
         s) SYSTS=$OPTARG
             ;;
-        p) PROCESS=$OPTARG
-            ;;
+        t) TEST=$OPTARG
+	    ;;
         *)
         usage
         ;;
     esac
 done
 
-echo "Process is $PROCESS, Data is $DATA, SYSTEMATICS ARE $SYSTS"
+echo "Process is ${PRO}, Data is $DATA, SYSTEMATICS ARE $SYSTS"
+echo "TEST is $TEST"
 
 EXE="/afs/cern.ch/user/g/gdamolin/Johan/TTbar/ExperimentalSystematics/test.exe"
 outdir="/afs/cern.ch/user/g/gdamolin/Johan/TTMue"
@@ -42,8 +45,8 @@ cd -
 echo "CMSSW_BASE is now set to $CMSSW_BASE"
 echo "PROXY is now set to $X509_USER_PROXY"
 echo "executing script as"
-echo "${EXE} $filename $ofilename ${XSEC} ${LUMI} ${DATA} ${SYSTS} ${PROCESS}"
-${EXE} $filename $ofilename ${XSEC} ${LUMI} ${DATA} ${SYSTS} ${PROCESS}|| {
+echo "${EXE} $filename $ofilename ${XSEC} ${LUMI} ${DATA} ${SYSTS} ${PRO}"
+${EXE} $filename $ofilename ${XSEC} ${LUMI} ${DATA} ${SYSTS} ${PRO}|| {
     echo "${EXE} failed with file ${filename}, removing intermediate file" 1>&2; 
     if [[ -f $ofilename ]]; then
         rm $ofilename

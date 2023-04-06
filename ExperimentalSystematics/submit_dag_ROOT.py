@@ -18,15 +18,8 @@ each dag entry.")
                         help="json file with datasets and xs..", default=None)
     parser.add_argument('-pr', "--proxy", type=str,
                         help="full path to voms cms user proxy", default=None)
-    parser.add_argument('-s', '--systematics', type=bool,
+    parser.add_argument('-s', '--systematics',  action='store_true',
                         help="If true, outputs also syst variations")
-                        '''
-    parser.add_argument('-d', '--isdata', type=bool,
-                        help="If true, file is data")
-    
-    parser.add_argument('-p', '--process', type=str,
-                        help="name of process to be used for histos")
-                        '''
     return parser
 
 
@@ -34,8 +27,8 @@ def return_subfile(input_dir, base_dir, executable):
     if not executable.startswith("/"):
         executable = '/afs/cern.ch/user/g/gdamolin/Johan/\
 TTbar/ExperimentalSystematics/'+executable
-        arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) \
--x $(XS) -l $(LUMI) -d $(DATA) -s $(SYSTS) -p $(PROCESS)'
+    arguments = 'Arguments = -i $(INFILE) -o $(OUTFILE) -p $(PRO) \
+-x $(XS) -l $(LUMI) -d $(DATA) -s $(SYSTS) -t $(TEST) '
 
     file_str = f"basedir={input_dir}\n\
 \n\
@@ -47,7 +40,7 @@ output                = {base_dir}/out/$(ClusterId).$(ProcId).out\n\
 error                 = {base_dir}/err/$(ClusterId).$(ProcId).err\n\
 log                   = {base_dir}/log/$(ClusterId).$(ProcId).log\n\
 \n\
-+JobFlavour = \"workday\"\n\
++JobFlavour = \"longlunch\"\n\
 {arguments}\n\
 queue"
     return file_str
@@ -68,19 +61,19 @@ def run_dasgoclient(dataset: str):
 
 
 def write_dag(dagfile, subfile: str,
-              infile: str, outfile: str, process:str
-              first_data: bool = False,
+              infile: str, outfile: str, proces: str,
               xs: float = None,
               lumi: int = None,
               data: bool = False,
               systs: bool= False,
+	      test: int= 42
               ):
     jobid = infile.split('/')[-1]
     infile = f"root://cms-xrd-global.cern.ch//{infile}"
     print(f"JOB {jobid} {subfile}", file=dagfile)
     print(f"VARS {jobid} INFILE=\"{infile}\" \
-OUTFILE=\"{outfile}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
-data=\"{data}\" systs=\"{systs} \" process=\"{process}\" ", file=dagfile)
+OUTFILE=\"{outfile}\" PRO=\"{proces}\" XS=\"{xs}\" LUMI=\"{lumi}\" \
+DATA=\"{data}\" SYSTS=\"{systs}\" TEST=\"{test}\"", file=dagfile)
 
 
 def main():
@@ -110,15 +103,16 @@ def main():
         xsec = dataS[sample]['xs']
         lumi = 59.82
         data = dataS[sample]['data']
-        process=dataS[sample]['process']
+        proces=dataS[sample]['process']
         datafiles = run_dasgoclient(dataset=dataset)
         with open(f"{basedir}/{sample}.dag", 'w') as dagfile:
         	for file in datafiles:
         		write_dag(dagfile=dagfile,
                               subfile=f"{basedir}/{sample}.submit",
                               infile=file, outfile=f"{output_dir}/{sample}",
-                              data=data, systs=systs, process=process
-                              xs=xsec, lumi=lumi)
+			      xs=xsec, lumi=lumi,
+                              data=data, systs=systs, proces=proces
+                              )
 
                  
         with open(f"{basedir}/{sample}.submit", 'w') as file:
