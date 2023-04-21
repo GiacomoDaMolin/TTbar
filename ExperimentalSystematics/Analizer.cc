@@ -45,7 +45,6 @@ cout<<"Call completed!"<<endl;
 	    trun->SetBranchStatus("genEventCount", 1);
 	    trun->SetBranchAddress("genEventSumw", &genEventSumw);
 	    trun->SetBranchAddress("genEventCount", &genEventCount);
-
 	    trun->GetEntry(0);
     }
 
@@ -274,21 +273,34 @@ cout<<"Call completed!"<<endl;
 	    trun_out->Branch("nEv", &n_events);
 	    trun_out->Fill();
     }
-    
+
+    vector<string> observables2,observables3;
+    if(processname=="TT2LL") {
+	processname="TT2ll";
+    	observables2= {"TT2lT_Muon_pt","TT2lT_Electron_pt","TT2lT_B_pt","TT2lT_Invariant_Mass","TT2lT_Lepton_Acoplanarity","TT2lT_Njets"}; 
+    	observables3= {"TT2TT_Muon_pt","TT2TT_Electron_pt","TT2TT_B_pt","TT2TT_Invariant_Mass","TT2TT_Lepton_Acoplanarity","TT2TT_Njets"}; 
+    }
+    if(processname=="DY") {
+	processname="DY2ee";
+    	observables2= {"DY2mm_Muon_pt","DY2mm_Electron_pt","DY2mm_B_pt","DY2mm_Invariant_Mass","DY2mm_Lepton_Acoplanarity","DY2mm_Njets"}; 
+    	observables3= {"DY2TT_Muon_pt","DY2TT_Electron_pt","DY2TT_B_pt","DY2TT_Invariant_Mass","DY2TT_Lepton_Acoplanarity","DY2TT_Njets"}; 
+    }
     vector<string> observables= {processname+"_Muon_pt",processname+"_Electron_pt",processname+"_B_pt",processname+"_Invariant_Mass",processname+"_Lepton_Acoplanarity",processname+"_Njets"}; 
     vector<string> systs= {"Muon_Id","Muon_Iso","Ele_Reco","Ele_IdIso","Ele_trigger"};
     vector<string> shift={"","Up","Down"};
     
-    /*Define all pointers here
-    TH1D* Muon_pt, *Electron_pt,*B_pt,*Invariant_Mass,*Lepton_Acoplanarity,*Njets;
-    TH1D* Muon_pt_Muon_IdUp, *Electron_pt,*B_pt,*Invariant_Mass,*Lepton_Acoplanarity,*Njets; */
     TH1D* temp=NULL;
-    vector<TH1D*>  Histos;
-    if(systematics){ for(int i=0;i<observables.size()*(systs.size()*2+1);i++) Histos.push_back(temp); }
-    else for(int i=0;i<observables.size();i++) Histos.push_back(temp);
+    vector<TH1D*>  Histos; //defaulted to LL if TT2LL && ee if DY
+    vector<TH1D*>  HistosTL,HistosTT; //correspond to mumu && TauTau in DY
+    if(systematics){ 
+	for(int i=0;i<observables.size()*(systs.size()*2+1);i++) {Histos.push_back(temp); 
+		if(observables2.size()>0){HistosTL.push_back(temp); HistosTT.push_back(temp);}
+	}
+     }
+    else for(int i=0;i<observables.size();i++) {Histos.push_back(temp); if(observables2.size()>0){HistosTL.push_back(temp); HistosTT.push_back(temp);}}
     
     //get histos nominal values
-    temp= new TH1D(observables[0].c_str(),observables[0].c_str(),20,25,205);
+    temp= new TH1D(observables[0].c_str(),observables[0].c_str(),40,25,205);
     Histos[0] = (TH1D*)temp->Clone();
     temp = new TH1D(observables[1].c_str(),observables[1].c_str(),20, 35, 200);
     Histos[1] = (TH1D*)temp->Clone();
@@ -300,8 +312,38 @@ cout<<"Call completed!"<<endl;
     Histos[4]= (TH1D*)temp->Clone();
     temp = new TH1D(observables[5].c_str(),observables[5].c_str(),5,1,6);
     Histos[5] = (TH1D*)temp->Clone();
+
+    if(HistosTT.size()>0){
+	temp= new TH1D(observables2[0].c_str(),observables2[0].c_str(),40,25,205);
+	HistosTL[0] = (TH1D*)temp->Clone();
+	temp = new TH1D(observables2[1].c_str(),observables2[1].c_str(),20, 35, 200);
+	HistosTL[1] = (TH1D*)temp->Clone();
+	temp = new TH1D(observables2[2].c_str(),observables2[2].c_str(),20,30,425);
+	HistosTL[2]= (TH1D*)temp->Clone(); 
+	temp= new TH1D(observables2[3].c_str(),observables2[3].c_str(),20, 12, 412);
+	HistosTL[3] = (TH1D*)temp->Clone();
+	temp = new TH1D(observables2[4].c_str(),observables2[4].c_str(),30,0, 2*M_PI);
+	HistosTL[4]= (TH1D*)temp->Clone();
+	temp = new TH1D(observables2[5].c_str(),observables2[5].c_str(),5,1,6);
+	HistosTL[5] = (TH1D*)temp->Clone();
+
+	temp= new TH1D(observables3[0].c_str(),observables3[0].c_str(),40,25,205);
+	HistosTT[0] = (TH1D*)temp->Clone();
+	temp = new TH1D(observables3[1].c_str(),observables3[1].c_str(),20, 35, 200);
+	HistosTT[1] = (TH1D*)temp->Clone();
+	temp = new TH1D(observables3[2].c_str(),observables3[2].c_str(),20,30,425);
+	HistosTT[2]= (TH1D*)temp->Clone(); 
+	temp= new TH1D(observables3[3].c_str(),observables3[3].c_str(),20, 12, 412);
+	HistosTT[3] = (TH1D*)temp->Clone();
+	temp = new TH1D(observables3[4].c_str(),observables3[4].c_str(),30,0, 2*M_PI);
+	HistosTT[4]= (TH1D*)temp->Clone();
+	temp = new TH1D(observables3[5].c_str(),observables3[5].c_str(),5,1,6);
+	HistosTT[5] = (TH1D*)temp->Clone();
+    }
+
     
     int auxindex=observables.size()-1;
+    int idx2=auxindex,idx3=auxindex;
     //here loop on systematics, clone the histo and do your things
     if(systematics){
     	for(int i=0; i<systs.size(); i++){
@@ -311,13 +353,30 @@ cout<<"Call completed!"<<endl;
 		for(int j=0;j<observables.size();j++){
 		    	 Histos[++auxindex]=cloneDims1d(Histos[j],(systs[i]+"Down").c_str());	
 	    	}
-    	} 
+    	}
+	if(HistosTT.size()>0){
+		for(int i=0; i<systs.size(); i++){
+			for(int j=0;j<observables2.size();j++){
+				    	 HistosTL[++idx2]=cloneDims1d(HistosTL[j],(systs[i]+"Up").c_str());	
+			    	}
+			for(int j=0;j<observables2.size();j++){
+				    	 HistosTL[++idx2]=cloneDims1d(HistosTL[j],(systs[i]+"Down").c_str());	
+			    	}
+			for(int j=0;j<observables3.size();j++){
+				    	 HistosTT[++idx3]=cloneDims1d(HistosTT[j],(systs[i]+"Up").c_str());	
+			    	}
+			for(int j=0;j<observables3.size();j++){
+				    	 HistosTT[++idx3]=cloneDims1d(HistosTT[j],(systs[i]+"Down").c_str());	
+			    	}
+		}
+	}
    }
 
    if(systematics && auxindex!=observables.size()*(systs.size()*2+1)-1) cout<<"Something may go terribly wrong here!"<< auxindex<<" vs "<<observables.size()*(systs.size()*2+1)-1 <<endl;
-
+   int cat=0; //category of final state index
     #pragma omp parallel for
     for (UInt_t i = 0; i <nEv; i++){
+	cat=0;
         tin->GetEntry(i);
         if (i % 100000 == 0) std::cout << "Processing entry " << i << " of " << nEv << endl;
         
@@ -425,7 +484,9 @@ cout<<"Call completed!"<<endl;
         selection = selection && (one_Bjet);
         if (!selection){ n_dropped++;  continue;}
 
-	//cout<<" ### Event: "<<i<<" passes the selections!"<<endl;
+	if (processname=="TT2ll") {cat=getCategoryTT(GenPart_pdgId,GenPart_genPartIdxMother,nGenPart);}
+
+	if (processname=="DY2ee") {cat=getCategoryDY(GenPart_pdgId,GenPart_genPartIdxMother,nGenPart);}
          
         if(!Data){ 
 		 
@@ -540,12 +601,32 @@ cout<<"Call completed!"<<endl;
         Acopl_emu=M_PI-(Electron_p4->DeltaPhi(*Muon_p4));
 	
 	for(int k=0;k<VecWeights.size();k++){
-		Histos[k*observables.size()] ->Fill(muon_pt,VecWeights[k]);
-    		Histos[k*observables.size()+1] ->Fill(electron_pt,VecWeights[k]);
-    		Histos[k*observables.size()+2] ->Fill(MainBjet_p4->Pt(),VecWeights[k]);
-    		Histos[k*observables.size()+3] ->Fill(invMass,VecWeights[k]);
-    		Histos[k*observables.size()+4] ->Fill(Acopl_emu,VecWeights[k]);
-    		Histos[k*observables.size()+5] ->Fill(njets,VecWeights[k]);
+		if(cat==0 || cat==2){
+			Histos[k*observables.size()] ->Fill(muon_pt,VecWeights[k]);
+	    		Histos[k*observables.size()+1] ->Fill(electron_pt,VecWeights[k]);
+	    		Histos[k*observables.size()+2] ->Fill(MainBjet_p4->Pt(),VecWeights[k]);
+	    		Histos[k*observables.size()+3] ->Fill(invMass,VecWeights[k]);
+	    		Histos[k*observables.size()+4] ->Fill(Acopl_emu,VecWeights[k]);
+	    		Histos[k*observables.size()+5] ->Fill(njets,VecWeights[k]);
+			}
+		if(HistosTT.size()>0){
+		if(cat==3){
+			HistosTL[k*observables.size()] ->Fill(muon_pt,VecWeights[k]);
+	    		HistosTL[k*observables.size()+1] ->Fill(electron_pt,VecWeights[k]);
+	    		HistosTL[k*observables.size()+2] ->Fill(MainBjet_p4->Pt(),VecWeights[k]);
+	    		HistosTL[k*observables.size()+3] ->Fill(invMass,VecWeights[k]);
+	    		HistosTL[k*observables.size()+4] ->Fill(Acopl_emu,VecWeights[k]);
+	    		HistosTL[k*observables.size()+5] ->Fill(njets,VecWeights[k]);
+			}
+		if(cat==4){
+			HistosTT[k*observables.size()] ->Fill(muon_pt,VecWeights[k]);
+	    		HistosTT[k*observables.size()+1] ->Fill(electron_pt,VecWeights[k]);
+	    		HistosTT[k*observables.size()+2] ->Fill(MainBjet_p4->Pt(),VecWeights[k]);
+	    		HistosTT[k*observables.size()+3] ->Fill(invMass,VecWeights[k]);
+	    		HistosTT[k*observables.size()+4] ->Fill(Acopl_emu,VecWeights[k]);
+	    		HistosTT[k*observables.size()+5] ->Fill(njets,VecWeights[k]);
+			}
+		}
 		if(!systematics){break;}
 		}
 
@@ -569,7 +650,10 @@ cout<<"Call completed!"<<endl;
     if(!Data) trun_out->Write();
 
     for(auto &k: Histos) HistWrite(k);
-
+    if( HistosTT.size()>0){
+	 for(auto &k: HistosTL) HistWrite(k);
+	 for(auto &k: HistosTT) HistWrite(k);
+    }
     fout->Close();
 }
 
