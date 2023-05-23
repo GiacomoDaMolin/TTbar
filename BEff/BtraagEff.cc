@@ -10,7 +10,8 @@ using std::abs;
 
 void EffComputer(std::string infile){
  std::cout<<"Starting the function"<<std::endl;
- TFile *fin= TFile::Open(("root://cms-xrd-global.cern.ch/"+infile).c_str());
+ //TFile *fin= TFile::Open(("root://cms-xrd-global.cern.ch/"+infile).c_str());
+TFile *fin= TFile::Open((infile).c_str());
 //TFile *fin= TFile::Open("root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/270000/A62BD1E4-52E1-F64F-9F99-894D7A4B19D1.root");
  TTree *tin = static_cast<TTree *>(fin->Get("Events"));
  tin->SetBranchStatus("*", 0);
@@ -34,18 +35,18 @@ void EffComputer(std::string infile){
  tin->SetBranchStatus("Jet_hadronFlavour", 1);
  tin->SetBranchAddress("Jet_hadronFlavour", &Jet_hadronFlavour);
  
- double ptbins[16]={25,40,50,60,70,80,100,120,140,160,180,220,260,400,1000};
+ double ptbins[15]={25,40,50,60,70,80,100,120,140,160,180,220,260,400,1000};
 
  double etabins[7]={0,0.4,0.8,1.2,1.6,2.0,2.4};
 
  std::cout<<"Create histos"<<std::endl; 
  //make unequal size bins: you have to have a bin for every pT. so a very large bin for very large pT is needed
- TH2D * h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",15,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Denom_c= new TH2D("c_jets","c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",15,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Denom_udsg= new TH2D("l_jets","l_jets vs pt and eta; p_T [GeV]; Pseudorapidity",15,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Num_b= new TH2D("b_jets_tagged","Tagged b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",15,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Num_c= new TH2D("c_jets_tagged","Tagged c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",15,ptbins,6,etabins);
- TH2D * h2_BTaggingEff_Num_udsg= new TH2D("l_jets_tagged","Tagged light_jets vs pt and eta; p_T [GeV]; Pseudorapidity",15,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Denom_b= new TH2D("b_jets","b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",14,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Denom_c= new TH2D("c_jets","c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",14,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Denom_udsg= new TH2D("l_jets","l_jets vs pt and eta; p_T [GeV]; Pseudorapidity",14,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Num_b= new TH2D("b_jets_tagged","Tagged b_jets vs pt and eta; p_T [GeV]; Pseudorapidity",14,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Num_c= new TH2D("c_jets_tagged","Tagged c_jets vs pt and eta; p_T [GeV]; Pseudorapidity",14,ptbins,6,etabins);
+ TH2D * h2_BTaggingEff_Num_udsg= new TH2D("l_jets_tagged","Tagged light_jets vs pt and eta; p_T [GeV]; Pseudorapidity",14,ptbins,6,etabins);
 
  h2_BTaggingEff_Denom_b->Sumw2();
  h2_BTaggingEff_Denom_c->Sumw2();
