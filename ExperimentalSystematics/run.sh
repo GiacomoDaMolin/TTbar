@@ -38,6 +38,8 @@ ofilename=${outdir}/$filestring"_MA.root"
 echo "ofilename $ofilename"
 
 cd $CMSSW
+eval pwd
+source  /cvmfs/cms.cern.ch/cmsset_default.sh
 eval `scram r -sh`
 export X509_USER_PROXY=$X509_USER_PROXY
 cd -
